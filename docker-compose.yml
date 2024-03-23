@@ -1,0 +1,55 @@
+###############################################################################
+#                          Generated on phpdocker.io                          #
+###############################################################################
+version: '3.1'
+services:
+    jobifull-mysql:
+        image: 'mysql:8.0'
+        working_dir: /application
+        volumes:
+            - '.:/application'
+            - './phpdocker/db_data:/var/lib/mysql'
+        environment:
+            - MYSQL_ROOT_PASSWORD=1csUvmB].xCdo_Ru_c+BN(I].
+            - MYSQL_DATABASE=jobifull_app
+            - MYSQL_USER=jobifull_app
+            - MYSQL_PASSWORD=1csUvmB].xCdo_Ru_c+BN(I].
+        ports:
+            - '8002:3306'
+
+    jobifull-phpmyadmin:
+        depends_on:
+            - jobifull-mysql
+        image: phpmyadmin
+        restart: always
+        ports:
+            - 8081:80
+        environment:
+            - PMA_HOST=mysql
+            - MYSQL_ROOT_PASSWORD=1csUvmB].xCdo_Ru_c+BN(I].
+            - PMA_ARBITRARY=1
+
+    jobifull-webserver:
+        image: 'nginx:alpine'
+        working_dir: /application
+        volumes:
+            - './public:/application'
+            - './phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf'
+        ports:
+            - '80:80'
+
+    php-fpm:
+        build: phpdocker/php-fpm
+        working_dir: /application
+        volumes:
+            - './public:/application'
+            - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini'
+
+    redis:
+        image: redis
+        container_name: jobifull-redis
+        volumes:
+            - '.:/application'
+            - './phpdocker/redis_data:/data'
+        ports:
+            - "6379:6379"

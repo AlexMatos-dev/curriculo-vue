@@ -1,0 +1,4 @@
+.idea
+.vscode
+/phpdocker/db_data
+/phpdocker/redis_data
