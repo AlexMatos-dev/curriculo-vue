@@ -1,15 +1,15 @@
 # Jobifull App Backend
 
-<h3 style="color:yellow">Start</h2>
+### Start
 
 Para Iniciar o ambiente de desenvolvimento execute o comando ``docker compose up -d``
 
 Caso o ambiente esteja sendo executado em um sistema Windows, á preciso ter o WSL2 instalado e estar com o Docker Desktop em execução.
 
-<h3 style="color:yellow">Docker</h2>
+### Docker
 As configurações de ambiente estão presentes dentro do arquivo ``docker-compose.yml`` no diretório principal.
 
-<h3 style="color:yellow">Laravel</h2>
+### Laravel
 Para definir as configurações de ambiente do Laravel, faça um cópia do arquivo ``.env.axample`` e renomeie para ``.env``
 
 Dentro das configurações do arquivo .env, definir as configurações a seguir:
@@ -27,9 +27,11 @@ Alterar DATABASE_NAME, DATABASE_USERNAME, DATABASE_PASSWORD pelas configuraçõe
 <b>ALERT:</b> <i>Ao editar o arquivo .env pela primeira vez, é preciso remove o ``#`` na frentre de alguns parâmetros.</i>
 
 #### Redis (Opcional)
+
 Definir as configurações do Redis conforme a seguir:
 
 ``REDIS_HOST=jobifull-redis``
 
 #### Dependências e Migrations
+
 Por fim, executar o ``composer install`` ou ``composer update`` para instalar as dependências do Laravel. E executar o comando ``php artisan migrate`` para executar as configurações de banco de dados.
