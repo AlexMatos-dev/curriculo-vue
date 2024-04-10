@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,7 +27,7 @@ class JobInvite extends Model
 
     public function job()
     {
-        return $this->belongsTo(JobList::class, 'job_id');
+        return $this->belongsTo(Job::class, 'job_id');
     }
 
     public function company()
