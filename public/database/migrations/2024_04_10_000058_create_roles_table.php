@@ -11,9 +11,9 @@ class CreateRolesTable extends Migration {
 			$table->bigIncrements('roles_id', true);
 			$table->integer('lroles_id')->unsigned();
 			$table->bigInteger('lrperson_id')->unsigned();
-			$table->bigInteger('lrprofes_id')->unsigned();
-			$table->bigInteger('lrcompan_id')->unsigned();
-			$table->bigInteger('lrrecrut_id')->unsigned();
+			$table->bigInteger('lrprofes_id')->unsigned()->nullable();
+			$table->bigInteger('lrcompan_id')->unsigned()->nullable();
+			$table->bigInteger('lrrecrut_id')->unsigned()->nullable();
 			$table->timestamps();
 		});
 	}

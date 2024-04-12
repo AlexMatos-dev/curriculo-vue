@@ -13,12 +13,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        if(empty(User::where('email', 'test@example.com')->get())){
+            User::factory()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'role' => 'adminstrator'
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'role' => 'adminstrator'
-        ]);
+        (new GenderSeeder())->run();
+        (new LanguageSeeder())->run();
+        (new RoleSeeder())->run();
     }
 }

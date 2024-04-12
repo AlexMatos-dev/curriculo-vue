@@ -27,6 +27,6 @@ class Payment extends Model
 
     public function person()
     {
-        return $this->belongsTo(Persons::class, 'person_id')->first();
+        return $this->belongsTo(Person::class, 'person_id')->first();
     }
 }

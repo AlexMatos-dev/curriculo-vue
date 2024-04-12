@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
-class Persons extends Model
+class Person extends Authenticatable
 {
+    use HasApiTokens, Notifiable;
+
+    protected $primaryKey = 'person_id';
     protected $table = 'persons';
     public $timestamps = true;
 

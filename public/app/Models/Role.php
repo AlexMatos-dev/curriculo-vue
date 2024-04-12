@@ -29,7 +29,7 @@ class Role extends Model
 
     public function person()
     {
-        return $this->belongsTo(Persons::class, 'lrperson_id')->first();
+        return $this->belongsTo(Person::class, 'lrperson_id')->first();
     }
 
     public function professional()
