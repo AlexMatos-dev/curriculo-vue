@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\ListLangue;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class LanguageSeeder extends Seeder
 {
@@ -19,7 +20,7 @@ class LanguageSeeder extends Seeder
         $languageArray = json_decode(file_get_contents($path), true);
         $langObj = new ListLangue();
         foreach($languageArray as $language){
-            $langName = $language['portugueseName'];
+            $langName = $language['ptLang'];
             if($langObj::where('llangue_name', $langName)->first())
                 continue;
             ListLangue::create([
