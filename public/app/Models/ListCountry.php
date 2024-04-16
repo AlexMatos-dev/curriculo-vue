@@ -15,6 +15,7 @@ class ListCountry extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'lcountry_name'
+        'lcountry_name',
+        'lcountry_acronyn'
     ];
 }

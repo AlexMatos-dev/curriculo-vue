@@ -27,6 +27,7 @@ class Company extends Model
         'company_website',
         'company_description',
         'company_number_employees',
-        'company_benefits'
+        'company_benefits',
+        'paying'
     ];
 }

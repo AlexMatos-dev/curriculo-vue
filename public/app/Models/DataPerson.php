@@ -18,7 +18,6 @@ class DataPerson extends Model
         'dpprofes_id',
         'dpdate_of_birth',
         'dpgender',
-        'dpaddress',
         'dpcity_id',
         'dpstate_id',
         'dppostal_code',

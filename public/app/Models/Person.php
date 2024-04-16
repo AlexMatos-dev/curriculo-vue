@@ -25,6 +25,12 @@ class Person extends Authenticatable
         'person_email',
         'person_password',
         'person_ddi',
-        'person_phone'
+        'person_phone',
+        'person_langue'
     ];
+
+    public function language()
+    {
+        return $this->belongsTo(ListLangue::class, 'llangue_id')->first();
+    }
 }

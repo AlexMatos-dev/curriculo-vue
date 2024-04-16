@@ -15,10 +15,20 @@ class Professional extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'person_id',
         'professional_slug',
-        'professional_name',
+        'professional_firstname',
+        'professional_lastname',
         'professional_email',
         'professional_phone',
-        'professional_photo'
+        'professional_photo',
+        'professional_cover',
+        'professional_title',
+        'paying'
     ];
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_id')->first();
+    }
 }

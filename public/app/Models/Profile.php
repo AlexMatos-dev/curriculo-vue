@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ListRole extends Model
+class Profile extends Model
 {
-    protected $table = 'list_roles';
+    protected $table = 'profiles';
     public $timestamps = true;
 
     /**
@@ -15,7 +15,12 @@ class ListRole extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'lroles_name',
-        'lroles_permissions'
+        'person_id',
+        'profile_type'
     ];
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_id')->first();
+    }
 }

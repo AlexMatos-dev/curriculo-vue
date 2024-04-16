@@ -16,7 +16,8 @@ class Recruiter extends Model
      */
     protected $fillable = [
         'company_id',
-        'recruiter_photo'
+        'recruiter_photo',
+        'paying'
     ];
 
     public function company()

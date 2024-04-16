@@ -10,6 +10,7 @@ class CreateRecruitersTable extends Migration {
 		Schema::create('recruiters', function(Blueprint $table) {
 			$table->bigIncrements('recruiter_id', true);
 			$table->bigInteger('company_id')->unsigned();
+			$table->tinyInteger('paying')->default(0);
 			$table->binary('recruiter_photo')->nullable();
 		});
 	}
