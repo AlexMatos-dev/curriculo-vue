@@ -9,11 +9,5 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    Artisan::call('migrate:fresh');
-    $e = Artisan::call('db:seed');
-
-    // $o = Artisan::call('db:seed');
-
-    // dd($e, $o);
     return view('welcome');
 });
