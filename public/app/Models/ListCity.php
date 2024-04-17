@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ListCity extends Model
 {
+    protected $primaryKey = 'lcity_id';
     protected $table = 'listcities';
     public $timestamps = true;
 

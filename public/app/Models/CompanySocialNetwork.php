@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompanySocialNetwork extends Model 
 {
+    protected $primaryKey = 'social_network_id';
     protected $table = 'companies_social_networks';
     public $timestamps = false;
 

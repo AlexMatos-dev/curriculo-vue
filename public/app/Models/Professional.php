@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Professional extends Model
 {
+    protected $primaryKey = 'professional_id';
     protected $table = 'professionals';
     public $timestamps = true;
 

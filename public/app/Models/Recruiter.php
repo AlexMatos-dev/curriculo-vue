@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recruiter extends Model
 {
+    protected $primaryKey = 'recruiter_id';
     protected $table = 'recruiters';
     public $timestamps = false;
 

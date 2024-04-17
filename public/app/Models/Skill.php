@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Skill extends Model
 {
+    protected $primaryKey = 'skill_id';
     protected $table = 'skills';
     public $timestamps = true;
 

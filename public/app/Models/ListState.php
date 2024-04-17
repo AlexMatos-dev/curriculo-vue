@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ListState extends Model
 {
+    protected $primaryKey = 'lstate_id';
     protected $table = 'liststates';
     public $timestamps = true;
 
@@ -18,7 +19,7 @@ class ListState extends Model
         'lstates_name',
         'lstates_parent_id',
         'lstates_level',
-        'lstacountry_id '
+        'lstacountry_id'
     ];
 
     public function listState()

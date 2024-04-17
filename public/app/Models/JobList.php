@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobList extends Model
 {
+    protected $primaryKey = 'job_id';
     protected $table = 'jobslist';
     public $timestamps = true;
 

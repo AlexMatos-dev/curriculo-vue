@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reference extends Model
 {
+    protected $primaryKey = 'reference_id';
     protected $table = 'references';
     public $timestamps = true;
 
