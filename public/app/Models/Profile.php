@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Profile extends Model
 {
+    const PROFESSIONAL = 'professionals';
+    const RECRUITER    = 'recruiters';
+    const COMPANY      = 'companies';
+
     protected $primaryKey = 'profile_id';
     protected $table = 'profiles';
     public $timestamps = true;
@@ -17,6 +21,7 @@ class Profile extends Model
      */
     protected $fillable = [
         'person_id',
+        'profile_type_id',
         'profile_type'
     ];
 

@@ -4,12 +4,10 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Str;
 
 class Person extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use Notifiable;
 
     protected $primaryKey = 'person_id';
     protected $table = 'persons';
@@ -27,6 +25,15 @@ class Person extends Authenticatable
         'person_ddi',
         'person_phone',
         'person_langue'
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'person_password'
     ];
 
     public function language()
