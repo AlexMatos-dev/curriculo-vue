@@ -268,10 +268,10 @@ class CreateForeignKeys extends Migration {
 	public function down()
 	{
 		Schema::table('persons', function(Blueprint $table) {
-			$table->dropForeign('persons_person_langue_llangue_id_foreign');
+			$table->dropForeign('persons_person_langue_foreign');
 		});
 		Schema::table('professionals', function(Blueprint $table) {
-			$table->dropForeign('persons_person_id_person_id_foreign');
+			$table->dropForeign('professionals_person_id_foreign');
 		});
 		Schema::table('companies', function(Blueprint $table) {
 			$table->dropForeign('companies_person_id_foreign');
@@ -289,13 +289,13 @@ class CreateForeignKeys extends Migration {
 			$table->dropForeign('jobs_applieds_professional_id_foreign');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobs_company_id_foreign');
+			$table->dropForeign('jobslist_company_id_foreign');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobs_city_id_foreign');
+			$table->dropForeign('jobslist_job_city_foreign');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobs_country_id_foreign');
+			$table->dropForeign('jobslist_job_country_foreign');
 		});
 		Schema::table('jobs_invites', function(Blueprint $table) {
 			$table->dropForeign('jobs_invites_job_id_foreign');
