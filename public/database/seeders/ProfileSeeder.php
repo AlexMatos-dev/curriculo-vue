@@ -10,6 +10,7 @@ use App\Models\Recruiter;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileSeeder extends Seeder
 {
@@ -19,21 +20,22 @@ class ProfileSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('pt_BR');
+        $defaultPassword = Hash::make('12345');
         $personData = [
             'company' => [
                 'person_username' => 'company X',
                 'person_email' => 'company@company.com',
-                'person_password' => '12345'
+                'person_password' => $defaultPassword
             ],
             'recruiter' => [
                 'person_username' => 'recruiter X',
                 'person_email' => 'recruiter@recruiter.com',
-                'person_password' => '12345'
+                'person_password' => $defaultPassword
             ],
             'professional' => [
                 'person_username' => 'professional X',
                 'person_email' => 'professional@professional.com',
-                'person_password' => '12345'
+                'person_password' => $defaultPassword
             ]
         ];
         $dataOfPerson = [
