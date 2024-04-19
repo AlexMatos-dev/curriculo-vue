@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Stichoza\GoogleTranslate\GoogleTranslate;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,8 +17,10 @@ class DatabaseSeeder extends Seeder
         //         'email' => 'root@administrator.com'
         //     ]);
         // }
+
         (new GenderSeeder())->run();
         (new LanguageSeeder())->run();
         (new CountrySeeder())->run();
+        (new ProfileSeeder())->run();
     }
 }

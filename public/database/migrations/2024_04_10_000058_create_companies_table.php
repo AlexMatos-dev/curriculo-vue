@@ -22,6 +22,7 @@ class CreateCompaniesTable extends Migration {
 			$table->string('company_description', 500)->nullable();
 			$table->integer('company_number_employees')->default('1');
 			$table->longText('company_benefits')->nullable();
+			$table->bigInteger('person_id')->unsigned();
 			$table->tinyInteger('paying')->default(0);
 			$table->timestamps();
 		});

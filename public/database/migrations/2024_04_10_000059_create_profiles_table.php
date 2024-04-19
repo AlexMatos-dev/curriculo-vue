@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('profiles', function (Blueprint $table) {
             $table->bigIncrements('profile_id', true);
             $table->bigInteger('person_id')->unsigned();
-            $table->integer('profile_type')->default(1);
+            $table->bigInteger('profile_type_id');
+            $table->string('profile_type', 20);
             $table->timestamps();
         });
     }

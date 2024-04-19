@@ -29,6 +29,12 @@ class Company extends Model
         'company_description',
         'company_number_employees',
         'company_benefits',
+        'person_id',
         'paying'
     ];
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_id')->first();
+    }
 }
