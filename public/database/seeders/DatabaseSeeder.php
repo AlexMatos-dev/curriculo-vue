@@ -11,13 +11,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {   
-        // if(empty(User::where('email', 'root@administrator.com')->get())){
-        //     User::factory()->create([
-        //         'name' => 'Root Admin',
-        //         'email' => 'root@administrator.com'
-        //     ]);
-        // }
-
         (new GenderSeeder())->run();
         (new LanguageSeeder())->run();
         (new CountrySeeder())->run();
