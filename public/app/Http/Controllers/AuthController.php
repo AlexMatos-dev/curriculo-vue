@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Models\Validator;
@@ -12,7 +13,9 @@ class AuthController extends Controller
 {
     /**
      * Get a JWT via given credentials.
-     *
+     * @param Stirng email    - required
+     * @param String password - required
+     * @param String personType (professional, recruiter or company)
      * @return \Illuminate\Http\JsonResponse
      */
     public function login()
@@ -37,7 +40,49 @@ class AuthController extends Controller
         }
         $dataToReturn = $this->respondWithToken($token)->getOriginalContent();
         $dataToReturn['lastLogin'] = $personType;
-        return $dataToReturn;
+        return response()->json(['data' => $dataToReturn]);
+    }
+
+    /**
+     * Get the authenticated User.
+     * @param String person_username - required
+     * @param String person_email - required
+     * @param String person_password - required (A uppercase and lowecase character, a number, a special character and more than 6 character length)
+     * @param String person_ddi
+     * @param String person_phone
+     * @param Int person_langue - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function register()
+    {
+        Validator::validateParameters($this->request, [
+            'person_username' => 'required|max:300',
+            'person_email' => 'required|max:200|email|unique:persons',
+            'person_password' => [
+                'min:6',              
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one digit
+                'regex:/[@$!%*#?&]/', // must contain a special character
+                'max:80'
+            ],
+            'person_ddi' => 'max:10',
+            'person_phone' => 'max:20',
+            'person_langue' => 'required|Integer'
+        ]);
+        if(!ListLangue::find(request('person_langue')))
+            return response()->json(['message' => 'invalid person language'], 400);
+        $person = Person::create([
+            'person_username' => request('person_username'),
+            'person_email' => request('person_email'),
+            'person_password' => Hash::make(request('person_password')),
+            'person_ddi' => request('person_ddi') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
+            'person_phone' => request('person_phone') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
+            'person_langue' => request('person_langue')
+        ]);
+        if(!$person)
+            return response()->json(['message' => 'person not created'], 500);
+        return response()->json(['data' => $person]);
     }
 
     /**
@@ -47,7 +92,7 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        return response()->json(auth('api')->user());
+        return response()->json(['data' => auth('api')->user()]);
     }
 
     /**
@@ -68,7 +113,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth('api')->refresh());
+        return response()->json(['data' => $this->respondWithToken(auth('api')->refresh())->getOriginalContent()]);
     }
 
     /**
