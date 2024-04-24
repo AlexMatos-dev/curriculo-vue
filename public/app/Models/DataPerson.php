@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataPerson extends Model 
 {
+    protected $primaryKey = 'dperson_id';
     protected $table = 'dataperson';
     public $timestamps = true;
 
@@ -18,7 +19,6 @@ class DataPerson extends Model
         'dpprofes_id',
         'dpdate_of_birth',
         'dpgender',
-        'dpaddress',
         'dpcity_id',
         'dpstate_id',
         'dppostal_code',

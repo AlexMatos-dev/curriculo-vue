@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recruiter extends Model
 {
+    protected $primaryKey = 'recruiter_id';
     protected $table = 'recruiters';
     public $timestamps = false;
 
@@ -16,7 +17,8 @@ class Recruiter extends Model
      */
     protected $fillable = [
         'company_id',
-        'recruiter_photo'
+        'recruiter_photo',
+        'paying'
     ];
 
     public function company()

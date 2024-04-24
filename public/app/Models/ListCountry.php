@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ListCountry extends Model
 {
+    protected $primaryKey = 'lcountry_id';
     protected $table = 'listcountries';
     public $timestamps = true;
 
@@ -15,6 +16,7 @@ class ListCountry extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'lcountry_name'
+        'lcountry_name',
+        'lcountry_acronyn'
     ];
 }

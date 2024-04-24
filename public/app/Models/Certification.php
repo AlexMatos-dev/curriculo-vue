@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Certification extends Model
 {
+    protected $primaryKey = 'certification_id';
     protected $table = 'certifications';
     public $timestamps = true;
 

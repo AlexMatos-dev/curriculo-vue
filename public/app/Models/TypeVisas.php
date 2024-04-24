@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TypeVisas extends Model
 {
+    protected $primaryKey = 'typevisas_id';
     protected $table = 'type_visas';
     public $timestamps = true;
 

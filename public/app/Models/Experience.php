@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Experience extends Model 
 {
+    protected $primaryKey = 'experience_id';
     protected $table = 'experiences';
     public $timestamps = true;
 

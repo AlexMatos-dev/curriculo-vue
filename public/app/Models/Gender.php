@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Gender extends Model
 {
+    protected $primaryKey = 'gender_id';
     protected $table = 'genders';
     public $timestamps = true;
 

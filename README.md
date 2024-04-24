@@ -34,4 +34,8 @@ Definir as configurações do Redis conforme a seguir:
 
 #### Dependências e Migrations
 
-Por fim, executar o ``composer install`` ou ``composer update`` para instalar as dependências do Laravel. E executar o comando ``php artisan migrate`` para executar as configurações de banco de dados.
+Por fim, executar o ``composer install`` ou ``composer update`` para instalar as dependências do Laravel. E executar o comando ``php artisan migrate`` para executar as configurações de banco de dados e ``php artisan db:seed`` para alimentar algumas tabelas com valores padrões.
+
+#### Configurações adicionais (opcional)
+
+Para ter acesso ao swagger da aplicação, execute os comandos a seguir em sequência ``npm install `` e após ``npm run dev`` para habilitar o acesso ao SWAGGER atráves da rota "``localhost/swagger``".

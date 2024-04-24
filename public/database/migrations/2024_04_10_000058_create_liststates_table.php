@@ -10,7 +10,7 @@ class CreateListstatesTable extends Migration {
 		Schema::create('liststates', function(Blueprint $table) {
 			$table->increments('lstates_id', true);
 			$table->string('lstates_name', 100);
-			$table->integer('lstates_parent_id')->unsigned();
+			$table->integer('lstates_parent_id')->unsigned()->nullable();
 			$table->integer('lstates_level')->default('0');
 			$table->integer('lstacountry_id')->unsigned();
 			$table->timestamps();

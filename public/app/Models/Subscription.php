@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscription extends Model
 {
+    protected $primaryKey = 'subscription_id';
     protected $table = 'subscriptions';
     public $timestamps = true;
 

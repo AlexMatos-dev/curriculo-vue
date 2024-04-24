@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobList extends Model
 {
+    protected $primaryKey = 'job_id';
     protected $table = 'jobslist';
     public $timestamps = true;
 
@@ -18,11 +19,12 @@ class JobList extends Model
     protected $fillable = [
         'company_id',
         'job_model',
-        'job_location',
         'job_city',
+        'job_country',
         'job_seniority',
         'job_salary',
         'job_description',
+        'job_skills',
         'job_english_level',
         'job_experience',
         'job_benefits'
@@ -33,4 +35,13 @@ class JobList extends Model
         return $this->belongsTo(Company::class, 'company_id')->first();
     }
 
+    public function city()
+    {
+        return $this->belongsTo(ListCity::class, 'city_id')->first();
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id')->first();
+    }
 }

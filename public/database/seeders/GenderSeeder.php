@@ -14,17 +14,17 @@ class GenderSeeder extends Seeder
     public function run(): void
     {
         $genderArray = [
-            "masculine",
-            "feminine",
-            "other",
+            ['en' => 'masculine', 'pt' => 'masculino'],
+            ['en' => 'feminine', 'pt' => 'feminino'],
+            ['en' => 'other', 'pt' => 'outro'],
         ];
         $genderObj = new Gender();
-        foreach($genderArray as $language){
-            $langName = mb_strtolower($language);
-            if($genderObj::where('gender_name', $langName)->first())
+        foreach($genderArray as $gender){
+            $genderName = mb_strtolower($gender['pt']);
+            if($genderObj::where('gender_name', $genderName)->first())
                 continue;
             Gender::create([
-                'gender_name' => $language
+                'gender_name' => $genderName
             ]);
         }
     }

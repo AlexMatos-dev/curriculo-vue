@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Language extends Model
 {
+    protected $primaryKey = 'lang_id';
     protected $table = 'languages';
     public $timestamps = true;
 

@@ -10,6 +10,7 @@ class CreateListcountriesTable extends Migration {
 		Schema::create('listcountries', function(Blueprint $table) {
 			$table->increments('lcountry_id', true);
 			$table->string('lcountry_name', 150);
+			$table->string('lcountry_acronyn')->nullable();
 			$table->timestamps();
 		});
 	}

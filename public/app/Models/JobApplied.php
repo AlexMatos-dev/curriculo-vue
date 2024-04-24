@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobApplied extends Model
 {
+    protected $primaryKey = 'applied_id';
     protected $table = 'jobs_applieds';
     public $timestamps = true;
 
@@ -26,6 +27,6 @@ class JobApplied extends Model
 
     public function job()
     {
-        return $this->belongsTo(Job::class, 'job_id');
+        return $this->belongsTo(JobList::class, 'job_id');
     }
 }
