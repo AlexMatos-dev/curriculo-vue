@@ -1,0 +1,295 @@
+openapi: 3.0.3
+info:
+  title: Swagger InfoIJobs - OpenAPI 3.0
+  description: |-
+    InfoIJobs
+
+    To send requests with custom data, use only the "Request Body"
+
+    Some useful links:
+    - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: nickolasbini@hotmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://infoijogbs/swagger
+  - url: https://infoijogbs/swagger
+  - url: http://localhost/
+tags:
+  - name: auth
+    description: Authentication routes and methods
+paths:
+  /api/login:
+    post:
+      tags:
+        - auth
+      summary: Perform login to retrieve a token
+      description: Get a JWT via given credentials
+      parameters:
+        - name: email
+          in: query
+          description: Person email
+          required: true
+          example: person@email.com
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: Person password
+          required: true
+          example: password
+          schema:
+            type: string
+        - name: personType
+          in: query
+          description: Either professional, recruiter or company | This saves the last entry login type
+          schema:
+            type: string
+      requestBody:
+        description: Perform login
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginWithSuccess'
+        '400':
+          description: Parameters missing or invalid
+          content:
+            application/json:
+              example:
+                message: invalid email
+        '401':
+          description: Invalid credentials
+          content:
+            aplication/json:
+              example: 
+                message: invalid credentials
+  /api/auth/register:
+    post:
+      tags:
+        - auth
+      summary: Creates a new person account
+      parameters:
+        - name: person_name
+          in: query
+          description: Person name
+          required: true
+          example: john
+          schema:
+            type: string
+        - name: person_email
+          in: query
+          description: Person email
+          required: true
+          example: person@email.com
+          schema:
+            type: string
+        - name: person_password
+          in: query
+          description: Person password - An uppercase and lowecase character, a number, a special character and more than 6 character length
+          required: true
+          example: myPassword
+          schema:
+            type: string
+        - name: person_langue
+          in: query
+          description: Person language
+          required: true
+          example: 1
+          schema:
+            type: integer
+        - name: person_ddi
+          in: query
+          description: Person ddi
+          schema:
+            type: string
+        - name: person_phone
+          in: query
+          description: Person phone
+          schema:
+            type: string
+      requestBody:
+        description: Perform login
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPerson'
+        required: true
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginWithSuccess'
+        '400':
+          description: Invalid sent parameters or language not found
+          content:
+            application/json:
+              examples:
+                Parameters:
+                  value:
+                    message: The person email field must be a valid email address. (dynamic response)
+                Language:
+                  value:
+                    message: language not found
+        '500':
+          description: Person not registred on server
+          content:
+            application/json:
+              example:
+                data: person not created
+  /api/auth/profile:
+    post:
+      tags:
+        - auth
+      summary: Get the authenticated User
+      parameters:
+        - in: header
+          name: X-Request-ID
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        '200':
+          description: Login successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonObject'
+        '401':
+          description: Authentication error
+          content:
+            application/json:
+              examples:
+                no token:
+                  value:
+                    message: token not provided
+                  summary: No token provided
+                invalid token:
+                  value:
+                    message: invalid token
+                  summary: Token is not valid
+components:
+  schemas:
+    Login:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+          example: person@email.com
+        password:
+          type: string
+          example: MyPassword
+        personType:
+          type: string
+          enum:
+            - professional
+            - recruiter
+            - company
+    RegisterPerson:
+      required:
+        - person_name
+        - person_email
+        - person_password
+        - person_langue
+        - person_ddi
+        - person_phone
+      type: object
+      properties:
+        person_name:
+          type: string
+          example: john
+        person_email:
+          type: string
+          example: person@email.com
+        person_password:
+          type: string
+          example: MyPassword
+        person_langue:
+          type: integer
+          example: 1
+        person_ddi:
+          type: string
+          example: 41
+        person_phone:
+          type: string
+          example: 987654321
+    LoginWithSuccess:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: XAiOiJKV1QiLCJh
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 3600
+        lastLogin:
+          type: string
+          enum:
+            - ''
+            - professional
+            - recruiter
+            - company
+    PersonObject:
+      required:
+        - test
+      type: object
+      properties:
+        person_id:
+          type: integer
+          example: 1
+        person_username:
+          type: string
+          example: john
+          maxLength: 300
+        email:
+          type: string
+          example: person@email.com
+          maxLength: 200
+          uniqueItems: true
+        password:
+          type: string
+          example: MyPassword
+          maxLength: 80
+          minimum: 6
+          pattern: /[a-z]/,/[A-Z]/,/[0-9]/,/[@$!%*#?&]/
+          description: An uppercase and lowecase character, a number, a special character and more than 6 character length
+        person_ddi:
+          type: string
+          example: '41'
+          maxLength: 10
+        person_phone:
+          type: string
+          example: '999999999'
+          maxLength: 20
+        person_langue:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'

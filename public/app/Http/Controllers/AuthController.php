@@ -28,7 +28,7 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
         $person = Person::where('person_email', $credentials['email']) ->first();
         if(!$person || !Hash::check($credentials['password'], $person->person_password))
-            return response()->json(['message' => 'unauthorized'], 401);
+            return response()->json(['message' => 'invalid credentials'], 401);
         $token = auth('api')->login($person);
         $key = "lastLoginOf--{$person->person_id}";
         $personType = '';
@@ -40,14 +40,14 @@ class AuthController extends Controller
         }
         $dataToReturn = $this->respondWithToken($token)->getOriginalContent();
         $dataToReturn['lastLogin'] = $personType;
-        return response()->json(['data' => $dataToReturn]);
+        return response()->json($dataToReturn);
     }
 
     /**
-     * Get the authenticated User.
+     * Creates a new person account.
      * @param String person_username - required
      * @param String person_email - required
-     * @param String person_password - required (A uppercase and lowecase character, a number, a special character and more than 6 character length)
+     * @param String person_password - required (An uppercase and lowecase character, a number, a special character and more than 6 character length)
      * @param String person_ddi
      * @param String person_phone
      * @param Int person_langue - required
@@ -82,7 +82,7 @@ class AuthController extends Controller
         ]);
         if(!$person)
             return response()->json(['message' => 'person not created'], 500);
-        return response()->json(['data' => $person]);
+        return response()->json($person);
     }
 
     /**
@@ -92,7 +92,7 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        return response()->json(['data' => auth('api')->user()]);
+        return response()->json(auth('api')->user());
     }
 
     /**
@@ -113,7 +113,7 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return response()->json(['data' => $this->respondWithToken(auth('api')->refresh())->getOriginalContent()]);
+        return response()->json($this->respondWithToken(auth('api')->refresh())->getOriginalContent());
     }
 
     /**
