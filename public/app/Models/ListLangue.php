@@ -18,4 +18,21 @@ class ListLangue extends Model
     protected $fillable = [
         'llangue_name'
     ];
+
+    /**
+     * Get the language ISO code from file
+     * @return String
+     */
+    public function getIsoCode()
+    {
+        $path = storage_path('app/dbSourceFiles/languages.json');
+        if(!file_exists($path))
+            return '';
+        $data = json_decode(file_get_contents($path), true);
+        foreach($data as $langue){
+            if($langue['ptLang'] == $this->llangue_name)
+                return $langue['code'];
+        }
+        return '';
+    }
 }

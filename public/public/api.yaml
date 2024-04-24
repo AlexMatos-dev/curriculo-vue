@@ -4,7 +4,8 @@ info:
   description: |-
     InfoIJobs
 
-    To send requests with custom data, use only the "Request Body"
+    To send requests with custom data, use only the "Request Body" but beware, the swagger behaves strangely on execute and possible will not request correctly.
+    Check the parameters and schemas as reference, DO NOT try to use the swagger to create new data
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
@@ -158,10 +159,11 @@ paths:
       summary: Get the authenticated User
       parameters:
         - in: header
-          name: X-Request-ID
+          name: Bearer
           schema:
             type: string
             format: uuid
+            example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJI
           required: true
       responses:
         '200':
@@ -183,6 +185,88 @@ paths:
                   value:
                     message: invalid token
                   summary: Token is not valid
+
+  /api/requestchangepassword:
+    post:
+      tags:
+        - auth
+      summary: Request a change password code which will be sent to logged Person email
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailToReceiveEmail@email.com
+          required: true
+      responses:
+        '200':
+          description: Email containing password change code sent
+          content:
+            application/json:
+              example: {"message": "email sent"}
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "email not sent"}
+  /api/changepassword:
+    post:
+      tags:
+        - auth
+      summary: Changes logged Person password. Code will only be usable once
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+          required: true
+        - name: code
+          in: query
+          description: The received code at email
+          required: true
+          example: 123456
+          schema:
+            type: string
+        - name: newPassword
+          in: query
+          description: Person new password
+          required: true
+          example: Password1@
+          schema:
+            type: string
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person password was updated
+          content:
+            application/json:
+              example: {"message": "password updated"}
+        '400':
+          description: Save error
+          content:
+            application/json:
+              examples: 
+                invalid code:
+                  value:
+                    message: invalid code
+                  summary: Code is invalid
+                invalid password:
+                  value:
+                    message: invalid password
+                  summary: The password does not match requirements (An uppercase and lowecase character, a number, a special character and more than 6 character length)
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "password not saved"}  
+                  
 components:
   schemas:
     Login:
@@ -250,6 +334,20 @@ components:
             - professional
             - recruiter
             - company
+    ChangePassword:
+      required:
+        - code
+        - newPassword
+      type: object
+      properties:
+        code:
+          type: string
+          example: person@email.com
+        newPassword:
+          type: string
+          example: Password1@
+          pattern: /[a-z]/,/[A-Z]/,/[0-9]/,/[@$!%*#?&]/
+          description: An uppercase and lowecase character, a number, a special character and more than 6 character length
     PersonObject:
       required:
         - test
@@ -291,3 +389,11 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    
+  
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
