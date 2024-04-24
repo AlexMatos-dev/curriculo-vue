@@ -99,7 +99,7 @@ class Person extends Authenticatable implements JWTSubject
             'languageIso' => $languageISO
         ]);
         $emailObj = new \App\Helpers\Mail();
-        $resultOfEmailSend = $emailObj->sendMail(auth('api')->user()->person_email, TranslatorHandler::translate('Your password change code!', $languageISO), $renderedEmail);
+        $resultOfEmailSend = $emailObj->sendMail($this->person_email, TranslatorHandler::translate('Your password change code!', $languageISO), $renderedEmail);
         if(!$resultOfEmailSend['success'])
             return false;
         Cache::put("resetPasswordCode--{$this->person_id}", "$code", 1800);

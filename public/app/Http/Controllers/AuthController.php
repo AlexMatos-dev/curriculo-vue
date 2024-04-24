@@ -114,12 +114,19 @@ class AuthController extends Controller
     }
 
     /**
-     * Request a change password code which will be sent to logged Person email
+     * Request a change password code which will be sent to informed Person email
+     * @param String email - required
      * @return \Illuminate\Http\JsonResponse
      */
     public function requestChangePasswordCode()
     {
-        if(!auth('api')->user()->sendRequestChangePasswordCodeEmail())
+        Validator::validateParameters($this->request, [
+            'email' => 'email|required'
+        ]);
+        $person = Person::where('person_email', request('email'))->first();
+        if(!$person)
+            return response()->json(['message' => 'invalid email'], 400);
+        if(!$person->sendRequestChangePasswordCodeEmail())
             return response()->json(['message' => 'email not sent'], 500);
         return response()->json(['message' => 'email sent'], 200);
     }
@@ -129,15 +136,19 @@ class AuthController extends Controller
      * Obs: Code will only be usable once
      * @param String code - required
      * @param String newPassword - required (An uppercase and lowecase character, a number, a special character and more than 6 character length)
+     * @param String email - required
      * @return \Illuminate\Http\JsonResponse
      */
     public function changePassword()
     {
         Validator::validateParameters($this->request, [
             'code' => 'required',
-            'newPassword' => Validator::getPersonPasswordRule()
+            'newPassword' => Validator::getPersonPasswordRule(),
+            'email' => 'email|required'
         ]);
-        $person = auth('api')->user();
+        $person = Person::where('person_email', request('email'))->first();
+        if(!$person)
+            return response()->json(['message' => 'invalid email'], 400);
         if(Hash::check(request('newPassword'), $person->person_password))
             return response()->json(['message' => 'invalid password'], 400);
         $cache = Cache::get('resetPasswordCode--'.$person->person_id);

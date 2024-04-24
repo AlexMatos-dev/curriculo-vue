@@ -186,18 +186,17 @@ paths:
                     message: invalid token
                   summary: Token is not valid
 
-  /api/auth/requestchangepassword:
+  /api/requestchangepassword:
     post:
       tags:
         - auth
       summary: Request a change password code which will be sent to logged Person email
       parameters:
-        - in: header
-          name: Bearer
+        - in: query
+          name: email
           schema:
             type: string
-            format: uuid
-            example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJI
+            example: emailToReceiveEmail@email.com
           required: true
       responses:
         '200':
@@ -210,18 +209,17 @@ paths:
           content:
             application/json:
               example: {"message": "email not sent"}
-  /api/auth/changepassword:
+  /api/changepassword:
     post:
       tags:
         - auth
       summary: Changes logged Person password. Code will only be usable once
       parameters:
-        - in: header
-          name: Bearer
+        - in: query
+          name: email
           schema:
             type: string
-            format: uuid
-            example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJI
+            example: emailOfPerson@email.com
           required: true
         - name: code
           in: query
