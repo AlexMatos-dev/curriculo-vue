@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Mail;
+use App\Helpers\TranslatorHandler;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
-use App\Models\Validator;
+use App\Helpers\Validator;
 use Illuminate\Support\Facades\Hash;
+
+use function Termwind\render;
 
 class AuthController extends Controller
 {
@@ -58,14 +62,7 @@ class AuthController extends Controller
         Validator::validateParameters($this->request, [
             'person_username' => 'required|max:300',
             'person_email' => 'required|max:200|email|unique:persons',
-            'person_password' => [
-                'min:6',              
-                'regex:/[a-z]/',      // must contain at least one lowercase letter
-                'regex:/[A-Z]/',      // must contain at least one uppercase letter
-                'regex:/[0-9]/',      // must contain at least one digit
-                'regex:/[@$!%*#?&]/', // must contain a special character
-                'max:80'
-            ],
+            'person_password' => Validator::getPersonPasswordRule(),
             'person_ddi' => 'max:10',
             'person_phone' => 'max:20',
             'person_langue' => 'required|Integer'
@@ -114,6 +111,43 @@ class AuthController extends Controller
     public function refresh()
     {
         return response()->json($this->respondWithToken(auth('api')->refresh())->getOriginalContent());
+    }
+
+    /**
+     * Request a change password code which will be sent to logged Person email
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function requestChangePasswordCode()
+    {
+        if(!auth('api')->user()->sendRequestChangePasswordCodeEmail())
+            return response()->json(['message' => 'email not sent'], 500);
+        return response()->json(['message' => 'email sent'], 200);
+    }
+
+    /**
+     * Changes logged Person password. 
+     * Obs: Code will only be usable once
+     * @param String code - required
+     * @param String newPassword - required (An uppercase and lowecase character, a number, a special character and more than 6 character length)
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changePassword()
+    {
+        Validator::validateParameters($this->request, [
+            'code' => 'required',
+            'newPassword' => Validator::getPersonPasswordRule()
+        ]);
+        $person = auth('api')->user();
+        if(Hash::check(request('newPassword'), $person->person_password))
+            return response()->json(['message' => 'invalid password'], 400);
+        $cache = Cache::get('resetPasswordCode--'.$person->person_id);
+        if($cache != request('code'))
+            return response()->json(['message' => 'invalid code'], 400);
+        $person->person_password = Hash::make(request('newPassword'));
+        if(!$person->save())
+            return response()->json(['message' => 'password not saved'], 500);
+        Cache::forget('resetPasswordCode--'.$person->person_id);
+        return response()->json(['message' => 'password updated'], 200);
     }
 
     /**
