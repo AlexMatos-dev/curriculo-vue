@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataPerson extends Model 
 {
-    protected $primaryKey = 'dperson_id';
+    protected $primaryKey = 'dpperson_id';
     protected $table = 'dataperson';
     public $timestamps = true;
 
@@ -50,4 +50,20 @@ class DataPerson extends Model
         return $this->belongsTo(ListCountry::class, 'dpcountry_id')->first();
     }
 
+    /**
+     * Creates or Updates $this DataPerson by sent data
+     * @param Array - Schema [$attrName => $attrValue]
+     * @return Profession|False
+     */
+    public function saveDataPerson($data = [])
+    {
+        $myAttributes = $this->fillable;
+        foreach($data as $attr => $value){
+            if(in_array($attr, $myAttributes))
+                $this->{$attr} = $value;
+        }
+        if(!$this->save())
+            return false;
+        return $this;
+    }
 }
