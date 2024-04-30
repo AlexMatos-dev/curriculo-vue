@@ -5,12 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\JobList;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class JobListController extends Controller
 {
     public function index(Request $request)
     {
         $query = JobList::query();
+
+        if ($request->has("job_model"))
+        {
+            $query->where("job_model", $request->job_model);
+        }
 
         if ($request->has("job_country"))
         {
@@ -29,12 +35,12 @@ class JobListController extends Controller
 
         if ($request->has("job_salary_start"))
         {
-            $query->where("job_salary", ">", $request->job_salary_start);
+            $query->where("job_salary", ">=", $request->job_salary_start);
         }
 
         if ($request->has("job_salary_end"))
         {
-            $query->where("job_salary", "<", $request->job_salary_end);
+            $query->where("job_salary", "<=", $request->job_salary_end);
         }
 
         if ($request->has("job_skills"))
@@ -77,16 +83,21 @@ class JobListController extends Controller
     {
         try
         {
-            // Validator::validateParameters($this->request, [
-            //     "company_id"        => "require|Integer",
-            //     "job_model"         => "require|min:5|max:300",
-            //     "job_country"       => "require|Integer",
-            //     "job_city"          => "require|Integer",
-            //     "job_seniority"     => "require|min:5|max:100",
-            //     "job_description"   => "require|min:10|max:500",
-            //     "job_english_level" => "max:100",
-            //     "job_experience"    => "max:100",
-            // ]);
+            $validator = Validator::make($request->all(), [
+                "company_id"        => "required|integer",
+                "job_model"         => "required|min:5|max:300",
+                "job_country"       => "required|integer",
+                "job_city"          => "required|integer",
+                "job_seniority"     => "required|min:5|max:100",
+                "job_description"   => "required|min:10|max:500",
+                "job_english_level" => "nullable|max:100",
+                "job_experience"    => "nullable|max:100",
+            ]);
+
+            if ($validator->fails())
+            {
+                return response()->json(["message" => "Validation failed", "Errors" => $validator->errors()], 400);
+            }
 
             JobList::create($request->all());
 
