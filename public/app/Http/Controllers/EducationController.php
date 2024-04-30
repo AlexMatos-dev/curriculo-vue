@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Curriculum;
 use App\Models\Education;
 use Illuminate\Http\Request;
 
 class EducationController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get all experiences by curriculum_id.
+     * @param Int curriculum_id   - required
+     * @param Int per_page
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-       return Education::all();
+        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
+
+        $education = Education::where('edcurriculum_id',$curriculum->curriculum_id );
+        $education = $education->paginate($request->per_page);
+
+        return response()->json($education);
     }
 
     /**
@@ -28,7 +37,19 @@ class EducationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'edcurriculum_id'   => 'required',
+            'eddegree'          => 'required',
+            'edfield_of_study'  => 'required',
+            'edinstitution'     => 'required',
+            'edstart_date'      => 'required',
+            'edend_date'        => 'required',
+            'eddescription'     => 'required'
+        ]);
+
+        $education = Education::create($request->all());
+
+        return response()->json($education);
     }
 
     /**
@@ -36,7 +57,7 @@ class EducationController extends Controller
      */
     public function show(Education $education)
     {
-        //
+        return response()->json($education);
     }
 
     /**
@@ -64,13 +85,15 @@ class EducationController extends Controller
 
         $education->update($request->all());
 
-        return $education;    }
+        return response()->json($education);
+    }
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Education $education)
     {
-        //
+        $education->delete();
+        return response()->json($education);
     }
 }

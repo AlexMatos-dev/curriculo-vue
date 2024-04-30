@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Curriculum;
 use App\Models\Experience;
 use Illuminate\Http\Request;
 
 class ExperienceController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get all experiences by curriculum_id.
+     * @param Int curriculum_id   - required
+     * @param Int per_page
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-       return Experience::all();
+
+        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
+
+        $experience = Experience::where('excurriculum_id',$curriculum->curriculum_id );
+        $experience =  $experience->paginate($request->pere_page);
+
+        return response()->json($experience);
     }
 
     /**
@@ -24,11 +34,27 @@ class ExperienceController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new Experience in storage.
+     * @param String exjob_title - required
+     * @param String excompany_name - required
+     * @param Date exstart_date - required
+     * @param Data exend_date - required
+     * @param String exdescription - required
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'exjob_title'       =>'required',
+            'excompany_name'    =>'required',
+            'exstart_date'      =>'required',
+            'exend_date'        =>'required',
+            'exdescription'     =>'required'
+        ]);
+
+        $experience = Experience::create($request->all());
+
+        return response()->json($experience);
+
     }
 
     /**
@@ -36,7 +62,7 @@ class ExperienceController extends Controller
      */
     public function show(Experience $experience)
     {
-        //
+        return response()->json($experience);
     }
 
     /**
@@ -66,10 +92,12 @@ class ExperienceController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified experience from storage.
      */
     public function destroy(Experience $experience)
     {
-        //
+        $experience->delete();
+
+        return response()->json($experience);
     }
 }
