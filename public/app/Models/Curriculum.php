@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Curriculum extends Model 
 {
+    const TYPE_FILE = 'file';
+    const TYPE_INFO = 'info';
+
     protected $primaryKey = 'curriculum_id';
     protected $table = 'curriculums';
     public $timestamps = true;
@@ -17,7 +20,9 @@ class Curriculum extends Model
      */
     protected $fillable = [
         'cprofes_id',
-        'clengua_id'
+        'clengua_id',
+        'curriculum_type',
+        'curriculum_file'
     ];
 
     public function professional()

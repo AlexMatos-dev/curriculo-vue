@@ -16,6 +16,7 @@ class ListLangue extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'llangue_name'
+        'llangue_name',
+        'llangue_acronyn'
     ];
 }

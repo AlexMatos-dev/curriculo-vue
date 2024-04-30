@@ -4,7 +4,8 @@ info:
   description: |-
     InfoIJobs
 
-    To send requests with custom data, use only the "Request Body"
+    To send requests with custom data, use only the "Request Body" but beware, the swagger behaves strangely on execute and possible will not request correctly.
+    Check the parameters and schemas as reference, DO NOT try to use the swagger to create new data
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
@@ -23,6 +24,14 @@ servers:
 tags:
   - name: auth
     description: Authentication routes and methods
+  - name: person
+    description: Person routes and methods
+  - name: professional
+    description: Professional routes and methods
+  - name: company
+    description: Company routes and methods
+  - name: recruiter
+    description: Recruiter routes and methods
 paths:
   /api/login:
     post:
@@ -158,10 +167,11 @@ paths:
       summary: Get the authenticated User
       parameters:
         - in: header
-          name: X-Request-ID
+          name: Bearer
           schema:
             type: string
             format: uuid
+            example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJI
           required: true
       responses:
         '200':
@@ -183,6 +193,549 @@ paths:
                   value:
                     message: invalid token
                   summary: Token is not valid
+
+  /api/requestchangepassword:
+    post:
+      tags:
+        - auth
+      summary: Request a change password code which will be sent to logged Person email
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailToReceiveEmail@email.com
+          required: true
+      responses:
+        '200':
+          description: Email containing password change code sent
+          content:
+            application/json:
+              example: {"message": "email sent"}
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "email not sent"}
+  /api/changepassword:
+    post:
+      tags:
+        - auth
+      summary: Changes logged Person password. Code will only be usable once
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+          required: true
+        - name: code
+          in: query
+          description: The received code at email
+          required: true
+          example: 123456
+          schema:
+            type: string
+        - name: newPassword
+          in: query
+          description: Person new password
+          required: true
+          example: Password1@
+          schema:
+            type: string
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person password was updated
+          content:
+            application/json:
+              example: {"message": "password updated"}
+        '400':
+          description: Save error
+          content:
+            application/json:
+              examples: 
+                invalid code:
+                  value:
+                    message: invalid code
+                  summary: Code is invalid
+                invalid password:
+                  value:
+                    message: invalid password
+                  summary: The password does not match requirements (An uppercase and lowecase character, a number, a special character and more than 6 character length)
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "password not saved"}
+              
+  /api/person/update:
+    post:
+      tags:
+        - person
+      summary: Updates logged person account
+      parameters:
+        - in: query
+          name: person_email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+        - name: person_username
+          in: query
+          description: Person user name
+          example: john
+          schema:
+            type: string
+        - name: person_ddi
+          in: query
+          description: Person DDI code
+          example: +55
+          schema:
+            type: string
+        - name: person_phone
+          in: query
+          description: Person Phone
+          example: 41981716151
+          schema:
+            type: string
+        - name: person_langue
+          in: query
+          description: Language from ListLanguages
+          example: 1
+          schema:
+            type: integer
+        
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonObject'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid parameters:
+                  value:
+                    message: invalid email
+                  summary: The person email field must be a valid email address. (dynamic response)
+                invalid email:
+                  value:
+                    message: invalid email
+                  summary: Email in use
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "person not updated"}
+              
+  /api/professional/update:
+    post:
+      tags:
+        - professional
+      summary: Updates logged person Professional account
+      parameters:
+        - in: query
+          name: professional_email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+        - name: professional_firstname
+          in: query
+          description: Professional first name
+          example: john
+          schema:
+            type: string
+        - name: professional_lastname
+          in: query
+          description: Professional last name
+          example: john
+          schema:
+            type: string
+        - name: professional_title
+          in: query
+          description: Professional title
+          example: +55
+          schema:
+            type: string
+        - name: professional_phone
+          in: query
+          description: Person Phone
+          example: 41981716151
+          schema:
+            type: string
+        - name: professional_photo
+          in: query
+          description: Professional profile photo - 2MB size allowed!
+          example: base64image
+          schema:
+            type: string
+        - name: professional_cover
+          in: query
+          description: Professional cover photo - 2MB size allowed!
+          example: base64image
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonObject'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+                
+        '500':
+          description: Save error
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                professional not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+  /api/professional/updateprofessionalperson:
+    post:
+      tags:
+        - professional
+      summary: Updates logged person DataPerson account
+      parameters:
+        - in: query
+          name: dpdate_of_birth
+          schema:
+            type: string
+            example: 2024-01-01
+            description: Professional date of birth
+        - name: dpgender
+          in: query
+          description: Gender id
+          example: 1
+          schema:
+            type: string
+        - name: dpcity_id
+          in: query
+          description: City id  - must belong to sent state id
+          example: 1
+          schema:
+            type: string
+        - name: dpstate_id
+          in: query
+          description: State id - must belong to sent country id
+          example: 1
+          schema:
+            type: string
+        - name: dppostal_code
+          in: query
+          description: Post code
+          example: 70213241
+          schema:
+            type: string
+        - name: dpcountry_id
+          in: query
+          description: Country id
+          example: 1
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPersonObject'
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                data person not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+        '500':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+              
+  /api/company/update:
+    post:
+      tags:
+        - company
+      summary: Updates logged person Company account
+      parameters:
+        - in: query
+          name: company_register_number
+          schema:
+            type: string
+            example: 42.827.028/0001-47
+            description: Company's licence number
+        - name: company_name
+          in: query
+          description: Name of the company
+          example: TimbersWood Unlimited
+          schema:
+            type: string
+        - name: company_logo
+          in: query
+          description: Logo photo of company
+          example: base64Image-51515
+          schema:
+            type: string
+        - name: company_cover_photo
+          in: query
+          description: Cover photo of company
+          example: base64Image-51515
+          schema:
+            type: string
+        - name: company_type
+          in: query
+          description: Company type - undefined, must check
+          example: timber & wood crafts
+          schema:
+            type: string
+        - name: company_video
+          in: query
+          description: The company video
+          example: https://timbercompany.com/presentationvideo
+          schema:
+            type: string
+        - name: company_email
+          in: query
+          description: The company's email
+          example: company@company.com
+          schema:
+            type: string
+        - name: company_phone
+          in: query
+          description: The company's phone
+          example: +554198765432
+          schema:
+            type: string
+        - name: company_website
+          in: query
+          description: Website of company
+          example: https://timbercompany.com
+          schema:
+            type: string
+        - name: company_description
+          in: query
+          description: Description of the company
+          example: A timber type company
+          schema:
+            type: string
+        - name: company_number_employees
+          in: query
+          description: The number of workers
+          example: 11
+          schema:
+            type: integer
+        - name: company_benefits
+          in: query
+          description: Text field for company benefits
+          example: Many advantages such as...
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPersonObject'
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                data person not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+        '500':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+  /api/company/manageadmin:
+    post:
+      tags:
+        - company
+      summary: Manages company admins, this method can ADD a new admin, REMOVE a current admin, GRANT privilegies and REVOKE privilegies of an admin. Only admins with privilegies can access!
+      parameters:
+        - in: query
+          name: action
+          description: Either "add", "remove", "grant" or "revoke"
+          schema:
+            type: string
+            example: add
+        - name: person_id
+          in: query
+          description: Person id to receive the action
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action sent is not valid
+                person is invalid:
+                  value:
+                    message: person is invalid
+                  summary: The perfon id is invalid
+        '500':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                company not found:
+                  value:
+                    message: company not found
+                  summary: The company of logged person was not found
+                action not performed:
+                  value:
+                    message: action not completed with success
+                  summary: A problem occurred while performing the action
+                no privilegies:
+                  value:
+                    message: you have no privilegies
+                  summary: Logged person is not an admin or not an admin with privilegies
+  /api/company/managerecruiter:
+    post:
+      tags:
+        - company
+      summary: Manages company recruiters, this method can ADD a new recruiter or REMOVE a current recruit. Only admins with privilegies can access!
+      parameters:
+        - in: query
+          name: action
+          description: Either "add", "remove"
+          schema:
+            type: string
+            example: add
+        - name: person_id
+          in: query
+          description: Person id to receive the action
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action sent is not valid
+                person is invalid:
+                  value:
+                    message: person is invalid
+                  summary: The perfon id is invalid
+        '500':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                company not found:
+                  value:
+                    message: company not found
+                  summary: The company of logged person was not found
+                action not performed:
+                  value:
+                    message: action not completed with success
+                  summary: A problem occurred while performing the action   
+                no privilegies:
+                  value:
+                    message: you have no privilegies
+                  summary: Logged person is not an admin or not an admin with privilegies
+  
+  /api/recruiter/update:
+    post:
+      tags:
+        - recruiter
+      summary: Updates logged person Recruiter account
+      parameters:
+        - in: query
+          name: recruiter_photo
+          schema:
+            type: string
+            example: base64Image-41415151
+            description: Recruiter photo
+      responses:
+        '200':
+          description: Recruiter data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterObject'
+        '400':
+          description: Save error or recruiter not found
+          content:
+            application/json:
+              examples: 
+                no recruiter found:
+                  value:
+                    message: No recruiter was found
+                  summary: The recruiter was not created
+                invalid parameters:
+                  value:
+                    message: invalid image
+                  summary: Invalid image
+        '500':
+          description: recruiter not updated
+          content:
+            application/json:
+              example: {"message": "recruiter not updated"}
+  
+                  
 components:
   schemas:
     Login:
@@ -250,6 +803,20 @@ components:
             - professional
             - recruiter
             - company
+    ChangePassword:
+      required:
+        - code
+        - newPassword
+      type: object
+      properties:
+        code:
+          type: string
+          example: person@email.com
+        newPassword:
+          type: string
+          example: Password1@
+          pattern: /[a-z]/,/[A-Z]/,/[0-9]/,/[@$!%*#?&]/
+          description: An uppercase and lowecase character, a number, a special character and more than 6 character length
     PersonObject:
       required:
         - test
@@ -291,3 +858,174 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    ProfessionalObject:
+      required:
+        - test
+      type: object
+      properties:
+        professional_id:
+          type: integer
+          example: 1
+        professional_slug:
+          type: string
+          example: john-woodgate-123141
+        professional_email:
+          type: string
+          example: person@email.com
+          maxLength: 200
+          uniqueItems: true
+        professional_firstname:
+          type: string
+          example: John
+          description: First name of professional
+        professional_lastname:
+          type: string
+          example: Wooddgate
+          description: Last name of professional
+        professional_phone:
+          type: string
+          example: '999999999'
+          maxLength: 20
+        professional_title:
+          type: integer
+          example: 1
+        person_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    DataPersonObject:
+      required:
+        - test
+      type: object
+      properties:
+        dpperson_id:
+          type: integer
+          example: 1
+        dpdate_of_birth:
+          type: string
+          example: 2024-01-01
+        dpgender:
+          type: integer
+          example: 1
+        dpcity_id:
+          type: integer
+          example: 1
+        dpstate_id:
+          type: integer
+          example: 1
+        dppostal_code:
+          type: string
+          example: '83700333'
+        dpcountry_id:
+          type: integer
+          example: 1
+        dpprofes_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    CompanyObject:
+      required:
+        - test
+      type: object
+      properties:
+        company_id:
+          type: integer
+          example: 1
+        company_slug:
+          type: string
+          example: 2024-01-01
+        company_register_number:
+          type: integer
+          example: 1
+        company_name:
+          type: integer
+          example: 1
+        company_type:
+          type: integer
+          example: 1
+        company_logo:
+          type: string
+          example: '83700333'
+        company_cover_photo:
+          type: integer
+          example: 1
+        company_video:
+          type: integer
+          example: 1
+        company_phone:
+          type: integer
+          example: 1
+        company_website:
+          type: integer
+          example: 1
+        company_description:
+          type: integer
+          example: 1
+        company_number_employees:
+          type: integer
+          example: 1
+        company_benefits:
+          type: integer
+          example: 1
+        paying:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    RecruiterObject:
+      required:
+        - test
+      type: object
+      properties:
+        recruiter_id:
+          type: integer
+          example: 1
+        company_id:
+          type: integer
+          example: 1
+        paying:
+          type: integer
+          example: 1
+        recruiter_photo:
+          type: string
+          example: base64Image OR null
+        person_id:
+          type: integer
+          example: 1
+        profile_id:
+          type: integer
+          example: 1
+        profile_type_id:
+          type: integer
+          example: 1
+        profile_type:
+          type: string
+          example: recruiters
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    
+  
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      
