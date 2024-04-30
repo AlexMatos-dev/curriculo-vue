@@ -14,8 +14,9 @@ class CurriculumSeeder extends Seeder
     public function run(): void
     {
         Curriculum::create([
-            'cprofes_id' => 1,
-            'clengua_id' => 131
+            'cprofes_id' => 2,
+            'clengua_id' => 1,
+            'curriculum_type'=>'teste',
         ]);
     }
 }

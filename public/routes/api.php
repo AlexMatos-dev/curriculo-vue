@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
+use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
@@ -21,6 +23,8 @@ Route::prefix('auth')->middleware('authenticate')->group(function(){
 Route::prefix('curriculum')->middleware('authenticate')->group(function(){
   Route::resource('experience',ExperienceController::class);
   Route::resource('education',EducationController::class);
+  Route::resource('certification',CertificationController::class);
+  Route::resource('reference',ReferenceController::class);
 });
 
 Route::prefix('person')->middleware('authenticate')->group(function(){
