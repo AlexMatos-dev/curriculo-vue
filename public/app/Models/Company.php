@@ -152,4 +152,74 @@ class Company extends Model
     {
         return CompanyAdmin::where('company_id', $this->company_id)->get();
     }
+
+    /**
+     * Add a recruiter to $this company
+     * @param Int person_id
+     * @return Bool
+     */
+    public function addRecruiter($person_id = null)
+    {
+        if(!$person_id)
+            return false;
+        $recruiter = $this->isMyRecruiter($person_id, true);
+        if($recruiter)
+            return true;
+        $recruiterResult = Recruiter::create([
+            'company_id' => $this->company_id,
+            'person_id' => $person_id
+        ]);
+        if(!$recruiterResult)
+            return false;
+        $profileResult = Profile::create([
+            'person_id' => $person_id,
+            'profile_type_id' => $recruiterResult->recruiter_id,
+            'profile_type' => Profile::RECRUITER
+        ]);
+        if(!$profileResult){
+            $recruiterResult->delete();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Removes an recruiter to $this company
+     * @param Int person_id
+     * @return Bool
+     */
+    public function removeRecruiter($person_id = null)
+    {
+        $recruiter = $this->isMyRecruiter($person_id, true);
+        if(!$recruiter)
+            return true;
+        if(!Profile::where('profile_type_id', $recruiter->recruiter_id)->where('profile_type', Profile::RECRUITER)->delete())
+            return false;
+        return $recruiter->delete();
+    }
+
+    /**
+     * Verifies if person_id (RECRUITER) belongs to $this company recruiters
+     * @param Int person_id
+     * @param Bool fetchObject
+     * @return Bool|Recruiter - If fetchObject == true
+     */
+    public function isMyRecruiter($person_id = null, $fetchObject = false)
+    {
+        $recruiters = $this->getRecruiters();
+        foreach($recruiters as $recruiter){
+            if($recruiter->person_id == $person_id && $recruiter->company_id == $this->company_id)
+                return $fetchObject ? $recruiter : true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns an array with all recruiter of $this company
+     * @return ArrayOfRecruiters
+     */
+    public function getRecruiters()
+    {
+        return Recruiter::where('company_id', $this->company_id)->get();
+    }
 }

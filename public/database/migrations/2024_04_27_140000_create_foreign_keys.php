@@ -24,6 +24,11 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('recruiters', function(Blueprint $table) {
+			$table->foreign('person_id')->references('person_id')->on('persons')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('recruiters', function(Blueprint $table) {
 			$table->foreign('company_id')->references('company_id')->on('companies')
 						->onDelete('restrict')
 						->onUpdate('restrict');
@@ -315,6 +320,9 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('companies_social_networks', function(Blueprint $table) {
 			$table->dropForeign('companies_social_networks_company_id_foreign');
+		});
+		Schema::table('recruiters', function(Blueprint $table) {
+			$table->dropForeign('recruiters_person_id_foreign');
 		});
 		Schema::table('recruiters', function(Blueprint $table) {
 			$table->dropForeign('recruiters_company_id_foreign');

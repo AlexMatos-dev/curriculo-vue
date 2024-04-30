@@ -81,8 +81,7 @@ class ProfessionalController extends Controller
                 return response()->json(['message' => 'professional not updated'], 500);
             }
         }
-        $message = $newProfessional ? 'professional created' : 'professional update';
-        return response()->json(['message' => $message, 'data' => $professional]);
+        return response()->json($professional);
     }
 
     /**
@@ -133,7 +132,6 @@ class ProfessionalController extends Controller
         }
         if(!$dataPerson->saveDataPerson($data))
             return response()->json(['message' => 'data person not updated', 400]);
-        $message = $newDataPerson ? 'data person created' : 'data person update';
-        return response()->json(['message' => $message, 'data' => $dataPerson]);
+        return response()->json($dataPerson);
     }
 }

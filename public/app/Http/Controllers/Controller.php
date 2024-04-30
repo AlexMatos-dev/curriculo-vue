@@ -11,4 +11,12 @@ class Controller
     {
         $this->request = $requestObj;
     }
+
+    public function getCompanyBySession()
+    {
+        $companyObj = Session()->get('company');
+        if(!$companyObj)
+            return false;
+        return $companyObj;
+    }
 }

@@ -6,19 +6,21 @@ use App\Helpers\Validator;
 use App\Models\Company;
 use App\Models\Person;
 use App\Models\Profile;
-use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
     /**
-     * Updates logged person Professional account.
-     * @param String professional_firstname - required
-     * @param String professional_lastname - required
-     * @param String professional_email - required
-     * @param String professional_phone
-     * @param String professional_title
-     * @param String professional_photo
-     * @param String professional_cover
+     * Updates logged person Company account.
+     * @param String company_register_number - required
+     * @param String company_name - required
+     * @param String company_type - required
+     * @param String company_video
+     * @param String company_email
+     * @param String company_phone
+     * @param String company_website
+     * @param String company_description
+     * @param String company_number_employees
+     * @param String company_benefits
      * @return \Illuminate\Http\JsonResponse
      */
     public function update()
@@ -88,8 +90,7 @@ class CompanyController extends Controller
             }
             $company->syncAdmins($person->person_id, true);
         }
-        $message = $newCompany ? 'company created' : 'company update';
-        return response()->json(['message' => $message, 'data' => $company]);
+        return response()->json($company);
     }
 
     /**
@@ -105,15 +106,10 @@ class CompanyController extends Controller
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
         $person = auth('api')->user();
-        $company = $person->getProfile(Profile::COMPANY);
-        if(!$company)
-            return response()->json(['message' => 'company not found'], 500);
-        if(!$company->isAdminWithPrivilegies($person->person_id))
-            return response()->json(['message' => 'you have no privilegies'], 500);
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(!$targetPerson || $person->person_id == $targetPerson->person_id)
             return response()->json(['message' => 'person is invalid'], 400);
-        $result = false;
         switch(request('action')){
             case 'add':
                 $result = $company->syncAdmins(request('person_id'));
@@ -126,6 +122,36 @@ class CompanyController extends Controller
             break;
             case 'revoke':
                 $result = $company->hadleAdminPivilegies(request('person_id'), false);
+            break;
+        }
+        if(!$result)
+            return response()->json(['message' => 'action not completed with success'], 500);
+        return response()->json(['message' => 'action performed']);
+    }
+
+    /**
+     * Manages company recruiters, this method can ADD a new recruiter or REMOVE a current recruit
+     * Obs: Only admins with privilegies can perform an action!
+     * @param String action - possible values ['add', 'remove']
+     * @param Int person_id - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function manageCompanyRecruiter()
+    {
+        $actions = ['add', 'remove'];
+        if(!in_array(request('action'), $actions))
+            return response()->json(['message' => 'invalid action'], 400);
+        $person = auth('api')->user();
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
+        $targetPerson = Person::find(request('person_id'));
+        if(!$targetPerson || $person->person_id == $targetPerson->person_id)
+            return response()->json(['message' => 'person is invalid'], 400);
+        switch(request('action')){
+            case 'add':
+                $result = $company->addRecruiter($targetPerson->person_id);
+            break;
+            case 'remove':
+                $result = $company->removeRecruiter($targetPerson->person_id);
             break;
         }
         if(!$result)

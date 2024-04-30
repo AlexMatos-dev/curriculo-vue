@@ -28,7 +28,10 @@ Route::prefix('professional')->middleware('authenticate')->group(function(){
 
 Route::prefix('company')->middleware('authenticate')->group(function(){
     Route::post('update', [CompanyController::class, 'update']);
-    Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
+    Route::middleware('companyadmin')->group(function(){
+        Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
+        Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
+    });
 });
 
 Route::prefix('recruiter')->middleware('authenticate')->group(function(){
