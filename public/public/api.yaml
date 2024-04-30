@@ -700,7 +700,7 @@ paths:
   /api/recruiter/update:
     post:
       tags:
-        - recuiter
+        - recruiter
       summary: Updates logged person Recruiter account
       parameters:
         - in: query
