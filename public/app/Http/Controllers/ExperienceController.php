@@ -58,7 +58,8 @@ class ExperienceController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified Experience.
+     * @param Int experience_id - required
      */
     public function show(Experience $experience)
     {
@@ -74,7 +75,13 @@ class ExperienceController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update Experience in storage.
+     * @param Int experience_id - required
+     * @param String exjob_title - required
+     * @param String excompany_name - required
+     * @param Date exstart_date - required
+     * @param Data exend_date - required
+     * @param String exdescription - required
      */
     public function update(Request $request, Experience $experience)
     {
@@ -93,6 +100,7 @@ class ExperienceController extends Controller
 
     /**
      * Remove the specified experience from storage.
+     * @param Int experience_id - required
      */
     public function destroy(Experience $experience)
     {

@@ -10,7 +10,7 @@ class EducationController extends Controller
 {
     /**
      * Get all experiences by curriculum_id.
-     * @param Int curriculum_id   - required
+     * @param Int curriculum_id - required
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse
      */
@@ -33,7 +33,14 @@ class EducationController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newl Education in storage.
+     * @param Int edcurriculum_id - required
+     * @param String eddegree - required
+     * @param String edfield_of_study - required
+     * @param String edinstitution - required
+     * @param Date edstart_date - required
+     * @param Date edend_date - required
+     * @param String eddescription - required
      */
     public function store(Request $request)
     {
@@ -53,7 +60,8 @@ class EducationController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified Education.
+     * @param Int education_id - required
      */
     public function show(Education $education)
     {
@@ -69,7 +77,15 @@ class EducationController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified Education in storage.
+     * @param Int education_id - required
+     * @param Int edcurriculum_id - required
+     * @param String eddegree - required
+     * @param String edfield_of_study - required
+     * @param String edinstitution - required
+     * @param Date edstart_date - required
+     * @param Date edend_date - required
+     * @param String eddescription - required
      */
     public function update(Request $request, Education $education)
     {
@@ -89,7 +105,8 @@ class EducationController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Education from storage.
+     * @param Int education_id - required
      */
     public function destroy(Education $education)
     {
