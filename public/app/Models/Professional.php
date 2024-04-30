@@ -25,11 +25,39 @@ class Professional extends Model
         'professional_photo',
         'professional_cover',
         'professional_title',
+        'currently_working',
+        'avaliable_to_travel',
         'paying'
     ];
 
     public function person()
     {
         return $this->belongsTo(Person::class, 'person_id')->first();
+    }
+
+    /**
+     * Creates or Updates $this Professional by sent data
+     * @param Array - Schema [$attrName => $attrValue]
+     * @return Profession|False
+     */
+    public function saveProfessional($data = [])
+    {
+        $myAttributes = $this->fillable;
+        foreach($data as $attr => $value){
+            if(in_array($attr, $myAttributes))
+                $this->{$attr} = $value;
+        }
+        if(!$this->save())
+            return false;
+        return $this;
+    }
+
+    /**
+     * Gets this Professional DataPerson object, if it exists
+     * @return DataPerson|Null
+     */
+    public function getDataPerson()
+    {
+        return DataPerson::where('dpprofes_id', $this->professional_id)->first();
     }
 }

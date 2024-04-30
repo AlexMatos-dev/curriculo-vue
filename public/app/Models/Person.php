@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\TranslatorHandler;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
@@ -75,22 +76,18 @@ class Person extends Authenticatable implements JWTSubject
      */
     public function sendRequestChangePasswordCodeEmail()
     {
-        $textToTranslate = [
-            'Your change password code:',
-            'The code will expire in 30 minutes and can be used only once.',
-            'In case you did not request this email, please ignore.',
-            'Thanks.',
-            'Team'
+        $emailTranslations = [
+            'your change password code',
+            'the code will expire in 30 minutes and can be used only once',
+            'in case you did not request this email, please ignore',
+            'thanks',
+            'team'
         ];
-        try {
-            $languageISO = $this->language()->getIsoCode();
-        } catch (\Throwable $th) {
-            $languageISO = 'pt';
-        }
-        $translatedText = TranslatorHandler::translateAll($textToTranslate, $languageISO);
-        foreach($textToTranslate as $text){
-            if(!array_key_exists($text, $translatedText))
-                $translatedText[$text][$languageISO] = $text;
+        $translationsForEmail = Translation::whereIn('en', $emailTranslations)->get();
+        $languageISO = $this->language()->llangue_acronyn;
+        $translatedText = [];
+        foreach($translationsForEmail as $translation){
+            $translatedText[$translation->en] = $translation->getTranslationByIsoCode($languageISO);
         }
         $code = strtoupper($this->generatePasswordCode());
         $renderedEmail = view('email_templates/password_reset_code', [
@@ -113,5 +110,47 @@ class Person extends Authenticatable implements JWTSubject
     public function generatePasswordCode()
     {
         return Str::random(6);
+    }
+
+    /**
+     * Gets the object of a Person profile target object.
+     * @param String profileType (Company, Professional or Recruiter)
+     * @return Object|Null
+     */
+    public function getProfile($profileType = '')
+    {
+        switch($profileType){
+            case Profile::PROFESSIONAL:
+                $object = Professional::join('profiles', function (JoinClause $join) {
+                    $join->on('professionals.professional_id', '=', 'profiles.profile_type_id')
+                        ->where('profiles.profile_type', '=', Profile::PROFESSIONAL)
+                        ->where('profiles.person_id', '=', $this->person_id);
+                })->first();
+            break;
+            case Profile::RECRUITER:
+                $object = Recruiter::join('profiles', function (JoinClause $join) {
+                    $join->on('recruiters.recruiter_id', '=', 'profiles.profile_type_id')
+                        ->where('profiles.profile_type', '=', Profile::RECRUITER)
+                        ->where('profiles.person_id', '=', $this->person_id);
+                })->first();
+            break;
+            case Profile::COMPANY:
+                $object = Company::join('profiles', function (JoinClause $join) {
+                    $join->on('companies.company_id', '=', 'profiles.profile_type_id')
+                        ->where('profiles.profile_type', '=', Profile::COMPANY)
+                        ->where('profiles.person_id', '=', $this->person_id);
+                })->first();
+            break;
+            default:
+                $object = null;
+            break;
+        }
+        return $object;
+    }
+
+    public function makeSlug($firstValue = '', $lastValue = '')
+    {
+        $uuid = str_replace(['.', '/', ','], '', microtime(true));
+        return Str::slug("$firstValue $lastValue $uuid");
     }
 }

@@ -2,28 +2,28 @@
 
 namespace Database\Seeders;
 
-use App\Models\ListLangue;
+use App\Models\ListProfessional;
 use App\Models\Translation;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class LanguageSeeder extends Seeder
+class ListProfessionalSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $path = storage_path('app/dbSourceFiles/languages.json');
+        $path = storage_path('app/dbSourceFiles/professions.json');
         if(!file_exists($path))
             return;
-        $languageArray = json_decode(file_get_contents($path), true);
-        $langObj = new ListLangue();
-        foreach($languageArray as $iso => $language){
-            if($langObj::where('llangue_name', $language['en'])->first())
+        $professionsArray = json_decode(file_get_contents($path), true);
+        $listProfessionalObj = new ListProfessional();
+        foreach($professionsArray as $language){
+            if($listProfessionalObj::where('profession_name', $language['en'])->first())
                 continue;
-            $result = ListLangue::create([
-                'llangue_name' => $language['en'],
-                'llangue_acronyn' => $iso
+            $result = ListProfessional::create([
+                'profession_name' => $language['en']
             ]);
             if(!$result || Translation::where('en', $language['en'])->first())
                 continue;

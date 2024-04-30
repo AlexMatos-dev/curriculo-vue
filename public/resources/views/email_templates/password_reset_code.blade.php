@@ -23,16 +23,16 @@
                   </div>
                   <div style="padding: 20px; background-color: rgb(255, 255, 255);">
                     <div style="color: rgb(0, 0, 0); text-align: left;">
-                      <h1 style="margin: 1rem 0">{{ $translations['Your change password code:'][$languageIso] }}</h1>
+                      <h1 style="margin: 1rem 0">{{ ucfirst($translations['your change password code']) }}:</h1>
                       <p style="padding-bottom: 16px"><span style="text-align: center;display: block;"><strong
                             style="font-size: 130%">{{ $code }}</strong></span></p>
-                      <p style="padding-bottom: 16px"><em>{{ $translations['The code will expire in 30 minutes and can be used only once.'][$languageIso] }}</em></p>
-                      <p style="padding-bottom: 16px">{{ $translations['In case you did not request this email, please ignore.'][$languageIso] }}</p>
-                      <p style="padding-bottom: 16px">{{ $translations['Thanks.'][$languageIso] }}</p>
+                      <p style="padding-bottom: 16px"><em>{{ ucfirst($translations['the code will expire in 30 minutes and can be used only once']) }}.</em></p>
+                      <p style="padding-bottom: 16px">{{ ucfirst($translations['in case you did not request this email, please ignore']) }}.</p>
+                      <p style="padding-bottom: 16px">{{ ucfirst($translations['thanks']) }}.</p>
                     </div>
                   </div>
                   <div style="padding-top: 20px; color: rgb(153, 153, 153); text-align: center;">
-                    <p style="padding-bottom: 16px; font-weight:600;">{{ $translations['Team'][$languageIso] }} <span style="color:#0b0b55;">Job<span style="color:#2adffd;">i</span>Full</span></p>
+                    <p style="padding-bottom: 16px; font-weight:600;">{{ $translations['team'] }} <span style="color:#0b0b55;">Job<span style="color:#2adffd;">i</span>Full</span></p>
                   </div>
                 </td>
               </tr>

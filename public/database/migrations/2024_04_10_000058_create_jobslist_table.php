@@ -10,7 +10,7 @@ class CreateJobsListTable extends Migration {
 		Schema::create('jobslist', function(Blueprint $table) {
 			$table->bigIncrements('job_id', true);
 			$table->bigInteger('company_id')->unsigned();
-			$table->string('job_model', 300)->nullable();
+			$table->unsignedBigInteger('job_modality_id');
 			$table->unsignedInteger('job_country')->nullable();
 			$table->unsignedBigInteger('job_city')->nullable();
 			$table->string('job_seniority', 100);

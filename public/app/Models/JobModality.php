@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ListLangue extends Model
+class JobModality extends Model
 {
-    protected $primaryKey = 'llangue_id';
-    protected $table = 'listlangues';
-    public $timestamps = true;
+    protected $primaryKey = 'job_modality_id';
+    protected $table = 'job_modalities';
+    public $timestamps = false;
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +16,7 @@ class ListLangue extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'llangue_name',
-        'llangue_acronyn'
+        'name',
+        'description'
     ];
 }

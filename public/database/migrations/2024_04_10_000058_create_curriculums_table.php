@@ -11,6 +11,8 @@ class CreateCurriculumsTable extends Migration {
 			$table->bigIncrements('curriculum_id', true);
 			$table->bigInteger('cprofes_id')->unsigned();
 			$table->integer('clengua_id')->unsigned();
+			$table->string('curriculum_type', 50);
+            $table->mediumText('curriculum_file', 2097152)->charset('binary')->nullable();
 			$table->timestamps();
 		});
 	}

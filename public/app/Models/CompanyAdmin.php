@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Recruiter extends Model
+class CompanyAdmin extends Model
 {
-    protected $primaryKey = 'recruiter_id';
-    protected $table = 'recruiters';
-    public $timestamps = false;
+    protected $primaryKey = 'company_admin_id';
+    protected $table = 'companies_admins';
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
@@ -18,8 +18,7 @@ class Recruiter extends Model
     protected $fillable = [
         'company_id',
         'person_id',
-        'recruiter_photo',
-        'paying'
+        'has_privilegies'
     ];
 
     public function company()

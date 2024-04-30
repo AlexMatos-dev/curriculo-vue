@@ -3,17 +3,21 @@
 namespace Database\Seeders;
 
 use App\Models\Company;
+use App\Models\CompanyAdmin;
 use App\Models\Person;
 use App\Models\Professional;
 use App\Models\Profile;
 use App\Models\Recruiter;
 use Faker\Factory as Faker;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileSeeder extends Seeder
 {
+    private $company_email;
+    private $companyPerson;
     /**
      * Run the database seeds.
      */
@@ -25,7 +29,8 @@ class ProfileSeeder extends Seeder
             'company' => [
                 'person_username' => 'company X',
                 'person_email' => 'company@company.com',
-                'person_password' => $defaultPassword
+                'person_password' => $defaultPassword,
+                'company_email' => 'company@company.com'
             ],
             'recruiter' => [
                 'person_username' => 'recruiter X',
@@ -66,6 +71,8 @@ class ProfileSeeder extends Seeder
             switch($type){
                 case 'company':
                     // Create Companies
+                    if(Company::where('company_email', $data['company_email'])->first())
+                        return;
                     $companyName = $faker->company();
                     $newObj = Company::create([
                         'company_slug' => Str::slug($companyName),
@@ -75,19 +82,22 @@ class ProfileSeeder extends Seeder
                         'company_logo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                         'company_cover_photo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                         'company_video' => $faker->url('youtube'),
-                        'company_email' => $faker->unique()->companyEmail(),
+                        'company_email' => $data['company_email'],
                         'company_phone' => $faker->unique()->phoneNumber(),
                         'company_website' => $faker->url($companyName),
                         'company_description' => $faker->text(499),
                         'company_number_employees' => $faker->randomNumber(2),
                         'company_benefits' => $faker->text(2000),
-                        'person_id' => $person->person_id,
                         'paying' => true
                     ]);
                     if(!$newObj){
                         $person->delete();
                         return;
                     }
+                    CompanyAdmin::create([
+                        'company_id' => $newObj->company_id,
+                        'person_id' => $person->person_id
+                    ]);
                     $objId = $newObj->company_id;
                     $profileType = Profile::COMPANY;
                 break;
@@ -96,11 +106,17 @@ class ProfileSeeder extends Seeder
                     $companyPerson = Person::where('person_email', 'company@company.com')->first();
                     if(!$companyPerson)
                         return;
-                    $companyObj = Company::where('person_id', $companyPerson->person_id)->first();
-                    if(!$companyObj)
+                    $this->companyPerson = $companyPerson;
+                    $this->company_email = $personData['company']['company_email'];
+                    $companyAdmin = CompanyAdmin::join('companies', function(JoinClause $join) {
+                        $join->on('companies_admins.company_id', '=', 'companies.company_id')
+                            ->where('companies_admins.person_id', '=', $this->companyPerson->person_id)
+                            ->where('companies.company_email', '=', $this->company_email);
+                    })->first();
+                    if(!$companyAdmin)
                         return;
                     $newObj = Recruiter::create([
-                        'company_id' => $companyObj->company_id,
+                        'company_id' => $companyAdmin->company_id,
                         'recruiter_photo' => $faker->imageUrl(360, 360, 'recruiter logo', true, 'recruiter logo'),
                         'paying' => true
                     ]);
