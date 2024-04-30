@@ -7241,6 +7241,7 @@
         },
         {
             "name": "phpunit/phpunit",
+
             "version": "10.5.20",
             "source": {
                 "type": "git",

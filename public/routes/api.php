@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ExperienceController;
+use App\Http\Controllers\EducationController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
@@ -15,6 +17,10 @@ Route::prefix('auth')->middleware('authenticate')->group(function(){
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('profile', [AuthController::class, 'profile']);
+});
+Route::prefix('curriculum')->middleware('authenticate')->group(function(){
+  Route::resource('experience',ExperienceController::class);
+  Route::resource('education',EducationController::class);
 });
 
 Route::prefix('person')->middleware('authenticate')->group(function(){
