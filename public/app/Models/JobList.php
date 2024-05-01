@@ -32,16 +32,16 @@ class JobList extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id')->first();
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function city()
     {
-        return $this->belongsTo(ListCity::class, 'city_id')->first();
+        return $this->belongsTo(ListCity::class, 'city_id');
     }
 
     public function country()
     {
-        return $this->belongsTo(Country::class, 'country_id')->first();
+        return $this->belongsTo(Country::class, 'country_id');
     }
 }

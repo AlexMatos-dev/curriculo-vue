@@ -11,7 +11,7 @@ class JobListController extends Controller
 {
     public function index(Request $request)
     {
-        $query = JobList::query();
+        $query = JobList::query()->with('company');
 
         if ($request->has("job_model"))
         {
@@ -69,7 +69,7 @@ class JobListController extends Controller
     {
         try
         {
-            $jobList = JobList::findOrFail($joblistId);
+            $jobList = JobList::with('company')->findOrFail($joblistId);
 
             return response()->json(["message" => "Vacant job found successfully.", "data" => $jobList], 200);
         }
