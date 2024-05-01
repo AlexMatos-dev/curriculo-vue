@@ -266,7 +266,311 @@ paths:
           content:
             application/json:
               example: {"message": "password not saved"}  
-                  
+  /api/joblist/index:
+    get:
+      tags:
+        - joblist
+      summary: List all jobs
+      description: retrieves a list of job with optional filters.
+      parameters:
+        - name: job_model
+          in: query
+          description: search for the given model
+          example: Remote
+          schema:
+            type: string
+        - name: job_country
+          in: query
+          description: search for the given country ID
+          example: 3
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: search for the given city ID
+          example: 3
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: search for the given technicar level
+          example: Intern
+          schema:
+            type: string
+        - name: job_salary_start
+          in: query
+          description: search for the given starting salary
+          example: 1527.20
+          schema:
+            type: float
+        - name: job_salary_end
+          in: query
+          description: search for the given ending salary
+          example: 2700.20
+          schema:
+            type: float
+        - name: job_skills
+          in: query
+          description: search for the given skills
+          example: 3
+          schema:
+            type: string
+        - name: job_english_level
+          in: query
+          description: search for the given english level
+          example: Fluent
+          schema:
+            type: string
+        - name: job_experience
+          in: query
+          description: search for the given experience
+          example: +2 years how backend developer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of job
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobList'
+  /api/joblist/show:
+    get:
+      tags:
+        - joblist
+      summary: Search for job
+      description: Search for a specific vacancy by ID
+      parameters:
+        - name: job_id
+          in: query
+          description: Job ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vacant job found successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobList'
+        '404':
+          description: Vacant job not found.
+  /api/joblist/store:
+    post:
+      tags:
+        - joblist
+      summary: Create a new job
+      parameters:
+        - name: company_id
+          in: query
+          description: Company ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: job_model
+          in: query
+          description: Work Model
+          required: true
+          example: remote
+          schema:
+            type: string
+        - name: job_country
+          in: query
+          description: Work country
+          required: true
+          example: 10
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: Work city
+          required: true
+          example: 15
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: technical level required
+          required: true
+          example: Intern
+          schema:
+            type: string
+        - name: job_salary
+          in: query
+          description: Work Payment
+          required: true
+          example: 7200.52
+          schema:
+            type: float
+        - name: job_model
+          in: query
+          description: Work Model
+          required: true
+          example: remote
+          schema:
+            type: string
+        - name: job_description
+          in: query
+          description: Work desctiption
+          required: true
+          example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_skills
+          in: query
+          description: Work skills required
+          required: true
+          example: PHP, Laravel, JavaScript, React
+          schema:
+            type: string
+        - name: job_english_level
+          in: query
+          description: English level
+          required: true
+          example: Fluent
+          schema:
+            type: string
+        - name: job_experience
+          in: query
+          description: Time experience
+          required: true
+          example: 2+ As backend developer
+          schema:
+            type: string
+        - name: job_benefits
+          in: query
+          description: Benefits offered
+          required: true
+          example: food voucher and home office
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content: 
+          application/json:
+      responses:
+        '201':
+          description: Vacant job created successfully.
+        '400':
+          description: Field entered incorrectly.
+          content:
+            application/json:
+  /api/joblist/update:
+    put:
+      tags:
+        - joblist
+      summary: Update a job by ID
+      parameters:
+        - name: company_id
+          in: query
+          description: Company ID
+          example: 8
+          schema:
+            type: integer
+        - name: job_model
+          in: query
+          description: Work Model
+          example: remote
+          schema:
+            type: string
+        - name: job_country
+          in: query
+          description: Work country
+          example: 10
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: Work city
+          example: 15
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: technical level required
+          example: Intern
+          schema:
+            type: string
+        - name: job_salary
+          in: query
+          description: Work Payment
+          example: 7200.52
+          schema:
+            type: float
+        - name: job_model
+          in: query
+          description: Work Model
+          example: remote
+          schema:
+            type: string
+        - name: job_description
+          in: query
+          description: Work desctiption
+          example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_skills
+          in: query
+          description: Work skills required
+          example: PHP, Laravel, JavaScript, React
+          schema:
+            type: string
+        - name: job_english_level
+          in: query
+          description: English level
+          example: Fluent
+          schema:
+            type: string
+        - name: job_experience
+          in: query
+          description: Time experience
+          example: 2+ As backend developer
+          schema:
+            type: string
+        - name: job_benefits
+          in: query
+          description: Benefits offered
+          example: food voucher and home office
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content: 
+          application/json:
+      responses:
+        '201':
+          description: Vacant job created successfully.
+        '400':
+          description: Field entered incorrectly.
+          content:
+            application/json:
+  /api/joblist/destroy:
+    post:
+      tags:
+        - joblist
+      summary: Delete a job
+      description: Delete a specific job by ID
+      parameters:
+        - name: job_id
+          in: query
+          description: Job ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vacant job deleted sucessfully.
+        '404':
+          description: Vacant job not found.
+          
 components:
   schemas:
     Login:

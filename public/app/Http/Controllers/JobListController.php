@@ -96,7 +96,7 @@ class JobListController extends Controller
 
             if ($validator->fails())
             {
-                return response()->json(["message" => "Validation failed", "Errors" => $validator->errors()], 400);
+                return response()->json(["message" => "Field entered incorrectly.", "Errors" => $validator->errors()], 400);
             }
 
             JobList::create($request->all());
