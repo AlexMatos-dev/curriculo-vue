@@ -13,6 +13,7 @@ class CreateListstatesTable extends Migration {
 			$table->integer('lstates_parent_id')->unsigned()->nullable();
 			$table->integer('lstates_level')->default('0');
 			$table->integer('lstacountry_id')->unsigned();
+			$table->string('lstate_acronyn', 20)->nullable();
 			$table->timestamps();
 		});
 	}

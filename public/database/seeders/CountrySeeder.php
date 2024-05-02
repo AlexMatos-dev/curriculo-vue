@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ListCountry;
+use App\Models\Translation;
 use Illuminate\Database\Seeder;
 
 class CountrySeeder extends Seeder
@@ -17,12 +18,19 @@ class CountrySeeder extends Seeder
             return;
         $countryArray = json_decode(file_get_contents($path), true);
         $countryObj = new ListCountry();
-        foreach($countryArray as $isoCode => $countryName){
-            if($countryObj::where('lcountry_name', $countryName)->first())
+        foreach($countryArray as $isoCode => $data){
+            if($countryObj::where('lcountry_name', $data['en'])->first())
                 continue;
-            ListCountry::create([
-                'lcountry_name' => $countryName,
+            $result = ListCountry::create([
+                'lcountry_name' => $data['en'],
                 'lcountry_acronyn' => $isoCode
+            ]);
+            if(!$result || Translation::where('en', $data['en'])->first())
+                continue;
+            Translation::create([
+                'en' => $data['es'],
+                'pt' => $data['pt'],
+                'es' => $data['es']
             ]);
         }
     }

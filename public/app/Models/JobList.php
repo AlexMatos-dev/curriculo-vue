@@ -18,7 +18,7 @@ class JobList extends Model
      */
     protected $fillable = [
         'company_id',
-        'job_model',
+        'job_modality_id',
         'job_city',
         'job_country',
         'job_seniority',
@@ -43,5 +43,10 @@ class JobList extends Model
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_id');
+    }
+
+    public function modality()
+    {
+        return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
     }
 }

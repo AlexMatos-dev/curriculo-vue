@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Mail;
-use App\Helpers\TranslatorHandler;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Helpers\Validator;
 use Illuminate\Support\Facades\Hash;
-
-use function Termwind\render;
 
 class AuthController extends Controller
 {
@@ -126,8 +122,11 @@ class AuthController extends Controller
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
             return response()->json(['message' => 'invalid email'], 400);
+        if(Cache::has("awaiting-email-receival-{$person->person_id}"))
+            return response()->json(['message' => 'code already sent, wait 1 minute'], 500);
         if(!$person->sendRequestChangePasswordCodeEmail())
             return response()->json(['message' => 'email not sent'], 500);
+        Cache::put("awaiting-email-receival-{$person->person_id}", 'email sent', 60);
         return response()->json(['message' => 'email sent'], 200);
     }
 
