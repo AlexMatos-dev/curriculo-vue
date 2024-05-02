@@ -273,7 +273,6 @@ paths:
           description: Save error
           content:
             application/json:
-<<<<<<< HEAD
               example: {"message": "password not saved"}  
   /api/joblist/index:
     get:
@@ -572,7 +571,6 @@ paths:
           description: Job ID
           required: true
           example: 8
-=======
               example: {"message": "password not saved"}
               
   /api/person/update:
@@ -904,17 +902,10 @@ paths:
           in: query
           description: Person id to receive the action
           example: 1
->>>>>>> ed44341362b3e4b86b7207336ea67d34aeba1882
           schema:
             type: integer
       responses:
         '200':
-<<<<<<< HEAD
-          description: Vacant job deleted sucessfully.
-        '404':
-          description: Vacant job not found.
-          
-=======
           description: Action performed
           content:
             application/json:
@@ -1043,7 +1034,6 @@ paths:
               example: {"message": "recruiter not updated"}
   
                   
->>>>>>> ed44341362b3e4b86b7207336ea67d34aeba1882
 components:
   schemas:
     Login:
