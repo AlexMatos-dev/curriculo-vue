@@ -19,4 +19,20 @@ class Controller
             return false;
         return $companyObj;
     }
+
+    public function getProfessionalBySession()
+    {
+        $professionalObj = Session()->get('professional');
+        if(!$professionalObj)
+            return false;
+        return $professionalObj;
+    }
+
+    public function getCurriculumBySession()
+    {
+        $curriculumObj = Session()->get('curriculum');
+        if(!$curriculumObj)
+            return false;
+        return $curriculumObj;
+    }
 }

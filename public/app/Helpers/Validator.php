@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class Validator
@@ -16,8 +17,46 @@ class Validator
         try {
             $request->validate($rules);
         } catch (\Throwable $th) {
-            response()->json(['message' => $th->getMessage()], 400)->send();
-            die();
+            self::throwResponse($th->getMessage(), 400);
+        }
+        return true;
+    }
+
+    /**
+     * Performes a validation on Request parameters accordingly to sent rules, the rules are exclusive to comparing date. In case of trigger on validation fail, 
+     * does not throw exception, just returns a JSON response with correspondent code
+     * @return Bool|\Illuminate\Http\JsonResponse
+     */
+    public static function validateDates(Request $request, $rules = [])
+    {
+        $gathered = [];
+        foreach($rules as $requestParam => $rule){
+            try {
+                $value = $request[$requestParam];
+                $gathered[$requestParam] = \Carbon\Carbon::parse($value);
+                $action = explode(':', $rule);
+                if(count($action) < 1 || !$request->{$action[1]})
+                    continue;
+                if(!array_key_exists($action[1], $gathered))
+                    $gathered[$action[1]] = Carbon::parse($request[$action[1]]);
+                $targetDate = $gathered[$action[1]];
+                switch($action[0]){
+                    case 'lower':
+                        if($gathered[$requestParam] > $targetDate)
+                            self::throwResponse("{$action[1]} is lower than $requestParam", 400);
+                    break;
+                    case 'equal':
+                        if($gathered[$requestParam] != $targetDate)
+                            self::throwResponse("{$action[1]} is not equal to $requestParam", 400);
+                    break;
+                    case 'bigger':
+                        if($gathered[$requestParam] < $targetDate)
+                            self::throwResponse("{$action[1]} is bigger than $requestParam", 400);
+                    break;
+                }
+            } catch (\Throwable $th) {
+                self::throwResponse($th->getMessage(), 500);   
+            }
         }
         return true;
     }
@@ -30,21 +69,23 @@ class Validator
     public static function validateImage($image = null)
     {
         if(!$image){
-            response()->json(['message' => 'invalid image'], 400)->send();
-            die();
+            self::throwResponse("invalid image", 400);
         }
         $fileHandler = new FileHandler($image);
         if(!$fileHandler->isExtensionValid()){
-            response()->json(['message' => 'invalid image format'], 400);
-            die();
+            self::throwResponse("invalid image format", 400);
         }
         if(!$fileHandler->isFileSizeValid()){
-            response()->json(['message' => 'image too big, max of 2 mb allowed'], 400);
-            die();
+            self::throwResponse("image too big, max of 2 mb allowed", 400);
         }
         return $fileHandler;
     }
 
+    /**
+     * Performes a validation on sent cnpj 
+     * @param String cnpj
+     * @return Bool|\Illuminate\Http\JsonResponse
+     */
     public static function validateCNPJ($cnpj = null)
     {
         $cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
@@ -64,7 +105,7 @@ class Validator
         $value = $sum % 11;
         $result = $cnpj[13] == ($value < 2 ? 0 : 11 - $value);
         if(!$result)
-            response()->json(['message' => 'cnpj is invalid'], 400);
+            self::throwResponse('cnpj is invalid', 400);
         return true;
     }
 
@@ -80,21 +121,16 @@ class Validator
         foreach($dataToCheck as $key => $data){
             if(!$data['data'])
                 continue;
-            if(!array_key_exists('object', $data) || !array_key_exists('data', $data)){
-                response()->json(['message' => 'invalid parameters for validation'], 500)->send();
-                die();
-            }
+            if(!array_key_exists('object', $data) || !array_key_exists('data', $data))
+                self::throwResponse('invalid parameters for validation', 500);
             try {
                 $objInstance = new $data['object']();
                 $foundObject = $objInstance->find($data['data']);
             } catch (\Throwable $th) {
-                response()->json(['message' => "$key is not valid"], 400)->send();
-                die();
+                self::throwResponse("$key is not valid", 400);
             }
-            if(!$foundObject){
-                response()->json(['message' => 'invalid parameters for validation'], 500)->send();
-                die();
-            }
+            if(!$foundObject)
+                self::throwResponse('invalid parameters for validation', 500);
             $objects[$key] = $foundObject;
         }
         return $objects;
@@ -114,5 +150,17 @@ class Validator
             'regex:/[@$!%*#?&]/', // must contain a special character
             'max:80'              // must contain less than 81 characters
         ];
+    }
+
+    /**
+     * Terminate application and return a json response with sent message and code
+     * @param String message
+     * @param Int code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function throwResponse($message = '', $code = 400)
+    {
+        response()->json(['message' => $message], $code)->send();
+        die();
     }
 }

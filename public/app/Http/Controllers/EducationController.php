@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\Curriculum;
 use App\Models\Education;
 use Illuminate\Http\Request;
@@ -16,11 +17,8 @@ class EducationController extends Controller
      */
     public function index(Request $request)
     {
-        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
-
-        $education = Education::where('edcurriculum_id',$curriculum->curriculum_id );
+        $education = Education::where('edcurriculum_id', $this->getCurriculumBySession()->curriculum_id);
         $education = $education->paginate($request->per_page);
-
         return response()->json($education);
     }
 
@@ -49,11 +47,14 @@ class EducationController extends Controller
             'eddegree'          => 'required',
             'edfield_of_study'  => 'required',
             'edinstitution'     => 'required',
-            'edstart_date'      => 'required',
-            'edend_date'        => 'required',
-            'eddescription'     => 'required'
+            'edstart_date'      => 'required|date_format:Y-m-d',
+            'edend_date'        => 'date_format:Y-m-d',
+            'eddescription'     => 'max:400'
         ]);
-
+        Validator::validateDates($request, [
+            'edstart_date' => 'lower:edend_date',
+            'edend_date' => 'bigger:edstart_date'
+        ]);
         $education = Education::create($request->all());
 
         return response()->json($education);
@@ -84,8 +85,8 @@ class EducationController extends Controller
      * @param String edfield_of_study - required
      * @param String edinstitution - required
      * @param Date edstart_date - required
-     * @param Date edend_date - required
-     * @param String eddescription - required
+     * @param Date edend_date
+     * @param String eddescription
      */
     public function update(Request $request, Education $education)
     {
@@ -94,13 +95,15 @@ class EducationController extends Controller
             'eddegree'          => 'required',
             'edfield_of_study'  => 'required',
             'edinstitution'     => 'required',
-            'edstart_date'      => 'required',
-            'edend_date'        => 'required',
-            'eddescription'     => 'required'
+            'edstart_date'      => 'required|date_format:Y-m-d',
+            'edend_date'        => 'date_format:Y-m-d',
+            'eddescription'     => 'max:400'
         ]);
-
+        Validator::validateDates($request, [
+            'edstart_date' => 'lower:edend_date',
+            'edend_date' => 'bigger:edstart_date'
+        ]);
         $education->update($request->all());
-
         return response()->json($education);
     }
 

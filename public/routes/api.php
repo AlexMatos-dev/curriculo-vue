@@ -4,9 +4,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\LinkController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\RecruiterController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\VisaController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
@@ -18,9 +22,13 @@ Route::prefix('auth')->middleware('authenticate')->group(function(){
     Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('profile', [AuthController::class, 'profile']);
 });
-Route::prefix('curriculum')->middleware('authenticate')->group(function(){
+Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(function(){
   Route::resource('experience',ExperienceController::class);
   Route::resource('education',EducationController::class);
+  Route::resource('skill', SkillController::class);
+  Route::resource('visa', VisaController::class);
+  Route::resource('link', LinkController::class);
+  Route::resource('curriculum', CurriculumController::class);
 });
 
 Route::prefix('person')->middleware('authenticate')->group(function(){

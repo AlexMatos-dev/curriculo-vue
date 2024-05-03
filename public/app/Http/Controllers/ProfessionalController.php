@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
+use App\Models\Curriculum;
 use App\Models\DataPerson;
 use App\Models\Gender;
 use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListState;
-use App\Models\Person;
 use App\Models\Professional;
 use App\Models\Profile;
-use Illuminate\Support\Str;
  
 
 class ProfessionalController extends Controller
