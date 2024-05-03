@@ -92,6 +92,7 @@ class JobListController extends Controller
                 "job_description"   => "required|min:10|max:500",
                 "job_english_level" => "nullable|max:100",
                 "job_experience"    => "nullable|max:100",
+                "job_salary"        => "required|integer"
             ]);
 
             if ($validator->fails())
@@ -116,7 +117,7 @@ class JobListController extends Controller
             $jobList = JobList::findOrFail($jobListId);
             $jobList->update($request->all());
 
-            return response()->json(["message" => "Vacant job $jobList->job_model updated successfully.", "data => $jobList"], 200);
+            return response()->json(["message" => "Vacant job $jobList->job_model updated successfully.", "data" => $jobList], 200);
         }
         catch (ModelNotFoundException $e)
         {
