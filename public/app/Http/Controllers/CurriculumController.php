@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Helpers\Validator;
 use App\Models\Curriculum;
 use App\Models\ListLangue;
-use App\Models\Profile;
 
 class CurriculumController extends Controller
 {
-
     /**
      * Get all curriculumns of logged professional.
      * @param Int per_page
@@ -20,7 +18,7 @@ class CurriculumController extends Controller
         Validator::validateParameters($this->request, [
             'per_page' => 'numeric'
         ]);
-        $curriculums = (new Curriculum())->getAllMyCurriculums(request('per_page', 15), $this->getProfessionalBySession()->professional_id);
+        $curriculums = (new Curriculum())->getAllMyCurriculums(request('per_page', 100), $this->getProfessionalBySession()->professional_id);
         return response()->json($curriculums);
 
         Validator::validateParameters($this->request, [
@@ -51,8 +49,7 @@ class CurriculumController extends Controller
         Validator::checkExistanceOnTable([
             'clengua_id' => ['data' => request('clengua_id'), 'object' => ListLangue::class]
         ]);
-        $professional = auth('api')->user()->getProfile(Profile::PROFESSIONAL);
-        if(!$professional)
+        $professional = $this->getProfessionalBySession();
             Validator::throwResponse('no professional found', 400);
         $curriculum = new Curriculum();
         if(request('curriculum_id')){
@@ -100,17 +97,22 @@ class CurriculumController extends Controller
         $curriculum = Curriculum::where('curriculum_id', request('curriculum'))->where('cprofes_id', $this->getProfessionalBySession())->first();
         if(!$curriculum)
             Validator::throwResponse('curriculum not found', 400);
-        // Check what needs to remove here
-        \App\Models\Experience::where('excurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Certification::where('cercurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Education::where('edcurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Skill::where('skcurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Reference::where('refcurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Visa::where('vicurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Country::where('curriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Presentation::where('precurriculum_id', $curriculum->curriculum_id)->delete();
-        \App\Models\Link::where('curriculum_id', $curriculum->curriculum_id)->delete();
-        if(!$curriculum->delete())
+        $error = false;
+        try {
+            \App\Models\Experience::where('excurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Certification::where('cercurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Education::where('edcurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Skill::where('skcurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Reference::where('refcurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Visa::where('vicurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Country::where('curriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Presentation::where('precurriculum_id', $curriculum->curriculum_id)->delete();
+            \App\Models\Link::where('curriculum_id', $curriculum->curriculum_id)->delete();
+            $curriculum->delete();
+        } catch (\Throwable $th) {
+            $error = true;
+        }
+        if($error)
             Validator::throwResponse('curriculum not removed', 500);
         return response()->json(['message' => 'curriculum removed']);
     }

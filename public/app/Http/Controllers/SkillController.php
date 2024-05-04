@@ -10,7 +10,7 @@ use App\Models\Tag;
 class SkillController extends Controller
 {
     /**
-     * Get all visas of logged professional Curriculum.
+     * Get all skills of logged professional Curriculum.
      * @param Int per_page
      * @param Int curriculum_id
      * @return \Illuminate\Http\JsonResponse
@@ -21,12 +21,12 @@ class SkillController extends Controller
             'per_page' => 'numeric',
             'curriculum_id' => 'numeric'
         ]);
-        $skills = (new Skill())->getAllMySkills(request('per_page', 15), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession()->curriculum_id);
+        $skills = (new Skill())->getAllMySkills(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession()->curriculum_id);
         return response()->json($skills);
     }
 
     /**
-     * Creates or Updates a skill.
+     * Creates a skill.
      * @param String visa_id  (in case of update)
      * @param String link_type - required
      * @param Date url - required
@@ -51,13 +51,16 @@ class SkillController extends Controller
     }
 
     /**
-     * Update the specified Education in storage.
+     * Update the specified Skill.
      * @param Int skill_name - required
      * @param Int skproficiency_level - required
      * @param Float experience_level - required
      */
-    public function update(Skill $skill)
+    public function update()
     {
+        $skill = Skill::find(request('skill'));
+        if(!$skill)
+            Validator::throwResponse('skill not found', 400);
         Validator::validateParameters($this->request, [
             'skill_name' => 'numeric|required',
             'skproficiency_level' => 'numeric|required',
@@ -87,15 +90,20 @@ class SkillController extends Controller
     }
 
     /**
-     * Remove the specified visa.
-     * @param Int visa - required (visa id)
+     * Remove the specified skill.
+     * @param Int skill - required (skill id)
      * @return \Illuminate\Http\JsonResponse 
      */
     public function destroy(Skill $skillObj)
     {
+        $skillObj = Skill::find(request('skill'));
+        if(!$skillObj)
+            Validator::throwResponse('skill not found', 400);
         $skill = $skillObj->isFromProfessionalCurriculum($this->getProfessionalBySession()->professional_id);
         if(!$skill)
             Validator::throwResponse('skill not found', 400);
+        if(!$skill->delete())
+            Validator::throwResponse('skill not removed', 500);
         return response()->json(['message' => 'skill removed']);
     }
 }

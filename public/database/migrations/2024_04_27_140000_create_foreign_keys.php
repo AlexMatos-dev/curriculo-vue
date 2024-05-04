@@ -173,6 +173,16 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
+		Schema::table('educations', function(Blueprint $table) {
+			$table->foreign('degree_type')->references('degree_type_id')->on('degree_types')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('educations', function(Blueprint $table) {
+			$table->foreign('edfield_of_study')->references('area_of_study_id')->on('areas_of_study')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
 		Schema::table('references', function(Blueprint $table) {
 			$table->foreign('refcurriculum_id')->references('curriculum_id')->on('curriculums')
 						->onDelete('restrict')
@@ -410,6 +420,12 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('educations', function(Blueprint $table) {
 			$table->dropForeign('educations_edcurriculum_id_foreign');
+		});
+		Schema::table('educations', function(Blueprint $table) {
+			$table->dropForeign('educations_degree_type_foreign');
+		});
+		Schema::table('educations', function(Blueprint $table) {
+			$table->dropForeign('educations_edfield_of_study_foreign');
 		});
 		Schema::table('references', function(Blueprint $table) {
 			$table->dropForeign('references_refcurriculum_id_foreign');

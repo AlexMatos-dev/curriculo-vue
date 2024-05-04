@@ -7,6 +7,14 @@ use Illuminate\Database\Query\JoinClause;
 
 class Link extends Model
 {
+    const LINK_TYPES = [
+        'youtube',
+        'linkedin',
+        'facebook',
+        'external',
+        'instagram'
+    ];
+
     protected $primaryKey = 'link_id';
     protected $table = 'links';
     public $timestamps = true;

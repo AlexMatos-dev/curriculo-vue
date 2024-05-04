@@ -133,4 +133,16 @@ class ProfessionalController extends Controller
             return response()->json(['message' => 'data person not updated', 400]);
         return response()->json($dataPerson);
     }
+
+    public function listProfessionals()
+    {
+        // Habilidades (Skills)
+        // Educação (Educations)
+        // Certification (Certifications)
+        // Experiencias (Experiences)
+        // Pais (Countries)
+        // Idiomas (Languages)
+        // Pofeciencia no idioma
+        // Visa (Visas)
+    }
 }

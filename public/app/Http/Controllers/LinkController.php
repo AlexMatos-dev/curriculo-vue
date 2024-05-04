@@ -21,7 +21,7 @@ class LinkController extends Controller
             'per_page' => 'numeric',
             'curriculum_id' => 'numeric'
         ]);
-        $links = (new Link())->getAllMyLinks(request('per_page', 15), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
+        $links = (new Link())->getAllMyLinks(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
         return response()->json($links);
     }
 
@@ -41,6 +41,8 @@ class LinkController extends Controller
             'url' => 'required|max:100',
             'curriculum_id' => 'numeric|required'
         ]);
+        if(!in_array(request('link_type'), Link::LINK_TYPES))
+            Validator::throwResponse('link type not valid', 400);
         $link = Link::create($this->request->all());
         if(!$link)
             Validator::throwResponse('link not created', 500);
@@ -54,13 +56,18 @@ class LinkController extends Controller
      * @param Int url - required
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Link $link)
+    public function update()
     {
         Validator::validateParameters($this->request, [
-            'link_id' => 'numeric',
+            'link_id' => 'numeric|required',
             'link_type' => 'required|max:100',
             'url' => 'required|max:100'
         ]);
+        $link = Link::find(request('link_id'));
+        if(!$link)
+            Validator::throwResponse('link not found', 400);
+        if(!in_array(request('link_type'), Link::LINK_TYPES))
+            Validator::throwResponse('link type not valid', 400);
         $link->update($this->request->all());
         if(!$link)
             Validator::throwResponse('link not updated', 500);

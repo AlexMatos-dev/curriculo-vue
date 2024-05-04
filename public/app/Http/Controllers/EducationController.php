@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
+use App\Models\AreaOfStudy;
 use App\Models\Curriculum;
+use App\Models\DegreeType;
 use App\Models\Education;
 use Illuminate\Http\Request;
 
@@ -31,25 +33,31 @@ class EducationController extends Controller
     }
 
     /**
-     * Store a newl Education in storage.
+     * Store a new Education in storage.
      * @param Int edcurriculum_id - required
      * @param String eddegree - required
-     * @param String edfield_of_study - required
+     * @param Int edfield_of_study - required
      * @param String edinstitution - required
+     * @param Int degree_type - required
      * @param Date edstart_date - required
-     * @param Date edend_date - required
-     * @param String eddescription - required
+     * @param Date edend_date
+     * @param String eddescription
      */
     public function store(Request $request)
     {
         $request->validate([
             'edcurriculum_id'   => 'required',
             'eddegree'          => 'required',
-            'edfield_of_study'  => 'required',
+            'edfield_of_study'  => 'required|numeric',
             'edinstitution'     => 'required',
             'edstart_date'      => 'required|date_format:Y-m-d',
+            'degree_type'       => 'required|numeric',
             'edend_date'        => 'date_format:Y-m-d',
             'eddescription'     => 'max:400'
+        ]);
+        Validator::checkExistanceOnTable($request, [
+            'edfield_of_study' => ['object' => AreaOfStudy::class, 'data' => request('edfield_of_study')],
+            'degree_type' => ['object' => DegreeType::class, 'data' => request('degree_type')]
         ]);
         Validator::validateDates($request, [
             'edstart_date' => 'lower:edend_date',
@@ -79,11 +87,11 @@ class EducationController extends Controller
 
     /**
      * Update the specified Education in storage.
-     * @param Int education_id - required
      * @param Int edcurriculum_id - required
      * @param String eddegree - required
-     * @param String edfield_of_study - required
+     * @param Int edfield_of_study - required
      * @param String edinstitution - required
+     * @param Int degree_type - required
      * @param Date edstart_date - required
      * @param Date edend_date
      * @param String eddescription
@@ -93,11 +101,16 @@ class EducationController extends Controller
         $request->validate([
             'edcurriculum_id'   => 'required',
             'eddegree'          => 'required',
-            'edfield_of_study'  => 'required',
+            'edfield_of_study'  => 'required|numeric',
             'edinstitution'     => 'required',
             'edstart_date'      => 'required|date_format:Y-m-d',
+            'degree_type'       => 'required|numeric',
             'edend_date'        => 'date_format:Y-m-d',
             'eddescription'     => 'max:400'
+        ]);
+        Validator::checkExistanceOnTable($request, [
+            'edfield_of_study' => ['object' => AreaOfStudy::class, 'data' => request('edfield_of_study')],
+            'degree_type' => ['object' => DegreeType::class, 'data' => request('degree_type')]
         ]);
         Validator::validateDates($request, [
             'edstart_date' => 'lower:edend_date',

@@ -22,15 +22,15 @@ class VisaController extends Controller
             'per_page' => 'numeric',
             'curriculum_id' => 'numeric'
         ]);
-        $visas = (new Visa())->getAllMyVisas(request('per_page', 15), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
+        $visas = (new Visa())->getAllMyVisas(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
         return response()->json($visas);
     }
 
     /**
-     * Creates or Updates a visa.
-     * @param String visa_id  (in case of update)
-     * @param String link_type - required
-     * @param Date url - required
+     * Creates a visa.
+     * @param Int vicountry_id - required
+     * @param Int visa_type - required
+     * @param Int curriculum_id - required
      * @return \Illuminate\Http\JsonResponse 
      */
     public function store()
