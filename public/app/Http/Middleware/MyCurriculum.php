@@ -29,7 +29,7 @@ class MyCurriculum extends Controller
         if(!$professional)
             Validator::throwResponse('professional not found', 401);
         Session()->put('professional', $professional);
-        if(($this->request->route()->getPrefix() != 'api/curriculum' || $this->isException()) || !request($this->curriculumId))
+        if(($this->request->route()->getPrefix() != 'api/curriculum' || ($this->isException()) && !request($this->curriculumId)))
             return $next($request);
         $curriculum = Curriculum::where('curriculum_id', request($this->curriculumId))->where('cprofes_id', $professional->professional_id)->first();
         if(!$curriculum)
@@ -92,8 +92,8 @@ class MyCurriculum extends Controller
             'api/curriculum/link' => ['methods' => ['GET', 'POST']],
             'api/curriculum/link/{link}' => ['methods' => ['GET', 'DELETE']],
             
-            'api/curriculum/visa' => ['methods' => ['GET', 'POST']],
-            'api/curriculum/visa/{visa}' => ['methods' => ['GET', 'DELETE']],
+            'api/curriculum/visa' => ['methods' => ['POST'], 'curriculum_id' => 'vicurriculum_id'],
+            'api/curriculum/visa/{visa}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'vicurriculum_id'],
 
             'api/curriculum/curriculum' => ['methods' => ['GET', 'POST']],
             'api/curriculum/curriculum/{curriculum}' => ['methods' => ['GET', 'DELETE']],

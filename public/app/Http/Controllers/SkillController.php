@@ -37,8 +37,7 @@ class SkillController extends Controller
         Validator::validateParameters($this->request, [
             'skcurriculum_id' => 'numeric|required',
             'skill_name' => 'numeric|required',
-            'skproficiency_level' => 'numeric|required',
-            'experience_level' => 'required|numeric|between:0,100'
+            'skproficiency_level' => 'numeric|required'
         ]);
         Validator::checkExistanceOnTable([
             'skill_name' => ['data' => request('skill_name'), 'object' => Tag::class],
@@ -62,9 +61,9 @@ class SkillController extends Controller
         if(!$skill)
             Validator::throwResponse('skill not found', 400);
         Validator::validateParameters($this->request, [
+            'skcurriculum_id' => 'numeric|required',
             'skill_name' => 'numeric|required',
-            'skproficiency_level' => 'numeric|required',
-            'experience_level' => 'required|numeric|between:0,100'
+            'skproficiency_level' => 'numeric|required'
         ]);
         Validator::checkExistanceOnTable([
             'skill_name' => ['data' => request('skill_name'), 'object' => Tag::class],

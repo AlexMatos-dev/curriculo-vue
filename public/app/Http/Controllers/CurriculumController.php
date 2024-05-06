@@ -16,19 +16,14 @@ class CurriculumController extends Controller
     public function index()
     {   
         Validator::validateParameters($this->request, [
-            'per_page' => 'numeric'
-        ]);
-        $curriculums = (new Curriculum())->getAllMyCurriculums(request('per_page', 100), $this->getProfessionalBySession()->professional_id);
-        return response()->json($curriculums);
-
-        Validator::validateParameters($this->request, [
             'per_page' => 'numeric',
             'curriculum_type' => "string|in:".Curriculum::TYPE_FILE.','.Curriculum::TYPE_INFO
         ]);
-        $curriculum = $this->getCurriculumBySession();
-        if(!$curriculum)
-            return response()->json(['message' => 'curriculum not found'], 400);
-        $curriculums = Curriculum::where('cprofes_id', $curriculum->curriculum_id)->where('curriculum_type', request('curriculum_type'))->paginate(request('per_page'));
+        $parameters = [
+            'per_page' => request('per_page', 100),
+            'curriculum_type' => request('curriculum_type')
+        ];
+        $curriculums = (new Curriculum())->getAllMyCurriculums($parameters, $this->getProfessionalBySession()->professional_id);
         return response()->json($curriculums);
     }
 
@@ -50,6 +45,7 @@ class CurriculumController extends Controller
             'clengua_id' => ['data' => request('clengua_id'), 'object' => ListLangue::class]
         ]);
         $professional = $this->getProfessionalBySession();
+        if(!$professional)
             Validator::throwResponse('no professional found', 400);
         $curriculum = new Curriculum();
         if(request('curriculum_id')){
@@ -94,7 +90,7 @@ class CurriculumController extends Controller
      */
     public function destroy()
     {
-        $curriculum = Curriculum::where('curriculum_id', request('curriculum'))->where('cprofes_id', $this->getProfessionalBySession())->first();
+        $curriculum = Curriculum::where('curriculum_id', request('curriculum'))->where('cprofes_id', $this->getProfessionalBySession()->professional_id)->first();
         if(!$curriculum)
             Validator::throwResponse('curriculum not found', 400);
         $error = false;

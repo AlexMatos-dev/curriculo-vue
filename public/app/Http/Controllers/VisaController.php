@@ -13,14 +13,14 @@ class VisaController extends Controller
     /**
      * Get all visas of logged professional Curriculum.
      * @param Int per_page
-     * @param Int curriculum_id
+     * @param Int vicurriculum_id
      * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {   
         Validator::validateParameters($this->request, [
             'per_page' => 'numeric',
-            'curriculum_id' => 'numeric'
+            'vicurriculum_id' => 'numeric'
         ]);
         $visas = (new Visa())->getAllMyVisas(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
         return response()->json($visas);
@@ -30,7 +30,7 @@ class VisaController extends Controller
      * Creates a visa.
      * @param Int vicountry_id - required
      * @param Int visa_type - required
-     * @param Int curriculum_id - required
+     * @param Int vicurriculum_id - required
      * @return \Illuminate\Http\JsonResponse 
      */
     public function store()
@@ -38,14 +38,22 @@ class VisaController extends Controller
         Validator::validateParameters($this->request, [
             'vicountry_id' => 'numeric|required',
             'visa_type' => 'numeric|required',
-            'curriculum_id' => 'numeric|required'
+            'vicurriculum_id' => 'numeric|required'
         ]);
         Validator::checkExistanceOnTable([
-            'vicountry_id' => ['data' => request('vicountry_id'), 'object' => ListCountry::class],
+            'country' => ['data' => request('vicountry_id'), 'object' => ListCountry::class],
             'visa_type' => ['data' => request('visa_type'), 'object' => TypeVisas::class]
         ]);
-        $visa = Visa::create($this->request->all());
-        if(!$visa->save())
+        $country = (new Country())->findOrCreateCountry([
+            'curriculum_id' => request('vicurriculum_id'),
+            'country_name' => request('vicountry_id')
+        ]);
+        if(!$country)
+            Validator::throwResponse('country not found', 500);
+        $values = $this->request->all();
+        $values['vicountry_id'] = $country->country_id;
+        $visa = Visa::create($values);
+        if(!$visa)
             Validator::throwResponse('visa not created', 500);
         return response()->json($visa);
     }
@@ -62,18 +70,31 @@ class VisaController extends Controller
         Validator::validateParameters($this->request, [
             'vicountry_id' => 'numeric|required',
             'visa_type' => 'numeric|required',
-            'curriculum_id' => 'numeric|required'
+            'vicurriculum_id' => 'numeric|required'
         ]);
-        Validator::checkExistanceOnTable([
-            'vicountry_id' => ['data' => request('vicountry_id'), 'object' => ListCountry::class],
+        $objects = Validator::checkExistanceOnTable([
+            'listCountry' => ['data' => request('vicountry_id'), 'object' => ListCountry::class],
             'visa_type' => ['data' => request('visa_type'), 'object' => TypeVisas::class]
         ]);
         $visa = Visa::find(request('visa'));
         if(!$visa)
             Validator::throwResponse('visa not found', 400);
-        $visa->update($this->request->all());
+        $country = $visa->country();
+        $isDifferent = false;
+        if($country->country_name != $objects['listCountry']->lcountry_id){
+            $isDifferent = ['countryId' => $country->country_id, 'curriculumId' => $visa->vicurriculum_id];
+            $country = $country->findOrCreateCountry([
+                'curriculum_id' => $visa->vicurriculum_id,
+                'country_name' => request('vicountry_id')
+            ]);
+        }
+        $values = $this->request->all();
+        $values['vicountry_id'] = $country->country_id;
+        $visa->update($values);
         if(!$visa)
             Validator::throwResponse('visa not updated', 500);
+        if($isDifferent)
+            $country->tryToRemove($isDifferent['countryId'], $isDifferent['curriculumId']);
         return response()->json($visa);
     }
 

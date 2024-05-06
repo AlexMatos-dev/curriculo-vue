@@ -42,9 +42,13 @@ class Curriculum extends Model
      * @param Integer professionlId
      * @return ArrayOfLinks
      */
-    public function getAllMyCurriculums($perPage = null, $professional_id = null)
+    public function getAllMyCurriculums($queryParam = [], $professional_id = null)
     {
+        $perPage = array_key_exists('per_page', $queryParam) ? $queryParam['per_page'] : 100;
+        $curriculumType = array_key_exists('curriculum_type', $queryParam) ? $queryParam['curriculum_type'] : null;
         $queryObj = Curriculum::where('cprofes_id', $professional_id);
+        if($curriculumType)
+            $queryObj->where('curriculum_type', $curriculumType);
         if(!$perPage){
             $links = $queryObj->get();
         }else{

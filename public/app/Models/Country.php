@@ -58,7 +58,7 @@ class Country extends Model
      */
     public function tryToRemove($country_id, $curriculum_id)
     {
-        if(Visa::where('vicurriculum_id', $curriculum_id)->where('vicountry_id', $country_id)->first())
+        if(Visa::where('vicurriculum_id', $curriculum_id)->where('vicountry_id', $country_id)->count() > 1)
             return false;
         return Country::where('country_id', $country_id)->delete();
     }
