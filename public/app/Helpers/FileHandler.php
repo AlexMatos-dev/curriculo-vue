@@ -8,7 +8,8 @@ class FileHandler{
     const ALLOWED_EXTENSIONS = [
         'png',
         'jpeg',
-        'gif'
+        'gif',
+        'pdf'
     ];
     const MAX_FILE_SIZE_MB = 2;
 

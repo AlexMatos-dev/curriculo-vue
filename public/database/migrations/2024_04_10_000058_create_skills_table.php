@@ -12,7 +12,6 @@ class CreateSkillsTable extends Migration {
 			$table->bigInteger('skcurriculum_id')->unsigned();
 			$table->bigInteger('skill_name')->unsigned();
 			$table->integer('skproficiency_level')->unsigned();
-			$table->float('experience_level')->nullable();
 			$table->timestamps();
 		});
 	}

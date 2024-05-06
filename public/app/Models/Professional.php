@@ -60,4 +60,61 @@ class Professional extends Model
     {
         return DataPerson::where('dpprofes_id', $this->professional_id)->first();
     }
+
+    /**
+     * Tries to add a job modality to logged professional
+     * @param Int jobModalityId
+     * @return Bool
+     */
+    public function syncJobModalities($jobModalityId = null)
+    {
+        if(!$jobModalityId || $this->isMyJobModality($jobModalityId))
+            return false;
+        return ProfessionalJobModality::create([
+            'professional_id' => $this->professional_id,
+            'job_modality_id' => $jobModalityId 
+        ]);
+    }
+
+    /**
+     * Tries to remove a job modality from professional
+     * @param Int jobModalityId
+     * @return Bool
+     */
+    public function removeJobModality($jobModalityId = null)
+    {
+        $jobModality = $this->isMyJobModality($jobModalityId);
+        if(!$jobModalityId || $jobModality)
+            return false;
+        return $jobModality->delete();
+    }
+
+    /**
+     * Checks if logged professional already posses sent jobModalityId
+     * @param Int jobModalityId
+     * @return ProfessionalJobModality
+     */
+    public function isMyJobModality($jobModalityId = null)
+    {
+        $jobModalitiesArray = $this->getJobModalities();
+        return array_key_exists($jobModalityId, $jobModalitiesArray) ? $jobModalitiesArray[$jobModalityId] : false;
+    }
+
+    /**
+     * Gets all job modalities of logged professional
+     * @param Int jobModalityId
+     * @return Array - of ProfessionalJobModality objects
+     */
+    public function getJobModalities()
+    {
+        $objectArray = ProfessionalJobModality::leftJoin('job_modalities AS jobModality', function($join){
+            $join->on('professionals_job_modalities.professional_job_modality_id', '=', 'jobModality.job_modality_id')
+                ->where('professionals_job_modalities.professional_id', $this->professional_id);
+        })->get();
+        $jobModalitiesArray = [];
+        foreach($objectArray as $object){
+            $jobModalitiesArray[$object->job_modality_id] = $object;
+        }
+        return $jobModalitiesArray;
+    }
 }

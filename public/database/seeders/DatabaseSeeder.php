@@ -12,12 +12,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         (new SystemTranslationSeeder())->run();
+        (new AreaOfStudySeeder())->run();
+        (new DegreeTypeSeeder())->run();
+        (new ProficiencySeed())->run();
+        (new TagsSeeder())->run();
+        (new VisasTypeSeeder())->run();
         (new JobModalitySeeder())->run();
         (new ListProfessionalSeeder())->run();
         (new GenderSeeder())->run();
         (new LanguageSeeder())->run();
         (new CountrySeeder())->run();
-        // (new ProfileSeeder())->run();
         (new BrStateSeeder)->run();
         (new BrCitySeeder)->run();
     }
