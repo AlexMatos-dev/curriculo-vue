@@ -38,6 +38,7 @@ Route::prefix('person')->middleware('authenticate')->group(function(){
 Route::prefix('professional')->middleware('authenticate')->group(function(){
     Route::post('update', [ProfessionalController::class, 'update']);
     Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
+    Route::post('updateprofessionaljobmodality', [ProfessionalController::class, 'manageProfessionalJobModality']);
 });
 
 Route::prefix('company')->middleware('authenticate')->group(function(){

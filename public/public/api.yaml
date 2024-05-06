@@ -494,6 +494,50 @@ paths:
           content:
             application/json:
               example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+  /api/professional/updateprofessionaljobmodality:
+    post:
+      tags:
+        - professional
+      summary: Manages job modalities of professional, this method can ADD a new jobModality, REMOVE a current jobModality or LIST all jobModalities of professional
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+            example: add (ADD or REMOVE or LIST)
+            description: Either ADD, REMOVE or LIST
+        - name: job_modality_id
+          in: query
+          description: The job modality id
+          example: 1
+          schema:
+            type: string
+            description: only required when 'action' = 'add'
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              example: {"message":"action performed", "data": "Array|Null"}
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action is invalid
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+        '500':
+          description: The action was not completed
+          content:
+            application/json:
+              example: {"message": "action not completed with success"}
+              
               
   /api/company/update:
     post:

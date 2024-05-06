@@ -49,4 +49,14 @@ class JobList extends Model
     {
         return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
     }
+
+    public function jobSeniority()
+    {
+        return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
+    }
+
+    public function jobEnglishLevel()
+    {
+        return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
+    }
 }

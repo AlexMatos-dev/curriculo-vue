@@ -20,10 +20,12 @@ class ProficiencySeed extends Seeder
         $proficiencyData = json_decode(file_get_contents($path), true);
         $profeciencyObj = new Proficiency();
         foreach($proficiencyData as $data){
-            if($profeciencyObj::where('proficiency_level', $data['en'])->first())
+            if($profeciencyObj::where('proficiency_level', $data['en'])->first() || !$profeciencyObj->getCategory($data['category']))
                 continue;
             $result = Proficiency::create([
                 'proficiency_level' => $data['en'],
+                'category' => $profeciencyObj->getCategory($data['category']),
+                'weight' => array_key_exists('weight', $data) ? $data['weight'] : null
             ]);
             if(!$result || Translation::where('en', $data['en'])->first())
                 continue;
