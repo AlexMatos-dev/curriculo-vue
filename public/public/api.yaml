@@ -1220,7 +1220,7 @@ paths:
             example: 15
             description: Quantity of results per page
           required: true
-        - in: path
+        - in: query
           name: curriculum_type
           schema:
             type: string
