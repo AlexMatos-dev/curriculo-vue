@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CompanySocialNetwork extends Model 
+class CompanySocialNetwork extends Model
 {
     protected $primaryKey = 'social_network_id';
     protected $table = 'companies_social_networks';
@@ -23,7 +23,6 @@ class CompanySocialNetwork extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id')->first();
+        return $this->belongsTo(Company::class, 'company_id');
     }
-
 }

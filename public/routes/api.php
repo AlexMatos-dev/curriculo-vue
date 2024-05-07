@@ -5,6 +5,7 @@ use App\Http\Controllers\JobListController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\RecruiterController;
@@ -53,4 +54,12 @@ Route::prefix('company')->middleware('authenticate')->group(function ()
 Route::prefix('recruiter')->middleware('authenticate')->group(function ()
 {
     Route::post('update', [RecruiterController::class, 'update']);
+});
+
+Route::prefix('social_network')->middleware('authenticate')->group(function ()
+{
+    Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
+    Route::post('store', [CompanySocialNetworkController::class, 'store']);
+    Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
+    Route::delete('destroy/{social_network_id}', [CompanySocialNetworkController::class, 'destroy']);
 });
