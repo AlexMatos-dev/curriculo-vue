@@ -32,20 +32,30 @@ class JobList extends Model
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id')->first();
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function city()
     {
-        return $this->belongsTo(ListCity::class, 'city_id')->first();
+        return $this->belongsTo(ListCity::class, 'city_id');
     }
 
     public function country()
     {
-        return $this->belongsTo(Country::class, 'country_id')->first();
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
     public function modality()
+    {
+        return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
+    }
+
+    public function jobSeniority()
+    {
+        return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
+    }
+
+    public function jobEnglishLevel()
     {
         return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\Curriculum;
 use App\Models\Experience;
 use Illuminate\Http\Request;
@@ -16,10 +17,7 @@ class ExperienceController extends Controller
      */
     public function index(Request $request)
     {
-
-        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
-
-        $experience = Experience::where('excurriculum_id',$curriculum->curriculum_id );
+        $experience = Experience::where('excurriculum_id', $this->getCurriculumBySession()->curriculum_id);
         $experience =  $experience->paginate($request->pere_page);
 
         return response()->json($experience);
@@ -39,18 +37,22 @@ class ExperienceController extends Controller
      * @param String excompany_name - required
      * @param Date exstart_date - required
      * @param Data exend_date - required
-     * @param String exdescription - required
+     * @param String exdescription
      */
     public function store(Request $request)
     {
         $request->validate([
             'exjob_title'       =>'required',
             'excompany_name'    =>'required',
-            'exstart_date'      =>'required',
-            'exend_date'        =>'required',
-            'exdescription'     =>'required'
+            'exstart_date'      =>'required|date_format:Y-m-d',
+            'exend_date'        =>'required|date_format:Y-m-d',
+            'exdescription'     =>'max:500',
+            'excurriculum_id'   =>'required|numeric'
         ]);
-
+        Validator::validateDates($request, [
+            'exstart_date' => 'lower:exend_date',
+            'exend_date' => 'bigger:exstart_date'
+        ]);
         $experience = Experience::create($request->all());
 
         return response()->json($experience);
@@ -88,9 +90,13 @@ class ExperienceController extends Controller
         $request->validate([
             'exjob_title'       =>'required',
             'excompany_name'    =>'required',
-            'exstart_date'      =>'required',
-            'exend_date'        =>'required',
-            'exdescription'     =>'required'
+            'exstart_date'      =>'required|date_format:Y-m-d',
+            'exend_date'        =>'required|date_format:Y-m-d',
+            'exdescription'     =>'max:500'
+        ]);
+        Validator::validateDates($request, [
+            'exstart_date' => 'lower:exend_date',
+            'exend_date' => 'bigger:exstart_date'
         ]);
 
         $experience->update($request->all());

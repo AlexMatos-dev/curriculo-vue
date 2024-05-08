@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Tag extends Model
+class AreaOfStudy extends Model
 {
-    protected $primaryKey = 'tags_id';
-    protected $table = 'tags';
+    protected $primaryKey = 'area_of_study_id';
+    protected $table = 'areas_of_study';
     public $timestamps = true;
 
     /**
@@ -16,6 +16,6 @@ class Tag extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'tags_name'
+        'name'
     ];
 }

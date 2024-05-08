@@ -11,7 +11,8 @@ class CreateEducationsTable extends Migration {
 			$table->increments('education_id', true);
 			$table->bigInteger('edcurriculum_id')->unsigned();
 			$table->string('eddegree', 100);
-			$table->string('edfield_of_study', 150);
+			$table->unsignedInteger('degree_type');
+			$table->unsignedInteger('edfield_of_study');
 			$table->string('edinstitution', 150);
 			$table->datetime('edstart_date');
 			$table->datetime('edend_date')->nullable();

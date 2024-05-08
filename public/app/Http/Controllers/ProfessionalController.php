@@ -5,13 +5,12 @@ namespace App\Http\Controllers;
 use App\Helpers\Validator;
 use App\Models\DataPerson;
 use App\Models\Gender;
+use App\Models\JobModality;
 use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListState;
-use App\Models\Person;
 use App\Models\Professional;
 use App\Models\Profile;
-use Illuminate\Support\Str;
  
 
 class ProfessionalController extends Controller
@@ -133,5 +132,44 @@ class ProfessionalController extends Controller
         if(!$dataPerson->saveDataPerson($data))
             return response()->json(['message' => 'data person not updated', 400]);
         return response()->json($dataPerson);
+    }
+
+    /**
+     * Manages job modalities of professional, this method can ADD a new jobModality, REMOVE a current jobModality or LIST all jobModalities of professional
+     * @param String action - possible values ['add', 'remove', 'list']
+     * @param String job_modality_id - only required when 'action' = 'add'
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function manageProfessionalJobModality()
+    {
+        $actions = ['add', 'remove', 'list'];
+        if(!in_array(request('action'), $actions))
+            return response()->json(['message' => 'invalid action'], 400);
+        $person = auth('api')->user();
+        $professional = $person->getProfile(Profile::PROFESSIONAL);
+        if(!$professional)
+            return response()->json(['message' => 'professional not found'], 400);
+        $data = null;
+        switch(request('action')){
+            case 'add':
+                Validator::validateParameters($this->request, [
+                    'job_modality_id' => 'numeric|required'
+                ]);
+                Validator::checkExistanceOnTable([
+                    'job_modality' => ['data' => request('job_modality_id'), 'object' => JobModality::class],
+                ]);
+                $result = $professional->syncJobModalities(request('job_modality_id'));
+            break;
+            case 'remove':
+                $result = $professional->removeJobModality(request('job_modality_id'));
+            break;
+            case 'list':
+                $result =  $professional->getJobModalities();
+                $data = is_array($result) ? $result : [];
+            break;
+        }
+        if(!$result)
+            return response()->json(['message' => 'action not completed with success'], 500);
+        return response()->json(['message' => 'action performed', 'data' => $data]);
     }
 }

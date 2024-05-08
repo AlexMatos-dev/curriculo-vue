@@ -148,6 +148,12 @@ class Person extends Authenticatable implements JWTSubject
         return $object;
     }
 
+    /**
+     * Returns a slug with sent parameters
+     * @param String firstValue
+     * @param String lastValue
+     * @return String
+     */
     public function makeSlug($firstValue = '', $lastValue = '')
     {
         $uuid = str_replace(['.', '/', ','], '', microtime(true));

@@ -13,11 +13,10 @@ class CreateJobsListTable extends Migration {
 			$table->unsignedBigInteger('job_modality_id');
 			$table->unsignedInteger('job_country')->nullable();
 			$table->unsignedBigInteger('job_city')->nullable();
-			$table->string('job_seniority', 100);
+			$table->unsignedInteger('job_seniority')->nullable();
 			$table->decimal('job_salary', 10,2)->default('0.0');
 			$table->string('job_description', 500);
-			$table->text('job_skills')->nullable();
-			$table->string('job_english_level', 100);
+			$table->unsignedInteger('job_english_level')->nullable();
 			$table->string('job_experience', 100);
 			$table->text('job_benefits')->nullable();
 			$table->timestamps();
