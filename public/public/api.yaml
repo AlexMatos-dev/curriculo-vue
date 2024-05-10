@@ -1668,8 +1668,6 @@ paths:
                   value:
                     message: no professional found
                   summary: Logged person account professional profile not found                    
-                  
-                  
   /api/curriculum/link:
     post:
       tags:
@@ -1866,9 +1864,108 @@ paths:
                 no professional found:
                   value:
                     message: no professional found
-                  summary: Logged person account professional profile not found
-  
-                  
+                  summary: Logged person account professional profile not found 
+  /api/social_network/showByCompanyId:
+    get:
+      tags:
+        - company_social_network
+      sumary: Get company social media
+      description: Get a company social media by ID
+      parameters:
+        - name: company_id
+          in: query
+          description: Company ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Return all social medias.
+        '404':
+          description: Social medias not found.
+  /api/social_network/store:
+    post:
+      tags:
+        - company_social_network
+      sumary: Create a new social network
+      description: create a new social network to a company
+      parameters:
+        - name: social_network_profile
+            in: query
+            description: Link to network profile
+            required: true
+            example: "www.instagram.com/profile/"
+            schema:
+              type: string
+        - name: company_id
+            in: query
+            description: Company id 
+            required: true
+            example: 1
+            schema:
+              type: integer
+        - name: social_network_type
+            in: query
+            description: Type os social network
+            required: true
+            example: "Instagram"
+            schema:
+              type: string
+        responses:
+          '200':
+            description: Company social network created sucessfully.
+          '404':
+            description: An error occurred while creating the social network, please try again later.
+  /api/social_network/update:
+    post:
+      tags:
+        - company_social_network
+      sumary: Update a social network
+      description: Update a social network
+      parameters:
+        - name: social_network_profile
+            in: query
+            description: Link to network profile
+            example: "www.instagram.com/profile/"
+            schema:
+              type: string
+        - name: company_id
+            in: query
+            description: Company id 
+            example: 1
+            schema:
+              type: integer
+        - name: social_network_type
+            in: query
+            description: Type os social network
+            example: "Instagram"
+            schema:
+              type: string
+      responses:
+          '200':
+            description: Company social network updated sucessfully.
+          '404':
+            description: Company social network not found.
+  /api/social_network/destroy:
+    post:
+        tags:
+          - company_social_network
+        summary: Delete a company social midia
+        description: Delete a specific social midia by ID
+        parameters:
+          - name: company_social_network
+            in: query
+            description: Company social network id
+            required: true
+            example: 8
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Company social network deleted sucessfully.
+          '404':
+            description: Company social network not found.
 components:
   schemas:
     Login:
