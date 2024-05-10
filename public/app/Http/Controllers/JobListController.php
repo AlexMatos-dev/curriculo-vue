@@ -25,7 +25,6 @@ class JobListController extends Controller
     /**
      * Perform a search accordingly to sent parameters and returns a list
      * @param Int page - default 1
-     * @param Int per_page - default 100
      * @param Int job_modality_id
      * @param Int company_id
      * @param Int job_country
@@ -34,10 +33,11 @@ class JobListController extends Controller
      * @param Float job_salary_end
      * @param String job_description
      * @param IntArray job_skills
-     * @param Int job_english_level
      * @param String job_experience_description
      * @param Int experience_in_months_start
      * @param Int experience_in_months_end
+     * @param Array job_visas
+     * @param Array job_visas_countries
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
      *      "curent_page": int,
@@ -49,7 +49,6 @@ class JobListController extends Controller
     {
         Validator::validateParameters($this->request, [
             'page' => 'integer',
-            'per_page' => 'integer',
             'company_id' => 'integer',
             'job_modality_id' => 'integer',
             'job_city' => 'integer',
@@ -58,8 +57,6 @@ class JobListController extends Controller
             'job_salary_start' => 'numeric',
             'job_salary_end' => 'numeric',
             'job_description' => 'max:500',
-            'job_skills' => 'array',
-            'job_english_level' => 'integer',
             'job_experience_description' => 'max:100',
             'experience_in_months_start' => 'integer',
             'experience_in_months_end' => 'integer'
@@ -71,9 +68,6 @@ class JobListController extends Controller
             'job_country' => ['object' => \App\Models\ListCountry::class, 'data' => $request->job_country, 'required' => false],
             'job_seniority' => ['object' => \App\Models\Proficiency::class, 'data' => $request->job_seniority, 'required' => false, 
                 'attrToCheck' => 'category', 'expectedValue' => \App\Models\Proficiency::CATEGORY_SENIORITY
-            ],
-            'job_english_level' => ['object' => \App\Models\Proficiency::class, 'data' => $request->job_english_level, 'required' => false, 
-                'attrToCheck' => 'category', 'expectedValue' => \App\Models\Proficiency::CATEGORY_LANGUAGE
             ]
         ]);
         if($request->job_city && $request->job_country){
@@ -82,12 +76,12 @@ class JobListController extends Controller
                 Validator::throwResponse('city is not from sent country');
         }
         $page = request('page', 1);
-        $perPage = request('per_page', 20);
+        $perPage = 100;
         $jobListObj = new JobList();
         $nonPaying = $jobListObj->listJobs($request, false);
-        $nonPaying = $jobListObj->spliteJobSkillsFromListedJobs($nonPaying);
+        $nonPaying = $jobListObj->splitjoinDataFromListedJobs($nonPaying);
         $paying = $jobListObj->listJobs($request, true);
-        $paying = $jobListObj->spliteJobSkillsFromListedJobs($paying);
+        $paying = $jobListObj->splitjoinDataFromListedJobs($paying);
         $total = count($paying) + count($nonPaying);
         $results = $jobListObj->processListedJobs([
             'paying'    => $paying,
@@ -101,8 +95,10 @@ class JobListController extends Controller
         if($page > 1){
             $nonPayingOffset = $results['status']['nonPaying'];
             $nonPaying = $jobListObj->listJobs($request, false, $perPage, $nonPayingOffset);
+            $nonPaying = $jobListObj->splitjoinDataFromListedJobs($nonPaying);
             $payingOffset = $results['status']['paying'];
             $paying = $jobListObj->listJobs($request, true, $perPage, $payingOffset);
+            $paying = $jobListObj->splitjoinDataFromListedJobs($paying);
             $results = $jobListObj->processListedJobs([
                 'paying'    => $paying,
                 'nonPaying' => $nonPaying
@@ -125,10 +121,10 @@ class JobListController extends Controller
     {
         try{
             $jobList = JobList::with('company')->findOrFail($joblistId);
-            $jobList->job_skills = $jobList->jobSkills();
-            return response()->json(["message" => "job found successfully", "data" => $jobList], 200);
+            $jobListObj = $jobList->splitjoinDataFromListedJobs([$jobList]);
+            return response()->json(["message" => "job found successfully", "data" => $jobListObj]);
         }catch(ModelNotFoundException $e){
-            return response()->json(["message" => "job not found", "Error" => $e], 404);
+            return response()->json(["message" => "job not found", "Error" => $e], 400);
         }
     }
 
@@ -140,7 +136,6 @@ class JobListController extends Controller
      * @param Int job_seniority
      * @param Float job_salary
      * @param String job_description
-     * @param Int job_english_level
      * @param Int experience_in_months
      * @param String job_experience_description
      * @param String job_benefits
@@ -160,7 +155,6 @@ class JobListController extends Controller
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
                 'job_description'   => 'required|max:500',
-                'job_english_level' => 'integer',
                 'experience_in_months' => 'integer',
                 'job_experience_description' => 'max:100',
                 'job_benefits'      => 'max:65535',
@@ -170,8 +164,7 @@ class JobListController extends Controller
                 'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
                 'job_city'          => ['object' => ListCity::class,    'data' => $request->job_city,          'required' => false],
                 'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
-                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false],
-                'job_english_level' => ['object' => Proficiency::class, 'data' => $request->job_english_level],
+                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
             if($request->job_city && !$request->job_country)
                 Validator::throwResponse('a country is required');
@@ -182,17 +175,15 @@ class JobListController extends Controller
             }
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse('invalid proficiency, must be seniority type');
-            if($request->job_english_level && $objects['job_english_level']->category != Proficiency::CATEGORY_LANGUAGE)
-                Validator::throwResponse('invalid proficiency, must be language type');
             $data = $request->all();
             unset($data['job_skills']);
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $jobList = JobList::create($data);
-            return response()->json(["message" => "job created successfully", 'data' => $jobList], 201);
+            return response()->json(["message" => "job created successfully", 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => "an error occurred while creating the job, please try again later.", "Error" => $e], 400);
+            return response()->json(["message" => "an error occurred while creating the job, please try again later.", "Error" => $e], 500);
         }
     }
 
@@ -205,7 +196,6 @@ class JobListController extends Controller
      * @param Int job_seniority
      * @param Float job_salary
      * @param String job_description
-     * @param Int job_english_level
      * @param Int experience_in_months
      * @param String job_experience_description
      * @param String job_benefits
@@ -230,7 +220,6 @@ class JobListController extends Controller
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
                 'job_description'   => 'required|max:500',
-                'job_english_level' => 'integer',
                 'experience_in_months' => 'integer',
                 'job_experience_description' => 'max:100',
                 'job_benefits'      => 'max:65535'
@@ -239,8 +228,7 @@ class JobListController extends Controller
                 'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
                 'job_city'          => ['object' => ListCity::class,    'data' => $request->job_city,          'required' => false],
                 'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
-                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false],
-                'job_english_level' => ['object' => Proficiency::class, 'data' => $request->job_english_level],
+                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
             if($request->job_city && !$request->job_country)
                 Validator::throwResponse('a country is required');
@@ -251,17 +239,15 @@ class JobListController extends Controller
             }
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse('invalid proficiency, must be seniority type');
-            if($request->job_english_level && $objects['job_english_level']->category != Proficiency::CATEGORY_LANGUAGE)
-                Validator::throwResponse('invalid proficiency, must be language type');
             $data = $request->all();
             unset($data['job_skills']);
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $result = $jobList->update($data);
-            return response()->json(["message" => "job updated successfully", 'data' => $jobList], 201);
+            return response()->json(["message" => "job updated successfully", 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => "an error occurred while updating the job, please try again later.", "Error" => $e], 400);
+            return response()->json(["message" => "an error occurred while updating the job, please try again later.", "Error" => $e], 500);
         }
     }
 
@@ -281,7 +267,7 @@ class JobListController extends Controller
             JobModality::where('joblist_id', $jobList->job_id);
             JobLanguage::where('joblist_id', $jobList->job_id);
             $jobList->delete();
-            return response()->json(["message" => "job $jobList->job_model deleted sucessfully."], 200);
+            return response()->json(["message" => "job $jobList->job_model deleted sucessfully."]);
         }
         catch (ModelNotFoundException $e)
         {

@@ -68,11 +68,6 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->foreign('job_english_level')->references('proficiency_id')->on('proficiency')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
 						->onDelete('restrict')
@@ -407,9 +402,6 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
 			$table->dropForeign('jobslist_job_seniority_foreign');
-		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobslist_job_english_level_foreign');
 		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->dropForeign('job_skills_joblist_id_foreign');

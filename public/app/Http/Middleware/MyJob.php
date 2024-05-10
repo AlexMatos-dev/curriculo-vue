@@ -15,25 +15,40 @@ use Symfony\Component\HttpFoundation\Response;
 class MyJob extends Controller
 {
     /**
-     * This middleware filters request, the logged person may only have access to its own data (its professional profile curriculums and subsequents Objects)
-     * The "handle" methods checks:
-     * Fetches Professional object of logged person account & sets it to session
-     * Fetches Curriculum object of logged person account & sets it to session if 'curriculum_id' is sent and route is not an exception (not to check route)
-     * Note: This method has an array of exceptions which disable the required parameters such as 'curriculum_id' fetch and check!
+     * This middleware filters request, the logged person may only have access to its own data (perform actions if his/her company is creator of job)
+     * Note: There are exception to ownership check
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
-        $company = $person->getProfile(Profile::COMPANY);
-        if(!$company)
-            Validator::throwResponse('company not found', 401);
         $jobList = JobList::find(request('joblist_id'));
         if(!$jobList)
             Validator::throwResponse('job not found', 401);
-        if($jobList->company_id != $company->company_id)
-            Validator::throwResponse('not your job', 401);
+        if(!$this->isException()){
+            $person = auth('api')->user();
+            $company = $person->getProfile(Profile::COMPANY);
+            if(!$company)
+                Validator::throwResponse('company not found', 401);
+            if($jobList->company_id != $company->company_id)
+                Validator::throwResponse('not your job', 401);
+        }
         Session()->put('job', $jobList);
         return $next($request);
+    }
+
+    /**
+     * Checkes if sent parameter is of exception, in this case does no check ownership of job
+     * @return Bool
+     */
+    public function isException()
+    {
+        $exceptionsParameters = [
+            'action' => 'list'
+        ];
+        foreach($exceptionsParameters as $paramName => $paramValue){
+            if($this->request->has($paramName) && request($paramName) == $paramValue)
+                return true;
+        }
+        return false;
     }
 }
