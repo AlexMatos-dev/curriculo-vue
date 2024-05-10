@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\ListProfessional;
+use App\Models\ListProfession;
 use App\Models\Translation;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ListProfessionalSeeder extends Seeder
+class ListProfessionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,11 +17,11 @@ class ListProfessionalSeeder extends Seeder
         if(!file_exists($path))
             return;
         $professionsArray = json_decode(file_get_contents($path), true);
-        $listProfessionalObj = new ListProfessional();
+        $lListProfessionObj = new ListProfession();
         foreach($professionsArray as $language){
-            if($listProfessionalObj::where('profession_name', $language['en'])->first())
+            if($lListProfessionObj::where('profession_name', $language['en'])->first())
                 continue;
-            $result = ListProfessional::create([
+            $result = ListProfession::create([
                 'profession_name' => $language['en']
             ]);
             if(!$result || Translation::where('en', $language['en'])->first())

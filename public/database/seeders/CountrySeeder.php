@@ -28,7 +28,7 @@ class CountrySeeder extends Seeder
             if(!$result || Translation::where('en', $data['en'])->first())
                 continue;
             Translation::create([
-                'en' => $data['es'],
+                'en' => $data['en'],
                 'pt' => $data['pt'],
                 'es' => $data['es']
             ]);

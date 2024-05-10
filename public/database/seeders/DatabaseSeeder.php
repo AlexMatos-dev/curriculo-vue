@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         (new TagsSeeder())->run();
         (new VisasTypeSeeder())->run();
         (new JobModalitySeeder())->run();
-        (new ListProfessionalSeeder())->run();
+        (new ListProfessionSeeder())->run();
         (new GenderSeeder())->run();
         (new LanguageSeeder())->run();
         (new CountrySeeder())->run();

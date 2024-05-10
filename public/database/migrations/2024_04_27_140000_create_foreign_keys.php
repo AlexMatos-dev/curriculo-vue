@@ -104,7 +104,12 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->foreign('visas_id')->references('visas_id')->on('visas')
+			$table->foreign('visas_type_id')->references('typevisas_id')->on('type_visas')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->foreign('country_id')->references('lcountry_id')->on('listcountries')
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
@@ -425,7 +430,10 @@ class CreateForeignKeys extends Migration {
 			$table->dropForeign('job_visas_joblist_id_foreign');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->dropForeign('job_visas_visas_id_foreign');
+			$table->dropForeign('job_visas_visas_type_id_foreign');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->dropForeign('job_visas_country_id_foreign');
 		});
 		Schema::table('jobs_invites', function(Blueprint $table) {
 			$table->dropForeign('jobs_invites_job_id_foreign');

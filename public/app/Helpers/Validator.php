@@ -111,8 +111,11 @@ class Validator
 
     /**
      * Performes a validation sent array, checking by a query if id exists on table.
-     * Obs: may not return an object if sent 'data' key is null or empty, always check if $attrName exists in return Array
-     * @param Array - Schema: [$attrName => ['object'=> $objectPath , 'data' => $objectId]] 
+     * Obs: may not return an object if sent 'data' key is null or empty, always check if $attrName exists in return Array. To check only if an id was
+     * sent use the 'required' attribute!
+     * @param Array - Schema: [$attrName => ['object'=> $objectPath , 'data' => $objectId, 'required' => bool,
+     *      'attrToCheck' => 'object attribute to check', 'expectedValue' => 'the value expected at $attrToCheck']
+     * ] 
      * @return Array [$attrName => $objectInstance]
      */
     public static function checkExistanceOnTable($dataToCheck = [])
@@ -121,6 +124,7 @@ class Validator
         foreach($dataToCheck as $key => $data){
             if(!$data['data'])
                 continue;
+            $required = array_key_exists('required', $data) && is_bool($data['required']) ? $data['required'] : false;
             if(!array_key_exists('object', $data) || !array_key_exists('data', $data))
                 self::throwResponse('invalid parameters for validation', 500);
             try {
@@ -129,8 +133,12 @@ class Validator
             } catch (\Throwable $th) {
                 self::throwResponse("$key is not valid", 400);
             }
-            if(!$foundObject)
+            if(!$foundObject && $required)
                 self::throwResponse('invalid parameters for validation', 500);
+            $attrToCheck = array_key_exists('attrToCheck', $data) ? $data['attrToCheck'] : false;
+            $expectedValue = array_key_exists('expectedValue', $data) ? $data['expectedValue'] : false;
+            if($attrToCheck && $expectedValue && $foundObject->{$attrToCheck} != $expectedValue)
+                self::throwResponse("invalid type of $attrToCheck", 400);
             $objects[$key] = $foundObject;
         }
         return $objects;

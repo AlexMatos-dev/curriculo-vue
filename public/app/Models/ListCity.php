@@ -24,4 +24,13 @@ class ListCity extends Model
     {
         return $this->belongsTo(ListState::class, 'lcitstates_id');
     }
+
+    public function getCountry()
+    {
+        return ListCity::where('lcity_id', $this->lcity_id)->leftJoin('liststates AS state', function($join){
+            $join->on('listcities.lcitstates_id', '=', 'state.lstates_id');
+        })->leftJoin('listcountries AS country', function($join){
+            $join->on('state.lstacountry_id', '=', 'country.lcountry_id');
+        })->first();
+    }
 }
