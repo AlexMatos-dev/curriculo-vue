@@ -23,6 +23,16 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
+		Schema::table('companies_social_networks', function(Blueprint $table) {
+			$table->foreign('social_network_type_id')->references('social_network_type_id')->on('companies_social_networks_types')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('companies_social_networks_types', function(Blueprint $table) {
+			$table->foreign('author_company_id')->references('company_id')->on('companies')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
 		Schema::table('recruiters', function(Blueprint $table) {
 			$table->foreign('person_id')->references('person_id')->on('persons')
 						->onDelete('restrict')
@@ -375,6 +385,12 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('companies_social_networks', function(Blueprint $table) {
 			$table->dropForeign('companies_social_networks_company_id_foreign');
+		});
+		Schema::table('companies_social_networks', function(Blueprint $table) {
+			$table->dropForeign('companies_social_networks_social_network_type_id_foreign');
+		});
+		Schema::table('companies_social_networks_types', function(Blueprint $table) {
+			$table->dropForeign('companies_social_networks_types_author_company_id_foreign');
 		});
 		Schema::table('recruiters', function(Blueprint $table) {
 			$table->dropForeign('recruiters_person_id_foreign');

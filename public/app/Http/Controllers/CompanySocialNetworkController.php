@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\CompanySocialNetwork;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Models\CompanySocialNetworkType;
 use Illuminate\Http\Request;
 
 class CompanySocialNetworkController extends Controller
@@ -15,15 +15,15 @@ class CompanySocialNetworkController extends Controller
         {
             $socialNetwork = CompanySocialNetwork::query()
                 ->where('company_id', '=', $companyId)
-                ->with('company');
+                ->with(['company', 'socialNetworkType']);
 
             $results = $socialNetwork->paginate(10);
 
             return response()->json($results);
         }
-        catch (ModelNotFoundException $e)
+        catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 404);
+            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
         }
     }
 
@@ -32,18 +32,20 @@ class CompanySocialNetworkController extends Controller
         try
         {
             $request->validate([
-                'social_network_profile'    => 'required',
-                'company_id'                => 'required',
-                'social_network_type'       => 'required',
+                'social_network_profile' => 'required',
+                'social_network_type_id' => 'required',
             ]);
-
-            $socialNetwork = CompanySocialNetwork::create($request->all());
-
-            return response()->json($socialNetwork, 201);
+            Validator::checkExistanceOnTable([
+                'socialNetworkType' => ['object' => CompanySocialNetworkType::class, 'data' => $request->social_network_type_id]
+            ]);
+            $data = $request->all();
+            $data['company_id'] = $this->getCompanyBySession()->company_id;
+            $socialNetwork = CompanySocialNetwork::create($data);
+            return response()->json($socialNetwork, 200);
         }
-        catch (ModelNotFoundException $e)
+        catch (\Exception $e)
         {
-            return response()->json(["message" => "An error occurred while creating the social network, please try again later.", "Error" => $e], 400);
+            return response()->json(["message" => "An error occurred while creating the social network, please try again later.", "Error" => $e->getMessage()], 400);
         }
     }
 
@@ -51,14 +53,18 @@ class CompanySocialNetworkController extends Controller
     {
         try
         {
+            $request->validate([
+                'social_network_profile' => 'required',
+                'social_network_type_id' => 'required',
+            ]);
             $network = CompanySocialNetwork::findOrFail($socialNetworkId);
             $network->update($request->all());
 
             return response()->json(["message" => "Social network updated successfully.", "data" => $network], 200);
         }
-        catch (ModelNotFoundException $e)
+        catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 404);
+            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
         }
     }
 
@@ -71,9 +77,9 @@ class CompanySocialNetworkController extends Controller
 
             return response()->json(["message" => "Social network deleted sucessfully."], 200);
         }
-        catch (ModelNotFoundException $e)
+        catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 404);
+            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
         }
     }
 }

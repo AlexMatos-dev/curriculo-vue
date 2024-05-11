@@ -70,7 +70,9 @@ Route::prefix('recruiter')->middleware('authenticate')->group(function ()
 Route::prefix('social_network')->middleware('authenticate')->group(function ()
 {
     Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
-    Route::post('store', [CompanySocialNetworkController::class, 'store']);
-    Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
-    Route::delete('destroy/{social_network_id}', [CompanySocialNetworkController::class, 'destroy']);
+    Route::middleware('companyadmin')->group(function(){
+        Route::post('store', [CompanySocialNetworkController::class, 'store']);
+        Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
+        Route::delete('destroy/{social_network_id}', [CompanySocialNetworkController::class, 'destroy']);
+    });
 });

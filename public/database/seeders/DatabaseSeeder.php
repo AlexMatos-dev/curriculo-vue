@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         (new SystemTranslationSeeder())->run();
+        (new CompanySocialNetworkTypeSeeder())->run();
         (new AreaOfStudySeeder())->run();
         (new DegreeTypeSeeder())->run();
         (new ProficiencySeed())->run();

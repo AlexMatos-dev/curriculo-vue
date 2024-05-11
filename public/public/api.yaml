@@ -9,6 +9,35 @@ info:
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
+    
+    
+    API responses have a pattern:
+    ---------------------------------------------------
+    Sucesso -> 
+    status: 200
+    data: Informação retornada
+    
+    Erro na passagem de parâmetros -> 
+    status: 400
+    message: Descrição do status
+    
+    Erro de Autenticação -> 
+    status: 401
+    message: Descrição do status
+    
+    Erro de Permissão -> 
+    status: 403
+    message: Descrição do status
+    
+    Não encontrado -> 
+    status: 404
+    message: Descrição do status
+    
+    Erro no sistema ->
+    status: 500
+    message: Descrição do erro
+    ---------------------------------------------------
+    
   termsOfService: http://swagger.io/terms/
   contact:
     email: nickolasbini@hotmail.com
@@ -1865,11 +1894,12 @@ paths:
                   value:
                     message: no professional found
                   summary: Logged person account professional profile not found 
+  
   /api/social_network/showByCompanyId:
     get:
       tags:
         - company_social_network
-      sumary: Get company social media
+      summary: Get company social media
       description: Get a company social media by ID
       parameters:
         - name: company_id
@@ -1881,67 +1911,71 @@ paths:
             type: integer
       responses:
         '200':
-          description: Return all social medias.
+          description: Return all CompanySocialMedia objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
         '404':
           description: Social medias not found.
   /api/social_network/store:
     post:
       tags:
         - company_social_network
-      sumary: Create a new social network
+      summary: Create a new social network
       description: create a new social network to a company
       parameters:
         - name: social_network_profile
-            in: query
-            description: Link to network profile
-            required: true
-            example: "www.instagram.com/profile/"
-            schema:
-              type: string
+          in: query
+          description: Link to network profile
+          required: true
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
         - name: company_id
-            in: query
-            description: Company id 
-            required: true
-            example: 1
-            schema:
-              type: integer
+          in: query
+          description: Company id 
+          required: true
+          example: 1
+          schema:
+            type: integer
         - name: social_network_type
-            in: query
-            description: Type os social network
-            required: true
-            example: "Instagram"
-            schema:
-              type: string
-        responses:
-          '200':
-            description: Company social network created sucessfully.
-          '404':
-            description: An error occurred while creating the social network, please try again later.
+          in: query
+          description: Type os social network
+          required: true
+          example: "Instagram"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company social network created sucessfully.
+        '404':
+          description: An error occurred while creating the social network, please try again later.
   /api/social_network/update:
     post:
       tags:
         - company_social_network
-      sumary: Update a social network
+      summary: Update a social network
       description: Update a social network
       parameters:
         - name: social_network_profile
-            in: query
-            description: Link to network profile
-            example: "www.instagram.com/profile/"
-            schema:
-              type: string
+          in: query
+          description: Link to network profile
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
         - name: company_id
-            in: query
-            description: Company id 
-            example: 1
-            schema:
-              type: integer
+          in: query
+          description: Company id 
+          example: 1
+          schema:
+            type: integer
         - name: social_network_type
-            in: query
-            description: Type os social network
-            example: "Instagram"
-            schema:
-              type: string
+          in: query
+          description: Type os social network
+          example: "Instagram"
+          schema:
+            type: string
       responses:
           '200':
             description: Company social network updated sucessfully.
