@@ -34,7 +34,8 @@ class Person extends Authenticatable implements JWTSubject
         'person_password',
         'person_ddi',
         'person_phone',
-        'person_langue'
+        'person_langue',
+        'last_login'
     ];
 
     /**
