@@ -19,10 +19,9 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 Route::post('requestchangepassword', [AuthController::class, 'requestChangePasswordCode']);
 Route::post('changepassword', [AuthController::class, 'changePassword']);
-Route::prefix('auth')->middleware('authenticate')->group(function ()
+Route::prefix('auth')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('logout', [AuthController::class, 'logout']);
-    Route::post('refresh', [AuthController::class, 'refresh']);
     Route::post('profile', [AuthController::class, 'profile']);
 });
 
@@ -38,26 +37,28 @@ Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(fun
     Route::resource('education', EducationController::class);
 });
 
-Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
-Route::prefix('joblist')->middleware(['authenticate', 'job'])->group(function(){
-    Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
-    Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
-    Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
+Route::middleware('auth:sanctum')->group(function(){
+    Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
+    Route::prefix('joblist')->middleware('job')->group(function(){
+        Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
+        Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
+        Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
+    });
 });
 
-Route::prefix('person')->middleware('authenticate')->group(function ()
+Route::prefix('person')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [PersonController::class, 'update']);
 });
 
-Route::prefix('professional')->middleware('authenticate')->group(function ()
+Route::prefix('professional')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [ProfessionalController::class, 'update']);
     Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
     Route::post('updateprofessionaljobmodality', [ProfessionalController::class, 'manageProfessionalJobModality']);
 });
 
-Route::prefix('company')->middleware('authenticate')->group(function ()
+Route::prefix('company')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [CompanyController::class, 'update']);
     Route::middleware('companyadmin')->group(function ()
@@ -67,12 +68,12 @@ Route::prefix('company')->middleware('authenticate')->group(function ()
     });
 });
 
-Route::prefix('recruiter')->middleware('authenticate')->group(function ()
+Route::prefix('recruiter')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [RecruiterController::class, 'update']);
 });
 
-Route::prefix('social_network')->middleware('authenticate')->group(function ()
+Route::prefix('social_network')->middleware('auth:sanctum')->group(function ()
 {
     Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
     Route::middleware('companyadmin')->group(function(){

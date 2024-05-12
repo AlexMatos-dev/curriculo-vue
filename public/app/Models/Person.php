@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
-use App\Helpers\TranslatorHandler;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
-class Person extends Authenticatable implements JWTSubject
+class Person extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     const PROFESSIONAL_PERSON_ACCOUNT = 'professional';
     const RECRUITER_PERSON_ACCOUNT    = 'recruiter';
@@ -46,26 +44,6 @@ class Person extends Authenticatable implements JWTSubject
     protected $hidden = [
         'person_password'
     ];
-
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
 
     public function language()
     {
