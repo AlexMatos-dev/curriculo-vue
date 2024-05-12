@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('curriculum', [
             \App\Http\Middleware\MyCurriculum::class
         ]);
+        $middleware->group('job', [
+            \App\Http\Middleware\MyJob::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -39,6 +39,11 @@ Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(fun
 });
 
 Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
+Route::prefix('joblist')->middleware(['authenticate', 'job'])->group(function(){
+    Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
+    Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
+    Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
+});
 
 Route::prefix('person')->middleware('authenticate')->group(function ()
 {

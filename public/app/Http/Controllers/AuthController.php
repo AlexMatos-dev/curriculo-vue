@@ -7,6 +7,7 @@ use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Helpers\Validator;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -40,6 +41,8 @@ class AuthController extends Controller
         }
         $dataToReturn = $this->respondWithToken($token)->getOriginalContent();
         $dataToReturn['lastLogin'] = $personType;
+        $person->last_login = Carbon::now();
+        $person->save();
         return response()->json($dataToReturn);
     }
 

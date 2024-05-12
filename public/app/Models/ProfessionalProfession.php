@@ -29,6 +29,6 @@ class ProfessionalProfession extends Model
 
     public function profession()
     {
-        return $this->belongsTo(ListProfessional::class, 'lprofession_id')->first();
+        return $this->belongsTo(ListProfession::class, 'lprofession_id')->first();
     }
 }

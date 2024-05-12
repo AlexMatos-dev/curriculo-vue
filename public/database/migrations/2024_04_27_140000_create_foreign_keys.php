@@ -78,11 +78,6 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->foreign('job_english_level')->references('proficiency_id')->on('proficiency')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
 						->onDelete('restrict')
@@ -114,7 +109,12 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->foreign('visas_id')->references('visas_id')->on('visas')
+			$table->foreign('visas_type_id')->references('typevisas_id')->on('type_visas')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->foreign('country_id')->references('lcountry_id')->on('listcountries')
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
@@ -419,9 +419,6 @@ class CreateForeignKeys extends Migration {
 		Schema::table('jobslist', function(Blueprint $table) {
 			$table->dropForeign('jobslist_job_seniority_foreign');
 		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobslist_job_english_level_foreign');
-		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->dropForeign('job_skills_joblist_id_foreign');
 		});
@@ -441,7 +438,10 @@ class CreateForeignKeys extends Migration {
 			$table->dropForeign('job_visas_joblist_id_foreign');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->dropForeign('job_visas_visas_id_foreign');
+			$table->dropForeign('job_visas_visas_type_id_foreign');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->dropForeign('job_visas_country_id_foreign');
 		});
 		Schema::table('jobs_invites', function(Blueprint $table) {
 			$table->dropForeign('jobs_invites_job_id_foreign');
