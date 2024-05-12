@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
 
 class ListState extends Model
 {
-    protected $primaryKey = 'lstate_id';
+    protected $primaryKey = 'lstates_id';
     protected $table = 'liststates';
     public $timestamps = true;
 
@@ -19,7 +20,8 @@ class ListState extends Model
         'lstates_name',
         'lstates_parent_id',
         'lstates_level',
-        'lstacountry_id'
+        'lstacountry_id',
+        'lstate_acronyn'
     ];
 
     public function listState()
@@ -30,5 +32,19 @@ class ListState extends Model
     public function listCountry()
     {
         return $this->belongsTo(ListCountry::class, 'lstacountry_id')->first();
+    }
+
+    /**
+     * Returns an array containing all ListState belonging to a country
+     * @param String countryAcronyn
+     * @return Array of ListState
+     */
+    public function getStatesByCountryAcronyn($countryAcronyn = null)
+    {
+        $this->countryAcronyn = $countryAcronyn;
+        return ListState::join('listcountries', function (JoinClause $join) {
+            $join->on('listcountries.lcountry_id', '=', 'liststates.lstacountry_id')
+                ->where('listcountries.lcountry_acronyn', '=', $this->countryAcronyn);
+        })->get();
     }
 }

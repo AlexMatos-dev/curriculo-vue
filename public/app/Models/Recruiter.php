@@ -17,6 +17,7 @@ class Recruiter extends Model
      */
     protected $fillable = [
         'company_id',
+        'person_id',
         'recruiter_photo',
         'paying'
     ];
@@ -24,5 +25,10 @@ class Recruiter extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id')->first();
+    }
+
+    public function person()
+    {
+        return $this->belongsTo(Person::class, 'person_id')->first();
     }
 }

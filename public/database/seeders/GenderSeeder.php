@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Gender;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Translation;
 use Illuminate\Database\Seeder;
 
 class GenderSeeder extends Seeder
@@ -14,17 +14,23 @@ class GenderSeeder extends Seeder
     public function run(): void
     {
         $genderArray = [
-            ['en' => 'masculine', 'pt' => 'masculino'],
-            ['en' => 'feminine', 'pt' => 'feminino'],
-            ['en' => 'other', 'pt' => 'outro'],
+            ['en' => 'masculine', 'pt' => 'masculino', 'es' => 'masculino'],
+            ['en' => 'feminine', 'pt' => 'feminino', 'es' => 'femenino'],
+            ['en' => 'other', 'pt' => 'outro', 'es' => 'otro'],
         ];
         $genderObj = new Gender();
         foreach($genderArray as $gender){
-            $genderName = mb_strtolower($gender['pt']);
-            if($genderObj::where('gender_name', $genderName)->first())
+            if($genderObj::where('gender_name', $gender['en'])->first())
                 continue;
-            Gender::create([
-                'gender_name' => $genderName
+            $result = Gender::create([
+                'gender_name' => $gender['en']
+            ]);
+            if(!$result || Translation::where('en', $gender['en'])->first())
+                continue;
+            Translation::create([
+                'en' => $gender['en'],
+                'pt' => $gender['pt'],
+                'es' => $gender['es']
             ]);
         }
     }

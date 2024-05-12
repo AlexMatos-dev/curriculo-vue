@@ -15,6 +15,7 @@ class CreatePersonsTable extends Migration {
 			$table->string('person_ddi', 10)->nullable();
 			$table->string('person_phone', 20)->nullable();
 			$table->unsignedInteger('person_langue');
+			$table->dateTime('last_login')->nullable();
 			$table->timestamps();
 		});
 	}

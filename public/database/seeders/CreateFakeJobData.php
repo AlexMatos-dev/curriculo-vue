@@ -4,10 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\JobList;
+use App\Models\JobModality;
+use App\Models\JobSkill;
 use App\Models\ListCity;
 use App\Models\ListCountry;
+use App\Models\ListProfession;
 use App\Models\ListState;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Proficiency;
+use App\Models\Tag;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
@@ -24,6 +28,11 @@ class CreateFakeJobData extends Seeder
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$countryObj)
             return;
+        $jobModalities = JobModality::all()->toArray();
+        $seniorities = Proficiency::where('category', Proficiency::CATEGORY_SENIORITY)->get()->toArray();
+        $languageProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LANGUAGE)->get()->toArray();
+        $skills = Tag::all()->toArray();
+        $professions = ListProfession::all()->toArray();
         // Create fake state
         $stateObj = ListState::where('lstates_name', 'estado cwb')->first();
         if(!$stateObj){
@@ -41,7 +50,7 @@ class CreateFakeJobData extends Seeder
         if(!$cityObj){
             $cityObj = ListCity::create([
                 'lcity_name' => 'cwb',
-                'lcitstates_id' => $stateObj->lstate_id
+                'lcitstates_id' => $stateObj->lstates_id
             ]);
             if(!$cityObj)
                 return;
@@ -82,26 +91,11 @@ class CreateFakeJobData extends Seeder
         }        
         // Create jobs
         $created = 0;
-        $jobModels = ['presencial','hibrido','remoto'];
         $jobSeniorities = [
-            ['name' => 'trainee', 'salary' => [500, 900], 'exp' => 0],
-            ['name' => 'estagiário', 'salary' => [1000,1600], 'exp' => 1],
-            ['name' => 'junior', 'salary' => [2000,3000], 'exp' => 2],
-            ['name' => 'pleno', 'salary' => [4000,7000], 'exp' => 4],
-            ['name' => 'senior', 'salary' => [7000,20000], 'exp' => 5],
-        ];
-        $skills = ['php','java','laravel','sql','angular'];
-        $englishLevels = ['iniciante','intermediario','avançado','fluente','nativo'];
-        $professions = [
-            "Administrador de Rede",
-            "Tecnólogo do Produto Sênior",
-            "Tecnólogo em Gestão Financeira",
-            "Tecnólogo em Telecomunicações",
-            "Tecnólogo(a)",
-            "Tecnólogo(a) de Processo de Produção",
-            "Tecnólogo(a) em Processamento de Dados",
-            "Tecnólogo(a) Mecânico",
-            "Web Designer",
+            'trainee' => ['salary' => [500, 900], 'exp' => 0],
+            'junior' => ['salary' => [2000,3000], 'exp' => 2],
+            'middle' => ['salary' => [4000,7000], 'exp' => 5],
+            'senior' => ['salary' => [7000,20000], 'exp' => 10],
         ];
         $fakeCompanies = Company::where('company_type', 'fake')->get()->toArray();
         for($o = 0; $o < 30; $o++){
@@ -109,22 +103,32 @@ class CreateFakeJobData extends Seeder
                 break;
             $job = null;
             try {
-                $jobData = $jobSeniorities[array_rand($jobSeniorities)];
+                $seniorityOfJob = $seniorities[array_rand($seniorities)];
+                $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
                 $job = JobList::create([
                     'company_id' => $fakeCompanies[array_rand($fakeCompanies)]['company_id'],
-                    'job_model' => $jobModels[array_rand($jobModels)],
+                    'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
                     'job_city' => $cityObj->lcity_id,
                     'job_country' => $countryObj->lcountry_id,
-                    'job_seniority' => $jobData['name'],
+                    'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),
-                    'job_description' => $professions[array_rand($professions)],
-                    'job_skills' => $skills[array_rand($skills)] . ',' . $skills[array_rand($skills)],
-                    'job_english_level' => $englishLevels[array_rand($englishLevels)],
-                    'job_experience' => $jobData['exp'],
+                    'job_description' => $professions[array_rand($professions)]['profession_name'],
+                    'job_english_level' => $languageProfeciency[array_rand($languageProfeciency)]['proficiency_id'],
+                    'job_experience_description' => $faker->text(80),
+                    'experience_in_months' => $jobData['exp'],
                     'job_benefits' => $faker->text(500)
                 ]);
+                if($job){
+                    for($in = 0; $in < random_int(2, 10); $in++){
+                        $thisSkill = $skills[array_rand($skills)];
+                        JobSkill::create([
+                            'joblist_id' => $job->job_id,
+                            'tag_id' => $thisSkill['tags_id']
+                        ]);
+                    }
+                }
             } catch (\Throwable $th) {
-                dd($th->getMessage());
+                echo $th->getMessage();
             }
             if($job)
                 $created++;

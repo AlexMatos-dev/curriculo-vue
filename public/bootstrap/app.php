@@ -13,7 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->group('authenticate', [
-            \App\Http\Middleware\Authentication::class
+            \App\Http\Middleware\Authentication::class,
+        ]);
+        $middleware->group('companyadmin', [
+            \App\Http\Middleware\CompanyAdmin::class
+        ]);
+        $middleware->group('curriculum', [
+            \App\Http\Middleware\MyCurriculum::class
+        ]);
+        $middleware->group('job', [
+            \App\Http\Middleware\MyJob::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

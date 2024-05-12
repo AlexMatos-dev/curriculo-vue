@@ -10,6 +10,7 @@ class CreateListlanguesTable extends Migration {
 		Schema::create('listlangues', function(Blueprint $table) {
 			$table->increments('llangue_id', true);
 			$table->string('llangue_name', 150);
+			$table->string('llangue_acronyn', 5);
 			$table->timestamps();
 		});
 	}

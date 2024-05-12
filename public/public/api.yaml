@@ -4,10 +4,40 @@ info:
   description: |-
     InfoIJobs
 
-    To send requests with custom data, use only the "Request Body"
+    To send requests with custom data, use only the "Request Body" but beware, the swagger behaves strangely on execute and possible will not request correctly.
+    Check the parameters and schemas as reference, DO NOT try to use the swagger to create new data
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
+    
+    
+    API responses have a pattern:
+    ---------------------------------------------------
+    Sucesso -> 
+    status: 200
+    data: Informação retornada
+    
+    Erro na passagem de parâmetros -> 
+    status: 400
+    message: Descrição do status
+    
+    Erro de Autenticação -> 
+    status: 401
+    message: Descrição do status
+    
+    Erro de Permissão -> 
+    status: 403
+    message: Descrição do status
+    
+    Não encontrado -> 
+    status: 404
+    message: Descrição do status
+    
+    Erro no sistema ->
+    status: 500
+    message: Descrição do erro
+    ---------------------------------------------------
+    
   termsOfService: http://swagger.io/terms/
   contact:
     email: nickolasbini@hotmail.com
@@ -23,6 +53,24 @@ servers:
 tags:
   - name: auth
     description: Authentication routes and methods
+  - name: person
+    description: Person routes and methods
+  - name: professional
+    description: Professional routes and methods
+  - name: company
+    description: Company routes and methods
+  - name: recruiter
+    description: Recruiter routes and methods
+  - name: joblist
+    description: Job routes and methods
+  - name: curriculum
+    description: Curriculum routes and methods
+  - name: skill - curriculum
+    description: Skill routes and methods
+  - name: visa - curriculum
+    description: Visa routes and methods
+  - name: link - curriculum
+    description: Link routes and methods
 paths:
   /api/login:
     post:
@@ -158,10 +206,11 @@ paths:
       summary: Get the authenticated User
       parameters:
         - in: header
-          name: X-Request-ID
+          name: Bearer
           schema:
             type: string
             format: uuid
+            example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJI
           required: true
       responses:
         '200':
@@ -183,6 +232,1945 @@ paths:
                   value:
                     message: invalid token
                   summary: Token is not valid
+
+  /api/requestchangepassword:
+    post:
+      tags:
+        - auth
+      summary: Request a change password code which will be sent to logged Person email
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailToReceiveEmail@email.com
+          required: true
+      responses:
+        '200':
+          description: Email containing password change code sent
+          content:
+            application/json:
+              example: {"message": "email sent"}
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "email not sent"}
+  /api/changepassword:
+    post:
+      tags:
+        - auth
+      summary: Changes logged Person password. Code will only be usable once
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+          required: true
+        - name: code
+          in: query
+          description: The received code at email
+          required: true
+          example: 123456
+          schema:
+            type: string
+        - name: newPassword
+          in: query
+          description: Person new password
+          required: true
+          example: Password1@
+          schema:
+            type: string
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person password was updated
+          content:
+            application/json:
+              example: {"message": "password updated"}
+        '400':
+          description: Save error
+          content:
+            application/json:
+              examples: 
+                invalid code:
+                  value:
+                    message: invalid code
+                  summary: Code is invalid
+                invalid password:
+                  value:
+                    message: invalid password
+                  summary: The password does not match requirements (An uppercase and lowecase character, a number, a special character and more than 6 character length)
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "password not saved"}
+              
+  /api/person/update:
+    post:
+      tags:
+        - person
+      summary: Updates logged person account
+      parameters:
+        - in: query
+          name: person_email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+        - name: person_username
+          in: query
+          description: Person user name
+          example: john
+          schema:
+            type: string
+        - name: person_ddi
+          in: query
+          description: Person DDI code
+          example: +55
+          schema:
+            type: string
+        - name: person_phone
+          in: query
+          description: Person Phone
+          example: 41981716151
+          schema:
+            type: string
+        - name: person_langue
+          in: query
+          description: Language from ListLanguages
+          example: 1
+          schema:
+            type: integer
+        
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonObject'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid parameters:
+                  value:
+                    message: invalid email
+                  summary: The person email field must be a valid email address. (dynamic response)
+                invalid email:
+                  value:
+                    message: invalid email
+                  summary: Email in use
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "person not updated"}
+              
+  /api/professional/update:
+    post:
+      tags:
+        - professional
+      summary: Updates logged person Professional account
+      parameters:
+        - in: query
+          name: professional_email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+        - name: professional_firstname
+          in: query
+          description: Professional first name
+          example: john
+          schema:
+            type: string
+        - name: professional_lastname
+          in: query
+          description: Professional last name
+          example: john
+          schema:
+            type: string
+        - name: professional_title
+          in: query
+          description: Professional title
+          example: +55
+          schema:
+            type: string
+        - name: professional_phone
+          in: query
+          description: Person Phone
+          example: 41981716151
+          schema:
+            type: string
+        - name: professional_photo
+          in: query
+          description: Professional profile photo - 2MB size allowed!
+          example: base64image
+          schema:
+            type: string
+        - name: professional_cover
+          in: query
+          description: Professional cover photo - 2MB size allowed!
+          example: base64image
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonObject'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+                
+        '500':
+          description: Save error
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                professional not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+  /api/professional/updateprofessionalperson:
+    post:
+      tags:
+        - professional
+      summary: Updates logged person DataPerson account
+      parameters:
+        - in: query
+          name: dpdate_of_birth
+          schema:
+            type: string
+            example: 2024-01-01
+            description: Professional date of birth
+        - name: dpgender
+          in: query
+          description: Gender id
+          example: 1
+          schema:
+            type: string
+        - name: dpcity_id
+          in: query
+          description: City id  - must belong to sent state id
+          example: 1
+          schema:
+            type: string
+        - name: dpstate_id
+          in: query
+          description: State id - must belong to sent country id
+          example: 1
+          schema:
+            type: string
+        - name: dppostal_code
+          in: query
+          description: Post code
+          example: 70213241
+          schema:
+            type: string
+        - name: dpcountry_id
+          in: query
+          description: Country id
+          example: 1
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPersonObject'
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                data person not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+        '500':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+  /api/professional/updateprofessionaljobmodality:
+    post:
+      tags:
+        - professional
+      summary: Manages job modalities of professional, this method can ADD a new jobModality, REMOVE a current jobModality or LIST all jobModalities of professional
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+            example: add (ADD or REMOVE or LIST)
+            description: Either ADD, REMOVE or LIST
+        - name: job_modality_id
+          in: query
+          description: The job modality id
+          example: 1
+          schema:
+            type: string
+            description: only required when 'action' = 'add'
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              example: {"message":"action performed", "data": "Array|Null"}
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action is invalid
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+        '500':
+          description: The action was not completed
+          content:
+            application/json:
+              example: {"message": "action not completed with success"}
+              
+              
+  /api/company/update:
+    post:
+      tags:
+        - company
+      summary: Updates logged person Company account
+      parameters:
+        - in: query
+          name: company_register_number
+          schema:
+            type: string
+            example: 42.827.028/0001-47
+            description: Company's licence number
+        - name: company_name
+          in: query
+          description: Name of the company
+          example: TimbersWood Unlimited
+          schema:
+            type: string
+        - name: company_logo
+          in: query
+          description: Logo photo of company
+          example: base64Image-51515
+          schema:
+            type: string
+        - name: company_cover_photo
+          in: query
+          description: Cover photo of company
+          example: base64Image-51515
+          schema:
+            type: string
+        - name: company_type
+          in: query
+          description: Company type - undefined, must check
+          example: timber & wood crafts
+          schema:
+            type: string
+        - name: company_video
+          in: query
+          description: The company video
+          example: https://timbercompany.com/presentationvideo
+          schema:
+            type: string
+        - name: company_email
+          in: query
+          description: The company's email
+          example: company@company.com
+          schema:
+            type: string
+        - name: company_phone
+          in: query
+          description: The company's phone
+          example: +554198765432
+          schema:
+            type: string
+        - name: company_website
+          in: query
+          description: Website of company
+          example: https://timbercompany.com
+          schema:
+            type: string
+        - name: company_description
+          in: query
+          description: Description of the company
+          example: A timber type company
+          schema:
+            type: string
+        - name: company_number_employees
+          in: query
+          description: The number of workers
+          example: 11
+          schema:
+            type: integer
+        - name: company_benefits
+          in: query
+          description: Text field for company benefits
+          example: Many advantages such as...
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Person data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataPersonObject'
+        '400':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+                data person not updated:
+                  value:
+                    message: Professional was not updated
+                  summary: Professional not updated
+        '500':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+  /api/company/manageadmin:
+    post:
+      tags:
+        - company
+      summary: Manages company admins, this method can ADD a new admin, REMOVE a current admin, GRANT privilegies and REVOKE privilegies of an admin. Only admins with privilegies can access!
+      parameters:
+        - in: query
+          name: action
+          description: Either "add", "remove", "grant" or "revoke"
+          schema:
+            type: string
+            example: add
+        - name: person_id
+          in: query
+          description: Person id to receive the action
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action sent is not valid
+                person is invalid:
+                  value:
+                    message: person is invalid
+                  summary: The perfon id is invalid
+        '500':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                company not found:
+                  value:
+                    message: company not found
+                  summary: The company of logged person was not found
+                action not performed:
+                  value:
+                    message: action not completed with success
+                  summary: A problem occurred while performing the action
+                no privilegies:
+                  value:
+                    message: you have no privilegies
+                  summary: Logged person is not an admin or not an admin with privilegies
+  /api/company/managerecruiter:
+    post:
+      tags:
+        - company
+      summary: Manages company recruiters, this method can ADD a new recruiter or REMOVE a current recruit. Only admins with privilegies can access!
+      parameters:
+        - in: query
+          name: action
+          description: Either "add", "remove"
+          schema:
+            type: string
+            example: add
+        - name: person_id
+          in: query
+          description: Person id to receive the action
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples: 
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action sent is not valid
+                person is invalid:
+                  value:
+                    message: person is invalid
+                  summary: The perfon id is invalid
+        '500':
+          description: Save error or professional not found
+          content:
+            application/json:
+              examples: 
+                company not found:
+                  value:
+                    message: company not found
+                  summary: The company of logged person was not found
+                action not performed:
+                  value:
+                    message: action not completed with success
+                  summary: A problem occurred while performing the action   
+                no privilegies:
+                  value:
+                    message: you have no privilegies
+                  summary: Logged person is not an admin or not an admin with privilegies
+  
+  /api/recruiter/update:
+    post:
+      tags:
+        - recruiter
+      summary: Updates logged person Recruiter account
+      parameters:
+        - in: query
+          name: recruiter_photo
+          schema:
+            type: string
+            example: base64Image-41415151
+            description: Recruiter photo
+      responses:
+        '200':
+          description: Recruiter data updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecruiterObject'
+        '400':
+          description: Save error or recruiter not found
+          content:
+            application/json:
+              examples: 
+                no recruiter found:
+                  value:
+                    message: No recruiter was found
+                  summary: The recruiter was not created
+                invalid parameters:
+                  value:
+                    message: invalid image
+                  summary: Invalid image
+        '500':
+          description: recruiter not updated
+          content:
+            application/json:
+              example: {"message": "recruiter not updated"}
+
+
+  /api/joblist/index:
+    get:
+      tags:
+        - joblist
+      summary: List all jobs
+      description: retrieves a list of job with optional filters.
+      parameters:
+        - name: job_modality_id
+          in: query
+          description: search for jobs with this job modality
+          example: 1
+          schema:
+            type: integer
+        - name: company_id
+          in: query
+          description: search for jobs of this company id
+          example: 3
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: search for jobs with this city id
+          example: 3
+          schema:
+            type: integer
+        - name: job_country
+          in: query
+          description: search for jobs with this country id
+          example: 3
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: search for jobs with this Proficiency id of category 'seniority'
+          example: Intern
+          schema:
+            type: string
+        - name: job_salary_start
+          in: query
+          description: search for jobs with given starting salary
+          example: 1527.20
+          schema:
+            type: number
+        - name: job_salary_end
+          in: query
+          description: search for jobs with given ending salary
+          example: 2700.20
+          schema:
+            type: number
+        - name: job_description
+          in: query
+          description: search fro jobs with (like) this description
+          example: php devoper
+          schema:
+            type: string
+        - name: job_experience_description
+          in: query
+          description: search for the given experience
+          example: +2 years how backend developer
+          schema:
+            type: string
+        - name: experience_in_months_start
+          in: query
+          description: search for jobs with experience above sent experience_in_months_start
+          example: 5
+          schema:
+            type: integer
+        - name: experience_in_months_end
+          in: query
+          description: search for jobs with experience bellow sent experience_in_months_end
+          example: 10
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of job
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobListPaginated'
+  /api/joblist/show/{joblistId}:
+    get:
+      tags:
+        - joblist
+      summary: Search for job
+      description: Search for a specific job by id
+      parameters:
+        - name: joblistId
+          in: path
+          description: Job id
+          required: true
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: job found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListShow'
+        '404':
+          description: job not found.
+  /api/joblist/store:
+    post:
+      tags:
+        - joblist
+      summary: Create a new job
+      parameters:
+        - name: job_modality_id
+          in: query
+          description: Job modality id
+          example: 8
+          required: true
+          schema:
+            type: integer
+        - name: job_country
+          in: query
+          description: List country id
+          example: 10
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: List city id | City must be located in the sent Country id
+          example: 15
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
+          schema:
+            type: string
+        - name: job_salary
+          in: query
+          description: Work Payment
+          example: 7200.52
+          schema:
+            type: number
+        - name: job_description
+          in: query
+          description: Work desctiption
+          example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: experience_in_months
+          in: query
+          description: experience in months
+          example: 2
+          schema:
+            type: integer
+        - name: job_experience_description
+          in: query
+          description: free text field for job experience description
+          example: 2+ As backend developer
+          schema:
+            type: string
+        - name: job_benefits
+          in: query
+          description: free text field for job benefits
+          example: food voucher and home office
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListShow'
+      responses:
+        '201':
+          description: job created successfully.
+        '400':
+          description: Field entered incorrectly.
+          content:
+            application/json:
+              example: {"message": "invalid parameters"}
+        '500':
+          description: Create error.
+          content:
+            application/json:
+              example: {"message": "an error occurred while creating the job, please try again later"}
+  /api/joblist/{jobListId}:
+    put:
+      tags:
+        - joblist
+      summary: Update a job by ID
+      parameters:
+        - name: jobListId
+          in: path
+          description: Job list id
+          example: 1
+          required: true
+          schema:
+            type: integer
+        - name: job_modality_id
+          in: query
+          description: Job modality id
+          example: 8
+          required: true
+          schema:
+            type: integer
+        - name: job_country
+          in: query
+          description: List country id
+          example: 10
+          schema:
+            type: integer
+        - name: job_city
+          in: query
+          description: List city id | City must be located in the sent Country id
+          example: 15
+          schema:
+            type: integer
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
+          schema:
+            type: string
+        - name: job_salary
+          in: query
+          description: Work Payment
+          example: 7200.52
+          schema:
+            type: number
+        - name: job_description
+          in: query
+          description: Work desctiption
+          example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: experience_in_months
+          in: query
+          description: experience in months
+          example: 2
+          schema:
+            type: integer
+        - name: job_experience_description
+          in: query
+          description: free text field for job experience description
+          example: 2+ As backend developer
+          schema:
+            type: string
+        - name: job_benefits
+          in: query
+          description: free text field for job benefits
+          example: food voucher and home office
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListShow'
+      responses:
+        '201':
+          description: job updated successfully.
+        '400':
+          description: Field entered incorrectly.
+          content:
+            application/json:
+              example: {"message": "invalid parameters"}
+        '500':
+          description: Update error.
+          content:
+            application/json:
+              example: {"message": "an error occurred while updating the job, please try again later"}
+  /api/joblist/{jobList_Id}:
+    delete:
+      tags:
+        - joblist
+      summary: Delete a job
+      description: Delete a specific job by id
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Job removed
+          content:
+            application/json:
+              example: {"message": "job deleted sucessfully"}
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              example: {"message": "job not found"}
+  /api/joblist/managelanguage/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job visas
+      description: Manages job visas, this method can ADD, REMOVE or LIST the job language(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: job_language_id
+          in: query
+          description: Jog language id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: language_id
+          in: query
+          description: job list id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: proficiency_id
+          in: query
+          description: Proficiency id of category = language
+          required: false
+          example: 1
+          schema:
+            type: integer 
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobVisas objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  /api/joblist/manageskills/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job skills
+      description: Manages job skills, this method can ADD, REMOVE or LIST the job skill(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: tag_id
+          in: query
+          description: Tag id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: job_skill_id
+          in: query
+          description: Job skill id
+          required: false
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobSkills objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  /api/joblist/managevisas/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job visa
+      description: Manages job visas, this method can ADD, REMOVE or LIST the job visa(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: visas_type_id
+          in: query
+          description: Tag id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: country_id
+          in: query
+          description: Job skill id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: job_visa_id
+          in: query
+          description: Job visa id
+          required: false
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobVisas objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  
+  
+  /api/curriculum/curriculum:
+    post:
+      tags:
+        - curriculum
+      summary: Creates or Updates a curriculum
+      parameters:
+        - in: query
+          name: curriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Only in case of an update
+          required: false
+        - in: query
+          name: curriculum_file
+          schema:
+            type: string
+            example: imageBase64|fileBase64
+            description: File as base64 until 2MB
+          required: true
+        - in: query
+          name: clengua_id
+          schema:
+            type: integer
+            example: 1
+            description: Language id
+          required: true
+      responses:
+        '200':
+          description: Email containing password change code sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Curriculum'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "curriculum not created/updated"}
+  /api/curriculum/curriculum/{curriculum_id}:
+    get:
+      tags:
+        - curriculum
+      summary: Display the specified Curriculum.
+      parameters:
+        - in: path
+          name: curriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: Curriculum object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Curriculum'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/curriculum/{curriculumid}:
+    delete:
+      tags:
+        - curriculum
+      summary: Remove the specified curriculum and all related things.
+      parameters:
+        - in: path
+          name: curriculumid
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "curriculum removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "curriculum not removed"}
+  /api/curriculum/curriculum/:
+    get:
+      tags:
+        - curriculum
+      summary: Get all curriculumns of logged professional.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: curriculum_type
+          schema:
+            type: string
+            example: info
+            description: Curriculum type ('file' or 'info')
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Curriculum Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                  
+
+  /api/curriculum/skill:
+    post:
+      tags:
+        - skill - curriculum
+      summary: Create a skill
+      parameters:
+        - in: query
+          name: skill_name
+          schema:
+            type: string
+            example: 1 
+            description: Tag id  
+          required: true
+        - in: query
+          name: skproficiency_level
+          schema:
+            type: integer
+            example: 1
+            description: Proficiency id
+          required: true
+        - in: query
+          name: experience_level
+          schema:
+            type: number
+            example: 50.50
+            description: Experience level from 0 until 100
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                skill not found:
+                  value:
+                    message: skill not found
+                  summary: Skill was not found
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+                  summary: Either skill_name or skproficiency_level was/were not found
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "skill not created"}
+  /api/curriculum/skill/{skill__id}:
+    put:
+      tags:
+        - skill - curriculum
+      summary: Updates a skill
+      parameters:
+        - in: path
+          name: skill__id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: query
+          name: skill_name
+          schema:
+            type: string
+            example: 1 
+            description: Tag id  
+          required: true
+        - in: query
+          name: skproficiency_level
+          schema:
+            type: integer
+            example: 1
+            description: Proficiency id
+          required: true
+        - in: query
+          name: experience_level
+          schema:
+            type: number
+            example: 50.50
+            description: Experience level from 0 until 100
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                skill not found:
+                  value:
+                    message: skill not found
+                  summary: Skill was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+                  summary: Either skill_name or skproficiency_level was/were not found
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "skill not updated"}
+  /api/curriculum/skill/{skill_id}:
+    get:
+      tags:
+        - skill - curriculum
+      summary: Display the specified Skill.
+      parameters:
+        - in: path
+          name: skill_id
+          schema:
+            type: integer
+            example: 1
+            description: skill id
+          required: true
+      responses:
+        '200':
+          description: Skill object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Skill'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: link not found
+                  summary: Curriculum not found
+  /api/curriculum/skill/{skillId}:
+    delete:
+      tags:
+        - skill - curriculum
+      summary: Remove the specified skill.
+      parameters:
+        - in: path
+          name: skillId
+          schema:
+            type: integer
+            example: 1
+            description: skill id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "skill removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                skill not found:
+                  value:
+                    message: skill not found
+                  summary: Skill not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "skill not removed"}
+  /api/curriculum/skill/:
+    get:
+      tags:
+        - skill - curriculum
+      summary: Get all skills of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Skill Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found                
+                  
+                  
+  /api/curriculum/visa:
+    post:
+      tags:
+        - visa - curriculum
+      summary: Creates a visa
+      parameters:
+        - in: query
+          name: vicountry_id
+          schema:
+            type: integer
+            example: 1 
+            description: Country of  this visa  
+          required: true
+        - in: query
+          name: visa_type
+          schema:
+            type: integer
+            example: 1
+            description: Type of the visa id
+          required: true
+        - in: query
+          name: vicurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visa'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+                  summary: Either vicountry_id or visa_type was/were not found
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "visa not created"}
+  /api/curriculum/visa/{visa__id}:
+    put:
+      tags:
+        - visa - curriculum
+      summary: Updates a visa
+      parameters:
+        - in: path
+          name: visa__id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: query
+          name: vicountry_id
+          schema:
+            type: integer
+            example: 1 
+            description: Country of  this visa  
+          required: true
+        - in: query
+          name: visa_type
+          schema:
+            type: integer
+            example: 1
+            description: Type of the visa id
+          required: true
+        - in: query
+          name: vicurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visa'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                visa not found:
+                  value:
+                    message: visa not found
+                  summary: Visa was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+                  summary: Either skill_name or skproficiency_level was/were not found
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "visa not updated"}
+  /api/curriculum/visa/{visa_id}:
+    get:
+      tags:
+        - visa - curriculum
+      summary: Display the specified Visa.
+      parameters:
+        - in: path
+          name: visa_id
+          schema:
+            type: integer
+            example: 1
+            description: visa id
+          required: true
+      responses:
+        '200':
+          description: Visa object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visa'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/visa/{visaId}:
+    delete:
+      tags:
+        - visa - curriculum
+      summary: Remove the specified visa.
+      parameters:
+        - in: path
+          name: visaId
+          schema:
+            type: integer
+            example: 1
+            description: visa id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "visa removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                visa not found:
+                  value:
+                    message: visa not found
+                  summary: visa not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "visa not removed"}
+  /api/curriculum/visa/:
+    get:
+      tags:
+        - visa - curriculum
+      summary: Get all visas of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: vicurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Visa Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found                    
+  /api/curriculum/link:
+    post:
+      tags:
+        - link - curriculum
+      summary: Create a link
+      parameters:
+        - in: query
+          name: link_type
+          schema:
+            type: string
+            example: youtube | linkedin | facebook | external | instagram 
+            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'  
+          required: true
+        - in: query
+          name: url
+          schema:
+            type: integer
+            example: 1
+            description: Language id
+          required: true
+        - in: query
+          name: curriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                link type not valid:
+                  value:
+                    message: link type not valid
+                  summary: Link type is not valid
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "link not created"}
+  /api/curriculum/link/{link__id}:
+    put:
+      tags:
+        - link - curriculum
+      summary: Update a link
+      parameters:
+        - in: path
+          name: link__id
+          schema:
+            type: integer
+            example: 1
+          required: true
+        - in: query
+          name: link_type
+          schema:
+            type: string
+            example: youtube | linkedin | facebook | external | instagram 
+            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'  
+          required: true
+        - in: query
+          name: url
+          schema:
+            type: integer
+            example: 1
+            description: Language id
+          required: true
+        - in: query
+          name: curriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                link type not valid:
+                  value:
+                    message: link type not valid
+                  summary: Link type is not valid
+        '500':
+          description: Authentication error
+          content:
+            application/json:
+              example: {"message": "link not created"}
+  /api/curriculum/link/{link_id}:
+    get:
+      tags:
+        - link - curriculum
+      summary: Display the specified Link.
+      parameters:
+        - in: path
+          name: link_id
+          schema:
+            type: integer
+            example: 1
+            description: link id
+          required: true
+      responses:
+        '200':
+          description: Link object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Link'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: link not found
+                  summary: Curriculum not found
+  /api/curriculum/link/{linkId}:
+    delete:
+      tags:
+        - link - curriculum
+      summary: Remove the specified link.
+      parameters:
+        - in: path
+          name: linkId
+          schema:
+            type: integer
+            example: 1
+            description: link id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "link removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "link not removed"}
+  /api/curriculum/link/:
+    get:
+      tags:
+        - link - curriculum
+      summary: Get all links of logged professional.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Link Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found 
+  
+  /api/social_network/showByCompanyId:
+    get:
+      tags:
+        - company_social_network
+      summary: Get company social media
+      description: Get a company social media by ID
+      parameters:
+        - name: company_id
+          in: query
+          description: Company ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Return all CompanySocialMedia objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '404':
+          description: Social medias not found.
+  /api/social_network/store:
+    post:
+      tags:
+        - company_social_network
+      summary: Create a new social network
+      description: create a new social network to a company
+      parameters:
+        - name: social_network_profile
+          in: query
+          description: Link to network profile
+          required: true
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
+        - name: company_id
+          in: query
+          description: Company id 
+          required: true
+          example: 1
+          schema:
+            type: integer
+        - name: social_network_type
+          in: query
+          description: Type os social network
+          required: true
+          example: "Instagram"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company social network created sucessfully.
+        '404':
+          description: An error occurred while creating the social network, please try again later.
+  /api/social_network/update:
+    post:
+      tags:
+        - company_social_network
+      summary: Update a social network
+      description: Update a social network
+      parameters:
+        - name: social_network_profile
+          in: query
+          description: Link to network profile
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
+        - name: company_id
+          in: query
+          description: Company id 
+          example: 1
+          schema:
+            type: integer
+        - name: social_network_type
+          in: query
+          description: Type os social network
+          example: "Instagram"
+          schema:
+            type: string
+      responses:
+          '200':
+            description: Company social network updated sucessfully.
+          '404':
+            description: Company social network not found.
+  /api/social_network/destroy:
+    post:
+        tags:
+          - company_social_network
+        summary: Delete a company social midia
+        description: Delete a specific social midia by ID
+        parameters:
+          - name: company_social_network
+            in: query
+            description: Company social network id
+            required: true
+            example: 8
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Company social network deleted sucessfully.
+          '404':
+            description: Company social network not found.
 components:
   schemas:
     Login:
@@ -250,6 +2238,20 @@ components:
             - professional
             - recruiter
             - company
+    ChangePassword:
+      required:
+        - code
+        - newPassword
+      type: object
+      properties:
+        code:
+          type: string
+          example: person@email.com
+        newPassword:
+          type: string
+          example: Password1@
+          pattern: /[a-z]/,/[A-Z]/,/[0-9]/,/[@$!%*#?&]/
+          description: An uppercase and lowecase character, a number, a special character and more than 6 character length
     PersonObject:
       required:
         - test
@@ -291,3 +2293,505 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    ProfessionalObject:
+      required:
+        - test
+      type: object
+      properties:
+        professional_id:
+          type: integer
+          example: 1
+        professional_slug:
+          type: string
+          example: john-woodgate-123141
+        professional_email:
+          type: string
+          example: person@email.com
+          maxLength: 200
+          uniqueItems: true
+        professional_firstname:
+          type: string
+          example: John
+          description: First name of professional
+        professional_lastname:
+          type: string
+          example: Wooddgate
+          description: Last name of professional
+        professional_phone:
+          type: string
+          example: '999999999'
+          maxLength: 20
+        professional_title:
+          type: integer
+          example: 1
+        person_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    DataPersonObject:
+      required:
+        - test
+      type: object
+      properties:
+        dpperson_id:
+          type: integer
+          example: 1
+        dpdate_of_birth:
+          type: string
+          example: 2024-01-01
+        dpgender:
+          type: integer
+          example: 1
+        dpcity_id:
+          type: integer
+          example: 1
+        dpstate_id:
+          type: integer
+          example: 1
+        dppostal_code:
+          type: string
+          example: '83700333'
+        dpcountry_id:
+          type: integer
+          example: 1
+        dpprofes_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    CompanyObject:
+      required:
+        - test
+      type: object
+      properties:
+        company_id:
+          type: integer
+          example: 1
+        company_slug:
+          type: string
+          example: 2024-01-01
+        company_register_number:
+          type: integer
+          example: 1
+        company_name:
+          type: integer
+          example: 1
+        company_type:
+          type: integer
+          example: 1
+        company_logo:
+          type: string
+          example: '83700333'
+        company_cover_photo:
+          type: integer
+          example: 1
+        company_video:
+          type: integer
+          example: 1
+        company_phone:
+          type: integer
+          example: 1
+        company_website:
+          type: integer
+          example: 1
+        company_description:
+          type: integer
+          example: 1
+        company_number_employees:
+          type: integer
+          example: 1
+        company_benefits:
+          type: integer
+          example: 1
+        paying:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    RecruiterObject:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: integer
+          example: 1
+        company_id:
+          type: integer
+          example: 1
+        paying:
+          type: integer
+          example: 1
+        recruiter_photo:
+          type: string
+          example: base64Image OR null
+        person_id:
+          type: integer
+          example: 1
+        profile_id:
+          type: integer
+          example: 1
+        profile_type_id:
+          type: integer
+          example: 1
+        profile_type:
+          type: string
+          example: recruiters
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobList:
+      required:
+        - test
+      type: object
+      properties:
+        job_id:
+          type: integer
+          example: 1
+        company_id:
+          type: integer
+          example: 1
+        job_modality_id:
+          type: integer
+          example: 1
+          description: id from job_modalities
+        job_country:
+          type: integer
+          example: 1
+        job_city:
+          type: integer
+          example: 1
+        job_seniority:
+          type: integer
+          example: 1
+          description: Proficiency id of category = seniority
+        job_salary:
+          type: number
+          example: 2500.00
+        job_description:
+          type: string
+          example: Job description
+        job_english_level:
+          type: integer
+          example: 1
+        experience_in_months:
+          type: integer
+          example: 10
+        job_experience_description:
+          type: string
+          example: worked for apple and google
+        job_benefits:
+          type: string
+          example: gym pass and udemy course pass
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobSkills'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobLanguages'
+        visas:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobVisas'
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Curriculum:
+      required:
+        - test
+      type: object
+      properties:
+        curriculum_id:
+          type: integer
+          example: 1
+        cprofes_id:
+          type: integer
+          example: 1
+        clengua_id:
+          type: integer
+          example: 1
+        curriculum_type:
+          type: string
+          example: info OR file
+        curriculum_file:
+          type: string
+          example: base64File OR null
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Link:
+      required:
+        - test
+      type: object
+      properties:
+        link_id:
+          type: integer
+          example: 1
+        curriculum_id:
+          type: integer
+          example: 1
+        link_type:
+          type: string
+          example: yotube
+        url:
+          type: string
+          example: https://youtube.com
+        cprofes_id:
+          type: integer
+          example: 1
+        clengua_id:
+          type: integer
+          example: 1
+        curriculum_type:
+          type: string
+          example: file | info
+        curriculum_file:
+          type: string
+          example: base64File | null
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Skill:
+      required:
+        - test
+      type: object
+      properties:
+        skill_id:
+          type: integer
+          example: 1
+        skcurriculum_id:
+          type: integer
+          example: 1
+        skill_name:
+          type: integer
+          example: 1
+          description: Tag id
+        skproficiency_level:
+          type: integer
+          example: 1
+          description: Proficiency id
+        experience_level:
+          type: number
+          example: 50.50
+          description: Float from 0 until 100
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Visa:
+      required:
+        - test
+      type: object
+      properties:
+        visas_id:
+          type: integer
+          example: 1
+          description: Visa id
+        vicurriculum_id:
+          type: integer
+          example: 1
+          description: Curriculum id
+        vicountry_id:
+          type: integer
+          example: 1
+          description: Country id
+        visa_type:
+          type: integer
+          example: 1
+          description: Visa type id
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobSkills:
+      required:
+        - test
+      type: object
+      properties:
+        job_skill_id:
+          type: integer
+          example: 1
+          description: job skill id
+        joblist_id:
+          type: integer
+          example: 1
+          description: JobList id
+        tag_id:
+          type: integer
+          example: 1
+          description: Tag id
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobVisas:
+      required:
+        - test
+      type: object
+      properties:
+        job_visa_id:
+          type: integer
+          example: 1
+          description: Job visa id
+        joblist_id:
+          type: integer
+          example: 1
+          description: Job list id
+        visas_type_id:
+          type: integer
+          example: 1
+          description: Type visa id
+        country_id:
+          type: integer
+          example: 1
+          description: List country id
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobLanguages:
+      required:
+        - test
+      type: object
+      properties:
+        job_language_id:
+          type: integer
+          example: 1
+          description: job language id
+        joblist_id:
+          type: integer
+          example: 1
+          description: Job list id
+        language_id:
+          type: integer
+          example: 1
+          description: List language id
+        proficiency_id:
+          type: integer
+          example: 1
+          description: Proficiency id of category = language
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'  
+    JobListPaginated:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/JobList'
+        curent_page:
+          type: integer
+          example: 1
+          description: the current page
+        last_page:
+          type: integer
+          example: 1
+          description: the last page
+        per_page:
+          type: integer
+          example: 100
+          description: the default list max size
+    JobListShow:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/JobList'
+        message:
+          type: string
+          example: job found successfully | job created successfully | job updated successfully
+    PaginatedResults:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        data:
+          type: string
+          example: An array of object data
+        first_page_url:
+          type: string
+          example: Url
+        from:
+          type: integer
+          example: 1
+        last_page:
+          type: integer
+          example: 2
+        last_page_url:
+          type: string
+          example: Url or null
+        links:
+          type: string 
+          example: {"url": null, "label": "&laquo; Previous","active": false}
+          description: Array of object
+        next_page_url:
+          type: string
+          example: Url or null
+        path:
+          type: string
+          example: Url
+        per_page:
+          type: integer
+          example: 100
+        prev_page_url:
+          type: string
+          example: Url OR null
+        to:
+          type: integer
+          example: 3
+        total:
+          type: integer
+          example: 3
+    
+  
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      

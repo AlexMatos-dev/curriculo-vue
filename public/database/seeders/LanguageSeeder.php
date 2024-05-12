@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\ListLangue;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Translation;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class LanguageSeeder extends Seeder
 {
@@ -19,12 +18,19 @@ class LanguageSeeder extends Seeder
             return;
         $languageArray = json_decode(file_get_contents($path), true);
         $langObj = new ListLangue();
-        foreach($languageArray as $language){
-            $langName = $language['ptLang'];
-            if($langObj::where('llangue_name', $langName)->first())
+        foreach($languageArray as $iso => $language){
+            if($langObj::where('llangue_name', $language['en'])->first())
                 continue;
-            ListLangue::create([
-                'llangue_name' => $langName
+            $result = ListLangue::create([
+                'llangue_name' => $language['en'],
+                'llangue_acronyn' => $iso
+            ]);
+            if(!$result || Translation::where('en', $language['en'])->first())
+                continue;
+            Translation::create([
+                'en' => $language['en'],
+                'pt' => $language['pt'],
+                'es' => $language['es']
             ]);
         }
     }
