@@ -8,13 +8,17 @@ use App\Models\JobModality;
 use App\Models\JobSkill;
 use App\Models\ListCity;
 use App\Models\ListCountry;
+use App\Models\ListLangue;
 use App\Models\ListProfession;
 use App\Models\ListState;
 use App\Models\Proficiency;
 use App\Models\Tag;
+use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Cast\Object_;
+use stdClass;
 
 class CreateFakeJobData extends Seeder
 {
@@ -30,9 +34,33 @@ class CreateFakeJobData extends Seeder
             return;
         $jobModalities = JobModality::all()->toArray();
         $seniorities = Proficiency::where('category', Proficiency::CATEGORY_SENIORITY)->get()->toArray();
+        $languagesArray = ListLangue::all()->toArray();
         $languageProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LANGUAGE)->get()->toArray();
         $skills = Tag::all()->toArray();
+        $visasArray = TypeVisas::all()->toArray();
+        $countriesArray = ListCountry::all()->toArray();
         $professions = ListProfession::all()->toArray();
+        $dataForJobLanguage = [];
+        foreach($languagesArray as $langData){
+            for($i = 0; $i < 3; $i++){
+                $randomLangProficiency = $languageProfeciency[array_rand($languageProfeciency)];
+                $dataForJobLanguage[] = (Object) [
+                    'llangue_id' => $langData['llangue_id'],
+                    'proficiency_id' => $randomLangProficiency['proficiency_id']
+                ];
+            }
+        }
+        $dataForJobVisas = [];
+        foreach($visasArray as $visa){
+            for($i = 0; $i < 3; $i++){
+                $randomCountry = $countriesArray[array_rand($countriesArray)];
+                $dataForJobVisas[] = (Object) [
+                    'visas_type_id' => $visa['typevisas_id'],
+                    'country_id' => $randomCountry['lcountry_id']
+                ];
+            }
+        }
+
         // Create fake state
         $stateObj = ListState::where('lstates_name', 'estado cwb')->first();
         if(!$stateObj){
@@ -97,7 +125,7 @@ class CreateFakeJobData extends Seeder
             'middle' => ['salary' => [4000,7000], 'exp' => 5],
             'senior' => ['salary' => [7000,20000], 'exp' => 10],
         ];
-        $fakeCompanies = Company::where('company_type', 'fake')->get()->toArray();
+        $fakeCompanies = Company::where('company_type', 'fake')->inRandomOrder()->get()->toArray();
         for($o = 0; $o < 30; $o++){
             if($created > 30)
                 break;
@@ -113,7 +141,6 @@ class CreateFakeJobData extends Seeder
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),
                     'job_description' => $professions[array_rand($professions)]['profession_name'],
-                    'job_english_level' => $languageProfeciency[array_rand($languageProfeciency)]['proficiency_id'],
                     'job_experience_description' => $faker->text(80),
                     'experience_in_months' => $jobData['exp'],
                     'job_benefits' => $faker->text(500)
@@ -126,6 +153,18 @@ class CreateFakeJobData extends Seeder
                             'tag_id' => $thisSkill['tags_id']
                         ]);
                     }
+
+                    $langData = [];
+                    for($i = 0; $i < 3; $i++){
+                        $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   
+                    }                   
+                    $job->sycnLanguages((Object) $langData);
+
+                    $visaData = [];
+                    for($i = 0; $i < 3; $i++){
+                        $visaData[] = $dataForJobVisas[array_rand($dataForJobVisas)];   
+                    }                   
+                    $job->sycnVisas((Object) $visaData);
                 }
             } catch (\Throwable $th) {
                 echo $th->getMessage();

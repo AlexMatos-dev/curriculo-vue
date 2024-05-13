@@ -309,6 +309,11 @@ class JobList extends Model
         return true;
     }
 
+    /**
+     * Syncs job languages by deleting all languages of $this JobList and them adding the sents Languages
+     * @param Array $languages - Array of object Language
+     * @return Bool
+     */
     public function sycnLanguages($languages = [])
     {
         JobLanguage::where('joblist_id', $this->job_id)->delete();
@@ -317,6 +322,24 @@ class JobList extends Model
                 'joblist_id' => $this->job_id,
                 'language_id' => $language->llangue_id,
                 'proficiency_id' => $language->proficiency_id
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * Syncs job visas by deleting all visas of $this JobList and them adding the sents visas
+     * @param Array $visas - Array of object Visas
+     * @return Bool
+     */
+    public function sycnVisas($visas = [])
+    {
+        JobVisa::where('joblist_id', $this->job_id)->delete();
+        foreach($visas as $visa){
+            JobVisa::create([
+                'joblist_id' => $this->job_id,
+                'visas_type_id' => $visa->visas_type_id,
+                'country_id' => $visa->country_id
             ]);
         }
         return true;
