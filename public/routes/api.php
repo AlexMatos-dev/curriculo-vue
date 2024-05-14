@@ -87,7 +87,7 @@ Route::prefix('social_network')->middleware('auth:sanctum')->group(function ()
     });
 });
 
-Route::prefix('profiency')->group(function ()
+Route::prefix('proficiency')->middleware('authenticate')->group(function ()
 {
     Route::get('index', [ProficiencyController::class, 'index']);
 });
