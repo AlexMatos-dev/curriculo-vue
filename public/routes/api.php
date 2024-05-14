@@ -10,6 +10,7 @@ use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
+use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\VisaController;
@@ -37,9 +38,11 @@ Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(fun
     Route::resource('education', EducationController::class);
 });
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware('auth:sanctum')->group(function ()
+{
     Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
-    Route::prefix('joblist')->middleware('job')->group(function(){
+    Route::prefix('joblist')->middleware('job')->group(function ()
+    {
         Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
         Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
         Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
@@ -76,9 +79,15 @@ Route::prefix('recruiter')->middleware('auth:sanctum')->group(function ()
 Route::prefix('social_network')->middleware('auth:sanctum')->group(function ()
 {
     Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
-    Route::middleware('companyadmin')->group(function(){
+    Route::middleware('companyadmin')->group(function ()
+    {
         Route::post('store', [CompanySocialNetworkController::class, 'store']);
         Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
         Route::delete('destroy/{social_network_id}', [CompanySocialNetworkController::class, 'destroy']);
     });
+});
+
+Route::prefix('profiency')->group(function ()
+{
+    Route::get('index', [ProficiencyController::class, 'index']);
 });

@@ -27,23 +27,17 @@ class Proficiency extends Model
 
     /**
      * Get category constant by name
-     * @param String name
-     * @return Stirng|null
+     * @param string $name
+     * @return string|null
      */
-    public function getCategory($name = '')
+    public static function getCategory($name = '')
     {
-        if(!in_array($name, [$this::CATEGORY_LANGUAGE, $this::CATEGORY_SENIORITY, $this::CATEGORY_LEVEL]))
-            return null;
-        switch($name){
-            case 'language':
-                return $this::CATEGORY_LANGUAGE;
-            break;
-            case 'seniority':
-                return $this::CATEGORY_SENIORITY;
-            break;
-            case 'level':
-                return $this::CATEGORY_LEVEL;
-            break;
-        }
+        $categories = [
+            'language' => self::CATEGORY_LANGUAGE,
+            'seniority' => self::CATEGORY_SENIORITY,
+            'level' => self::CATEGORY_LEVEL,
+        ];
+
+        return $categories[$name] ?? null;
     }
 }
