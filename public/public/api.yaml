@@ -9,35 +9,35 @@ info:
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
-    
-    
+
+
     API responses have a pattern:
     ---------------------------------------------------
-    Sucesso -> 
+    Sucesso ->
     status: 200
     data: Informação retornada
-    
-    Erro na passagem de parâmetros -> 
+
+    Erro na passagem de parâmetros ->
     status: 400
     message: Descrição do status
-    
-    Erro de Autenticação -> 
+
+    Erro de Autenticação ->
     status: 401
     message: Descrição do status
-    
-    Erro de Permissão -> 
+
+    Erro de Permissão ->
     status: 403
     message: Descrição do status
-    
-    Não encontrado -> 
+
+    Não encontrado ->
     status: 404
     message: Descrição do status
-    
+
     Erro no sistema ->
     status: 500
     message: Descrição do erro
     ---------------------------------------------------
-    
+
   termsOfService: http://swagger.io/terms/
   contact:
     email: nickolasbini@hotmail.com
@@ -122,7 +122,7 @@ paths:
           description: Invalid credentials
           content:
             aplication/json:
-              example: 
+              example:
                 message: invalid credentials
   /api/auth/register:
     post:
@@ -299,7 +299,7 @@ paths:
           description: Save error
           content:
             application/json:
-              examples: 
+              examples:
                 invalid code:
                   value:
                     message: invalid code
@@ -313,7 +313,7 @@ paths:
           content:
             application/json:
               example: {"message": "password not saved"}
-              
+
   /api/person/update:
     post:
       tags:
@@ -349,7 +349,7 @@ paths:
           example: 1
           schema:
             type: integer
-        
+
       # requestBody:
       #   description: Change password
       #   content:
@@ -368,7 +368,7 @@ paths:
           description: Invalid parameters
           content:
             application/json:
-              examples: 
+              examples:
                 invalid parameters:
                   value:
                     message: invalid email
@@ -382,7 +382,7 @@ paths:
           content:
             application/json:
               example: {"message": "person not updated"}
-              
+
   /api/professional/update:
     post:
       tags:
@@ -442,12 +442,12 @@ paths:
           content:
             application/json:
               example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
-                
+
         '500':
           description: Save error
           content:
             application/json:
-              examples: 
+              examples:
                 professional not found:
                   value:
                     message: No professional was found
@@ -509,7 +509,7 @@ paths:
           description: Save error or professional not found
           content:
             application/json:
-              examples: 
+              examples:
                 professional not found:
                   value:
                     message: No professional was found
@@ -552,7 +552,7 @@ paths:
           description: Save error or professional not found
           content:
             application/json:
-              examples: 
+              examples:
                 invalid action:
                   value:
                     message: invalid action
@@ -566,8 +566,8 @@ paths:
           content:
             application/json:
               example: {"message": "action not completed with success"}
-              
-              
+
+
   /api/company/update:
     post:
       tags:
@@ -657,7 +657,7 @@ paths:
           description: Save error or professional not found
           content:
             application/json:
-              examples: 
+              examples:
                 professional not found:
                   value:
                     message: No professional was found
@@ -699,7 +699,7 @@ paths:
           description: Invalid parameters
           content:
             application/json:
-              examples: 
+              examples:
                 invalid action:
                   value:
                     message: invalid action
@@ -712,7 +712,7 @@ paths:
           description: Save error or professional not found
           content:
             application/json:
-              examples: 
+              examples:
                 company not found:
                   value:
                     message: company not found
@@ -753,7 +753,7 @@ paths:
           description: Invalid parameters
           content:
             application/json:
-              examples: 
+              examples:
                 invalid action:
                   value:
                     message: invalid action
@@ -766,7 +766,7 @@ paths:
           description: Save error or professional not found
           content:
             application/json:
-              examples: 
+              examples:
                 company not found:
                   value:
                     message: company not found
@@ -774,12 +774,12 @@ paths:
                 action not performed:
                   value:
                     message: action not completed with success
-                  summary: A problem occurred while performing the action   
+                  summary: A problem occurred while performing the action
                 no privilegies:
                   value:
                     message: you have no privilegies
                   summary: Logged person is not an admin or not an admin with privilegies
-  
+
   /api/recruiter/update:
     post:
       tags:
@@ -803,7 +803,7 @@ paths:
           description: Save error or recruiter not found
           content:
             application/json:
-              examples: 
+              examples:
                 no recruiter found:
                   value:
                     message: No recruiter was found
@@ -1157,7 +1157,7 @@ paths:
           required: false
           example: 1
           schema:
-            type: integer 
+            type: integer
       responses:
         '200':
           description: Action performed
@@ -1283,8 +1283,8 @@ paths:
           content:
             application/json:
               example: {"message":"action not performed"}
-  
-  
+
+
   /api/curriculum/curriculum:
     post:
       tags:
@@ -1443,7 +1443,7 @@ paths:
                   value:
                     message: no professional found
                   summary: Logged person account professional profile not found
-                  
+
 
   /api/curriculum/skill:
     post:
@@ -1455,8 +1455,8 @@ paths:
           name: skill_name
           schema:
             type: string
-            example: 1 
-            description: Tag id  
+            example: 1
+            description: Tag id
           required: true
         - in: query
           name: skproficiency_level
@@ -1513,8 +1513,8 @@ paths:
           name: skill_name
           schema:
             type: string
-            example: 1 
-            description: Tag id  
+            example: 1
+            description: Tag id
           required: true
         - in: query
           name: skproficiency_level
@@ -1653,9 +1653,9 @@ paths:
                 no professional found:
                   value:
                     message: no professional found
-                  summary: Logged person account professional profile not found                
-                  
-                  
+                  summary: Logged person account professional profile not found
+
+
   /api/curriculum/visa:
     post:
       tags:
@@ -1666,8 +1666,8 @@ paths:
           name: vicountry_id
           schema:
             type: integer
-            example: 1 
-            description: Country of  this visa  
+            example: 1
+            description: Country of  this visa
           required: true
         - in: query
           name: visa_type
@@ -1720,8 +1720,8 @@ paths:
           name: vicountry_id
           schema:
             type: integer
-            example: 1 
-            description: Country of  this visa  
+            example: 1
+            description: Country of  this visa
           required: true
         - in: query
           name: visa_type
@@ -1867,7 +1867,7 @@ paths:
                 no professional found:
                   value:
                     message: no professional found
-                  summary: Logged person account professional profile not found                    
+                  summary: Logged person account professional profile not found
   /api/curriculum/link:
     post:
       tags:
@@ -1878,8 +1878,8 @@ paths:
           name: link_type
           schema:
             type: string
-            example: youtube | linkedin | facebook | external | instagram 
-            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'  
+            example: youtube | linkedin | facebook | external | instagram
+            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'
           required: true
         - in: query
           name: url
@@ -1932,8 +1932,8 @@ paths:
           name: link_type
           schema:
             type: string
-            example: youtube | linkedin | facebook | external | instagram 
-            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'  
+            example: youtube | linkedin | facebook | external | instagram
+            description: Acceptable types -> 'youtube', 'linkedin', 'facebook', 'external', 'instagram'
           required: true
         - in: query
           name: url
@@ -2064,8 +2064,1200 @@ paths:
                 no professional found:
                   value:
                     message: no professional found
-                  summary: Logged person account professional profile not found 
-  
+                  summary: Logged person account professional profile not found
+
+
+  /api/curriculum/experience:
+    post:
+      tags:
+        - experience - curriculum
+      summary: Creates a experience
+      parameters:
+        - in: query
+          name: exjob_title
+          schema:
+            type: string
+            example: FullStack Developer
+            description: Job title of experience
+          required: true
+        - in: query
+          name: excompany_name
+          schema:
+            type: string
+            example: Enterprise Example
+            description: Coompany name of experience
+          required: true
+
+        - in: query
+          name: exstart_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: Start date of the experience
+          required: true
+
+        - in: query
+          name: exend_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: End date of the experience
+          required: false
+
+        - in: query
+          name: exdescription
+          schema:
+            type: string
+            example: Enterprise Example
+            description: description of the experience
+          required: true
+
+        - in: query
+          name: excurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "experience not created"}
+  /api/curriculum/experience/{experience__id}:
+    put:
+      tags:
+        - experience - curriculum
+      summary: Updates a experience
+      parameters:
+        - in: query
+          name: exjob_title
+          schema:
+            type: string
+            example: FullStack Developer
+            description: Job title of experience
+          required: true
+        - in: query
+          name: excompany_name
+          schema:
+            type: string
+            example: Enterprise Example
+            description: Coompany name of experience
+          required: true
+
+        - in: query
+          name: exstart_date
+          schema:
+            type: string
+            example: 2024-01-01
+            description: Start date of the experience
+          required: true
+
+        - in: query
+          name: exstart_date
+          schema:
+            type: string
+            example: 2024-01-01
+            description: End date of the experience
+          required: false
+
+        - in: query
+          name: exdescription
+          schema:
+            type: string
+            example: Enterprise Example
+            description: description of the experience
+          required: true
+
+        - in: query
+          name: excurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                experience not found:
+                  value:
+                    message: experience not found
+                  summary: Experience was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "experience not updated"}
+  /api/curriculum/experience/{experience_id}:
+    get:
+      tags:
+        - experience - curriculum
+      summary: Display the specified Experience.
+      parameters:
+        - in: path
+          name: experience_id
+          schema:
+            type: integer
+            example: 1
+            description: experience id
+          required: true
+      responses:
+        '200':
+          description: Experience object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Experience'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/experience/{experienceId}:
+    delete:
+      tags:
+        - experience - curriculum
+      summary: Remove the specified experience.
+      parameters:
+        - in: path
+          name: experienceId
+          schema:
+            type: integer
+            example: 1
+            description: experience id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "experience removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                experience not found:
+                  value:
+                    message: experience not found
+                  summary: experience not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "experience not removed"}
+  /api/curriculum/experience/:
+    get:
+      tags:
+        - experience - curriculum
+      summary: Get all experiences of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: excurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Experience Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+
+  /api/curriculum/education:
+    post:
+      tags:
+        - education - curriculum
+      summary: Creates a education
+      parameters:
+        - in: query
+          name: eddegree
+          schema:
+            type: string
+            example: Bacheelor
+            description: Degree of education
+          required: true
+        - in: query
+          name: edfield_of_study
+          schema:
+            type: integer
+            example: 1
+            description: Field of Study
+          required: true
+        - in: query
+          name: edinstitution
+          schema:
+            type: integer
+            example: Stanford
+            description: Field of Study
+          required: true
+        - in: query
+          name: edstart_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: Start date of the education
+          required: true
+        - in: query
+          name: edend_date
+          schema:
+            type: datee
+            example: 2024-01-01
+            description: End date of the education
+          required: false
+        - in: query
+          name: eddescription
+          schema:
+            type: string
+            example: Education Description Example
+            description: description of the education
+          required: true
+        - in: query
+          name: edcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Education'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "education not created"}
+  /api/curriculum/education/{education__id}:
+    put:
+      tags:
+        - education - curriculum
+      summary: Updates a education
+      parameters:
+        - in: query
+          name: eddegree
+          schema:
+            type: string
+            example: Bacheelor
+            description: Degree of education
+          required: true
+        - in: query
+          name: edfield_of_study
+          schema:
+            type: integer
+            example: Filed Example
+            description: Field of Study
+          required: true
+        - in: query
+          name: edinstitution
+          schema:
+            type: integer
+            example: Stanford
+            description: Field of Study
+          required: true
+        - in: query
+          name: edstart_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: Start date of the education
+          required: true
+        - in: query
+          name: edend_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: End date of the education
+          required: false
+        - in: query
+          name: eddescription
+          schema:
+            type: string
+            example: Education Description Example
+            description: description of the education
+          required: true
+        - in: query
+          name: edcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Education'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                education not found:
+                  value:
+                    message: education not found
+                  summary: Education was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "education not updated"}
+  /api/curriculum/education/{education_id}:
+    get:
+      tags:
+        - education - curriculum
+      summary: Display the specified Education.
+      parameters:
+        - in: path
+          name: education_id
+          schema:
+            type: integer
+            example: 1
+            description: education id
+          required: true
+      responses:
+        '200':
+          description: Education object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Education'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/education/{educationId}:
+    delete:
+      tags:
+        - education - curriculum
+      summary: Remove the specified education.
+      parameters:
+        - in: path
+          name: educationId
+          schema:
+            type: integer
+            example: 1
+            description: education id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "education removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                education not found:
+                  value:
+                    message: education not found
+                  summary: education not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "education not removed"}
+  /api/curriculum/education/:
+    get:
+      tags:
+        - education - curriculum
+      summary: Get all educations of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: edcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Education Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+
+  /api/curriculum/certification:
+    post:
+      tags:
+        - certification - curriculum
+      summary: Creates a certification
+      parameters:
+        - in: query
+          name: certification_name
+          schema:
+            type: string
+            example: ZCPE
+            description: Certification Name
+          required: true
+        - in: query
+          name: cerissuing_organization
+          schema:
+            type: String
+            example: Zend
+            description: Certification issuing organization
+          required: true
+        - in: query
+          name: cerissue_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: Issue certification date
+          required: true
+        - in: query
+          name: cert_hours
+          schema:
+            type: integer
+            example: 86
+            description: Hours of the certification
+          required: true
+        - in: query
+          name: cerdescription
+          schema:
+            type: String
+            example: Ceeretification Zend for PHP development.
+            description: Certification description
+          required: true
+        - in: query
+          name: cerlink
+          schema:
+            type: String
+            example: http://framework.zend.com
+            description: Certificatin Link.
+          required: true
+
+        - in: query
+          name: cercurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "certification not created"}
+  /api/curriculum/certification/{certification__id}:
+    put:
+      tags:
+        - certification - curriculum
+      summary: Updates a certification
+      parameters:
+        - in: query
+          name: certification_name
+          schema:
+            type: string
+            example: ZCPE
+            description: Certification Name
+          required: true
+        - in: query
+          name: cerissuing_organization
+          schema:
+            type: String
+            example: Zend
+            description: Certification issuing organization
+          required: true
+        - in: query
+          name: cerissue_date
+          schema:
+            type: date
+            example: 2024-01-01
+            description: Issue certification date
+          required: true
+        - in: query
+          name: cert_hours
+          schema:
+            type: integer
+            example: 86
+            description: Hours of the certification
+          required: true
+        - in: query
+          name: cerdescription
+          schema:
+            type: String
+            example: Ceeretification Zend for PHP development.
+            description: Certification description
+          required: true
+        - in: query
+          name: cerlink
+          schema:
+            type: String
+            example: http://framework.zend.com
+            description: Certificatin Link.
+          required: true
+
+        - in: query
+          name: cercurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                certification not found:
+                  value:
+                    message: certification not found
+                  summary: Certification was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "certification not updated"}
+  /api/curriculum/certification/{certification_id}:
+    get:
+      tags:
+        - certification - curriculum
+      summary: Display the specified Certification.
+      parameters:
+        - in: path
+          name: certification_id
+          schema:
+            type: integer
+            example: 1
+            description: certification id
+          required: true
+      responses:
+        '200':
+          description: Certification object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certification'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/certification/{certificationId}:
+    delete:
+      tags:
+        - certification - curriculum
+      summary: Remove the specified certification.
+      parameters:
+        - in: path
+          name: certificationId
+          schema:
+            type: integer
+            example: 1
+            description: certification id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "certification removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                certification not found:
+                  value:
+                    message: certification not found
+                  summary: certification not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "certification not removed"}
+  /api/curriculum/certification/:
+    get:
+      tags:
+        - certification - curriculum
+      summary: Get all certifications of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: cercurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Certification Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+
+  /api/curriculum/presentation:
+    post:
+      tags:
+        - presentation - curriculum
+      summary: Creates a presentation
+      parameters:
+        - in: query
+          name: presentation_text
+          schema:
+            type: string
+            example: Presentation example text.
+            description: Presentation Text.
+          required: true
+
+        - in: query
+          name: precurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentation'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "presentation not created"}
+  /api/curriculum/presentation/{presentation__id}:
+    put:
+      tags:
+        - presentation - curriculum
+      summary: Updates a presentation
+      parameters:
+        - in: query
+          name: presentation_text
+          schema:
+            type: string
+            example: Presentation example text.
+            description: Presentation Text.
+          required: true
+
+        - in: query
+          name: precurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentation'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                presentation not found:
+                  value:
+                    message: presentation not found
+                  summary: Presentation was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "presentation not updated"}
+  /api/curriculum/presentation/{presentation_id}:
+    get:
+      tags:
+        - presentation - curriculum
+      summary: Display the specified Presentation.
+      parameters:
+        - in: path
+          name: presentation_id
+          schema:
+            type: integer
+            example: 1
+            description: presentation id
+          required: true
+      responses:
+        '200':
+          description: Presentation object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Presentation'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/presentation/{presentationId}:
+    delete:
+      tags:
+        - presentation - curriculum
+      summary: Remove the specified presentation.
+      parameters:
+        - in: path
+          name: presentationId
+          schema:
+            type: integer
+            example: 1
+            description: presentation id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "presentation removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                presentation not found:
+                  value:
+                    message: presentation not found
+                  summary: presentation not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "presentation not removed"}
+  /api/curriculum/presentation/:
+    get:
+      tags:
+        - presentation - curriculum
+      summary: Get all presentations of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: precurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Presentation Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+
+  /api/curriculum/reference:
+    post:
+      tags:
+        - reference - curriculum
+      summary: Creates a reference
+      parameters:
+        - in: query
+          name: reference_name
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference Name.
+          required: true
+
+        - in: query
+          name: reference_email
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference E-mail.
+          required: true
+
+        - in: query
+          name: reference_text
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference Text.
+          required: true
+
+        - in: query
+          name: refcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reference'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                invalid object id:
+                  value:
+                    message: $objectName is not valid
+        '500':
+          description: Create error
+          content:
+            application/json:
+              example: {"message": "reference not created"}
+  /api/curriculum/reference/{reference__id}:
+    put:
+      tags:
+        - reference - curriculum
+      summary: Updates a reference
+      parameters:
+        - in: query
+          name: reference_name
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference Name.
+          required: true
+
+        - in: query
+          name: reference_email
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference E-mail.
+          required: true
+
+        - in: query
+          name: reference_text
+          schema:
+            type: string
+            example: Reference example text.
+            description: Reference Text.
+          required: true
+
+        - in: query
+          name: refcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: Curriculum id
+          required: true
+      responses:
+        '200':
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reference'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                reference not found:
+                  value:
+                    message: reference not found
+                  summary: Reference was not found
+                invalid object id:
+                  value:
+                    message: $nomeDoObjeto is not valid
+        '500':
+          description: Update error
+          content:
+            application/json:
+              example: {"message": "reference not updated"}
+  /api/curriculum/reference/{reference_id}:
+    get:
+      tags:
+        - reference - curriculum
+      summary: Display the specified Reference.
+      parameters:
+        - in: path
+          name: reference_id
+          schema:
+            type: integer
+            example: 1
+            description: reference id
+          required: true
+      responses:
+        '200':
+          description: Reference object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reference'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                curriculum not found:
+                  value:
+                    message: curriculum not found
+                  summary: Curriculum not found
+  /api/curriculum/reference/{referenceId}:
+    delete:
+      tags:
+        - reference - curriculum
+      summary: Remove the specified reference.
+      parameters:
+        - in: path
+          name: referenceId
+          schema:
+            type: integer
+            example: 1
+            description: reference id
+          required: true
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "reference removed"}
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
+                  summary: Logged person account professional profile not found
+                reference not found:
+                  value:
+                    message: reference not found
+                  summary: reference not found
+        '500':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "reference not removed"}
+  /api/curriculum/reference/:
+    get:
+      tags:
+        - reference - curriculum
+      summary: Get all references of logged professional Curriculum.
+      parameters:
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            example: 15
+            description: Quantity of results per page
+          required: true
+        - in: query
+          name: refcurriculum_id
+          schema:
+            type: integer
+            example: 1
+            description: The professional curriculum id
+          required: false
+      responses:
+        '200':
+          description: In this case "data" property contains an array of Reference Objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              examples:
+                no professional found:
+                  value:
+                    message: no professional found
   /api/social_network/showByCompanyId:
     get:
       tags:
@@ -2105,7 +3297,7 @@ paths:
             type: string
         - name: company_id
           in: query
-          description: Company id 
+          description: Company id
           required: true
           example: 1
           schema:
@@ -2137,7 +3329,7 @@ paths:
             type: string
         - name: company_id
           in: query
-          description: Company id 
+          description: Company id
           example: 1
           schema:
             type: integer
@@ -2171,7 +3363,7 @@ paths:
             description: Company social network deleted sucessfully.
           '404':
             description: Company social network not found.
-  
+
   /api/proficiency/index:
     get:
         tags:
@@ -2192,7 +3384,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Profeciency'
-                  
+
 components:
   schemas:
     Login:
@@ -2736,7 +3928,7 @@ components:
           example: '2024-04-23T14:16:25.000000Z'
         updated_at:
           type: string
-          example: '2024-04-23T14:16:25.000000Z'  
+          example: '2024-04-23T14:16:25.000000Z'
     Profeciency:
       required:
         - test
@@ -2785,7 +3977,7 @@ components:
       properties:
         data:
           type: array
-          items: 
+          items:
             $ref: '#/components/schemas/JobList'
         curent_page:
           type: integer
@@ -2806,7 +3998,7 @@ components:
       properties:
         data:
           type: array
-          items: 
+          items:
             $ref: '#/components/schemas/JobList'
         message:
           type: string
@@ -2833,7 +4025,7 @@ components:
           type: string
           example: Url or null
         links:
-          type: string 
+          type: string
           example: {"url": null, "label": "&laquo; Previous","active": false}
           description: Array of object
         next_page_url:
@@ -2854,10 +4046,9 @@ components:
         total:
           type: integer
           example: 3
-          
+
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      
