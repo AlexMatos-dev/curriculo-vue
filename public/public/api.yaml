@@ -9,6 +9,35 @@ info:
 
     Some useful links:
     - [Back end repository](https://github.com/jobifull/jobifull-app-backend)
+    
+    
+    API responses have a pattern:
+    ---------------------------------------------------
+    Sucesso -> 
+    status: 200
+    data: Informação retornada
+    
+    Erro na passagem de parâmetros -> 
+    status: 400
+    message: Descrição do status
+    
+    Erro de Autenticação -> 
+    status: 401
+    message: Descrição do status
+    
+    Erro de Permissão -> 
+    status: 403
+    message: Descrição do status
+    
+    Não encontrado -> 
+    status: 404
+    message: Descrição do status
+    
+    Erro no sistema ->
+    status: 500
+    message: Descrição do erro
+    ---------------------------------------------------
+    
   termsOfService: http://swagger.io/terms/
   contact:
     email: nickolasbini@hotmail.com
@@ -20,7 +49,7 @@ externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 servers:
-  - url: http://localhost/
+  - url: https://api.jobifull.eu/
 tags:
   - name: auth
     description: Authentication routes and methods
@@ -797,60 +826,72 @@ paths:
       summary: List all jobs
       description: retrieves a list of job with optional filters.
       parameters:
-        - name: job_model
+        - name: job_modality_id
           in: query
-          description: search for the given model
-          example: Remote
+          description: search for jobs with this job modality
+          example: 1
           schema:
-            type: string
-        - name: job_country
+            type: integer
+        - name: company_id
           in: query
-          description: search for the given country ID
+          description: search for jobs of this company id
           example: 3
           schema:
             type: integer
         - name: job_city
           in: query
-          description: search for the given city ID
+          description: search for jobs with this city id
+          example: 3
+          schema:
+            type: integer
+        - name: job_country
+          in: query
+          description: search for jobs with this country id
           example: 3
           schema:
             type: integer
         - name: job_seniority
           in: query
-          description: search for the given technicar level
+          description: search for jobs with this Proficiency id of category 'seniority'
           example: Intern
           schema:
             type: string
         - name: job_salary_start
           in: query
-          description: search for the given starting salary
+          description: search for jobs with given starting salary
           example: 1527.20
           schema:
             type: number
         - name: job_salary_end
           in: query
-          description: search for the given ending salary
+          description: search for jobs with given ending salary
           example: 2700.20
           schema:
             type: number
-        - name: job_skills
+        - name: job_description
           in: query
-          description: search for the given skills
-          example: 3
+          description: search fro jobs with (like) this description
+          example: php devoper
           schema:
             type: string
-        - name: job_english_level
-          in: query
-          description: search for the given english level
-          example: Fluent
-          schema:
-            type: string
-        - name: job_experience
+        - name: job_experience_description
           in: query
           description: search for the given experience
           example: +2 years how backend developer
           schema:
             type: string
+        - name: experience_in_months_start
+          in: query
+          description: search for jobs with experience above sent experience_in_months_start
+          example: 5
+          schema:
+            type: integer
+        - name: experience_in_months_end
+          in: query
+          description: search for jobs with experience bellow sent experience_in_months_end
+          example: 10
+          schema:
+            type: integer
       responses:
         '200':
           description: A list of job
@@ -859,162 +900,146 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/JobList'
-  /api/joblist/show:
+                  $ref: '#/components/schemas/JobListPaginated'
+  /api/joblist/show/{joblistId}:
     get:
       tags:
         - joblist
       summary: Search for job
-      description: Search for a specific vacancy by ID
+      description: Search for a specific job by id
       parameters:
-        - name: job_id
-          in: query
-          description: Job ID
+        - name: joblistId
+          in: path
+          description: Job id
           required: true
-          example: 8
+          example: 1
           schema:
             type: integer
       responses:
         '200':
-          description: Vacant job found successfully.
+          description: job found successfully.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/JobList'
+                $ref: '#/components/schemas/JobListShow'
         '404':
-          description: Vacant job not found.
+          description: job not found.
   /api/joblist/store:
     post:
       tags:
         - joblist
       summary: Create a new job
       parameters:
-        - name: company_id
+        - name: job_modality_id
           in: query
-          description: Company ID
-          required: true
+          description: Job modality id
           example: 8
+          required: true
           schema:
             type: integer
-        - name: job_model
-          in: query
-          description: Work Model
-          required: true
-          example: remote
-          schema:
-            type: string
         - name: job_country
           in: query
-          description: Work country
-          required: true
+          description: List country id
           example: 10
           schema:
             type: integer
         - name: job_city
           in: query
-          description: Work city
-          required: true
+          description: List city id | City must be located in the sent Country id
           example: 15
           schema:
             type: integer
         - name: job_seniority
           in: query
-          description: technical level required
-          required: true
-          example: Intern
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: job_salary
           in: query
           description: Work Payment
-          required: true
           example: 7200.52
           schema:
             type: number
         - name: job_description
           in: query
           description: Work desctiption
-          required: true
           example: We need a person who knows advanced flutter
           schema:
             type: string
-        - name: job_skills
+        - name: experience_in_months
           in: query
-          description: Work skills required
-          required: true
-          example: PHP, Laravel, JavaScript, React
+          description: experience in months
+          example: 2
           schema:
-            type: string
-        - name: job_english_level
+            type: integer
+        - name: job_experience_description
           in: query
-          description: English level
-          required: true
-          example: Fluent
-          schema:
-            type: string
-        - name: job_experience
-          in: query
-          description: Time experience
-          required: true
+          description: free text field for job experience description
           example: 2+ As backend developer
           schema:
             type: string
         - name: job_benefits
           in: query
-          description: Benefits offered
-          required: true
+          description: free text field for job benefits
           example: food voucher and home office
           schema:
             type: string
       requestBody:
         required: true
-        content: 
-          application/json:
-            example: ""
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListShow'
       responses:
         '201':
-          description: Vacant job created successfully.
+          description: job created successfully.
         '400':
           description: Field entered incorrectly.
           content:
             application/json:
-              example: ""
-  /api/joblist/update:
+              example: {"message": "invalid parameters"}
+        '500':
+          description: Create error.
+          content:
+            application/json:
+              example: {"message": "an error occurred while creating the job, please try again later"}
+  /api/joblist/{jobListId}:
     put:
       tags:
         - joblist
       summary: Update a job by ID
       parameters:
-        - name: company_id
-          in: query
-          description: Company ID
-          example: 8
+        - name: jobListId
+          in: path
+          description: Job list id
+          example: 1
+          required: true
           schema:
             type: integer
-        - name: job_model
+        - name: job_modality_id
           in: query
-          description: Work Model
-          example: remote
+          description: Job modality id
+          example: 8
+          required: true
           schema:
-            type: string
+            type: integer
         - name: job_country
           in: query
-          description: Work country
+          description: List country id
           example: 10
           schema:
             type: integer
         - name: job_city
           in: query
-          description: Work city
+          description: List city id | City must be located in the sent Country id
           example: 15
           schema:
             type: integer
         - name: job_seniority
           in: query
-          description: technical level required
-          example: Intern
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: job_salary
@@ -1029,62 +1054,237 @@ paths:
           example: We need a person who knows advanced flutter
           schema:
             type: string
-        - name: job_skills
+        - name: experience_in_months
           in: query
-          description: Work skills required
-          example: PHP, Laravel, JavaScript, React
+          description: experience in months
+          example: 2
           schema:
-            type: string
-        - name: job_english_level
+            type: integer
+        - name: job_experience_description
           in: query
-          description: English level
-          example: Fluent
-          schema:
-            type: string
-        - name: job_experience
-          in: query
-          description: Time experience
+          description: free text field for job experience description
           example: 2+ As backend developer
           schema:
             type: string
         - name: job_benefits
           in: query
-          description: Benefits offered
+          description: free text field for job benefits
           example: food voucher and home office
           schema:
             type: string
       requestBody:
         required: true
-        content: 
-          application/json:
-            example: ""
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListShow'
       responses:
         '201':
-          description: Vacant job created successfully.
+          description: job updated successfully.
         '400':
           description: Field entered incorrectly.
           content:
             application/json:
-              example: ""
-  /api/joblist/destroy:
-    post:
+              example: {"message": "invalid parameters"}
+        '500':
+          description: Update error.
+          content:
+            application/json:
+              example: {"message": "an error occurred while updating the job, please try again later"}
+  /api/joblist/{jobList_Id}:
+    delete:
       tags:
         - joblist
       summary: Delete a job
-      description: Delete a specific job by ID
+      description: Delete a specific job by id
       parameters:
-        - name: job_id
-          in: query
-          description: Job ID
+        - name: jobList_Id
+          in: path
+          description: job list id
           required: true
           example: 8
           schema:
             type: integer
       responses:
         '200':
-          description: Vacant job deleted sucessfully.
+          description: Job removed
+          content:
+            application/json:
+              example: {"message": "job deleted sucessfully"}
         '404':
-          description: Vacant job not found.
+          description: Job not found
+          content:
+            application/json:
+              example: {"message": "job not found"}
+  /api/joblist/managelanguage/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job visas
+      description: Manages job visas, this method can ADD, REMOVE or LIST the job language(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: job_language_id
+          in: query
+          description: Jog language id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: language_id
+          in: query
+          description: job list id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: proficiency_id
+          in: query
+          description: Proficiency id of category = language
+          required: false
+          example: 1
+          schema:
+            type: integer 
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobVisas objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  /api/joblist/manageskills/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job skills
+      description: Manages job skills, this method can ADD, REMOVE or LIST the job skill(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: tag_id
+          in: query
+          description: Tag id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: job_skill_id
+          in: query
+          description: Job skill id
+          required: false
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobSkills objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  /api/joblist/managevisas/{jobList_Id}:
+    post:
+      tags:
+        - joblist
+      summary: Manage job visa
+      description: Manages job visas, this method can ADD, REMOVE or LIST the job visa(s). Only job owner company can use this method!
+      parameters:
+        - name: jobList_Id
+          in: path
+          description: job list id
+          required: true
+          example: 8
+          schema:
+            type: integer
+        - name: action
+          in: query
+          description: Either 'add', 'remove' or 'list'
+          required: true
+          example: add
+          schema:
+            type: string
+        - name: visas_type_id
+          in: query
+          description: Tag id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: country_id
+          in: query
+          description: Job skill id
+          required: false
+          example: 8
+          schema:
+            type: integer
+        - name: job_visa_id
+          in: query
+          description: Job visa id
+          required: false
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Action performed
+          content:
+            application/json:
+              example: {"message": "action performed", "data": "Array of JobVisas objects | null"}
+        '404':
+          description: Invalid parameters
+          content:
+            application/json:
+              example: {"message": "invalid parameters dynamic message"}
+        '500':
+          description: Action error
+          content:
+            application/json:
+              example: {"message":"action not performed"}
+  
+  
   /api/curriculum/curriculum:
     post:
       tags:
@@ -1668,8 +1868,6 @@ paths:
                   value:
                     message: no professional found
                   summary: Logged person account professional profile not found                    
-                  
-                  
   /api/curriculum/link:
     post:
       tags:
@@ -1866,8 +2064,134 @@ paths:
                 no professional found:
                   value:
                     message: no professional found
-                  summary: Logged person account professional profile not found
+                  summary: Logged person account professional profile not found 
   
+  /api/social_network/showByCompanyId:
+    get:
+      tags:
+        - company_social_network
+      summary: Get company social media
+      description: Get a company social media by ID
+      parameters:
+        - name: company_id
+          in: query
+          description: Company ID
+          required: true
+          example: 8
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Return all CompanySocialMedia objects.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+        '404':
+          description: Social medias not found.
+  /api/social_network/store:
+    post:
+      tags:
+        - company_social_network
+      summary: Create a new social network
+      description: create a new social network to a company
+      parameters:
+        - name: social_network_profile
+          in: query
+          description: Link to network profile
+          required: true
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
+        - name: company_id
+          in: query
+          description: Company id 
+          required: true
+          example: 1
+          schema:
+            type: integer
+        - name: social_network_type
+          in: query
+          description: Type os social network
+          required: true
+          example: "Instagram"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Company social network created sucessfully.
+        '404':
+          description: An error occurred while creating the social network, please try again later.
+  /api/social_network/update:
+    post:
+      tags:
+        - company_social_network
+      summary: Update a social network
+      description: Update a social network
+      parameters:
+        - name: social_network_profile
+          in: query
+          description: Link to network profile
+          example: "www.instagram.com/profile/"
+          schema:
+            type: string
+        - name: company_id
+          in: query
+          description: Company id 
+          example: 1
+          schema:
+            type: integer
+        - name: social_network_type
+          in: query
+          description: Type os social network
+          example: "Instagram"
+          schema:
+            type: string
+      responses:
+          '200':
+            description: Company social network updated sucessfully.
+          '404':
+            description: Company social network not found.
+  /api/social_network/destroy:
+    post:
+        tags:
+          - company_social_network
+        summary: Delete a company social midia
+        description: Delete a specific social midia by ID
+        parameters:
+          - name: company_social_network
+            in: query
+            description: Company social network id
+            required: true
+            example: 8
+            schema:
+              type: integer
+        responses:
+          '200':
+            description: Company social network deleted sucessfully.
+          '404':
+            description: Company social network not found.
+  
+  /api/proficiency/index:
+    get:
+        tags:
+          - proficiency
+        summary: List of proficiencies
+        description: Get all the proficiencies
+        parameters:
+          - name: category
+            in: query
+            description: Category of the proficiency
+            example: seniority
+            schema:
+              type: string
+        responses:
+          '200':
+            description: A list of proficiencies object array
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Profeciency'
                   
 components:
   schemas:
@@ -2124,7 +2448,7 @@ components:
         - test
       type: object
       properties:
-        recruiter_id:
+        data:
           type: integer
           example: 1
         company_id:
@@ -2165,9 +2489,10 @@ components:
         company_id:
           type: integer
           example: 1
-        job_model:
-          type: string
-          example: remote
+        job_modality_id:
+          type: integer
+          example: 1
+          description: id from job_modalities
         job_country:
           type: integer
           example: 1
@@ -2175,26 +2500,43 @@ components:
           type: integer
           example: 1
         job_seniority:
-          type: string
-          example: 'Junior'
+          type: integer
+          example: 1
+          description: Proficiency id of category = seniority
         job_salary:
           type: number
           example: 2500.00
         job_description:
           type: string
           example: Job description
-        job_skills:
-          type: string
-          example: 1,2,3,4
         job_english_level:
           type: integer
           example: 1
-        job_experience:
+        experience_in_months:
           type: integer
           example: 10
+        job_experience_description:
+          type: string
+          example: worked for apple and google
         job_benefits:
           type: string
-          example: Text
+          example: gym pass and udemy course pass
+        skills:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobSkills'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobLanguages'
+        visas:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobVisas'
+        match:
+          type: number
+          example: 100.00
+          description: The float/double number of the match accordingly to sent parameters | This exists only in /api/joblist/show/{joblistId}
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -2317,9 +2659,158 @@ components:
           example: '2024-04-23T14:16:25.000000Z'
         updated_at:
           type: string
-          example: '2024-04-23T14:16:25.000000Z'      
-          
-          
+          example: '2024-04-23T14:16:25.000000Z'
+    JobSkills:
+      required:
+        - test
+      type: object
+      properties:
+        job_skill_id:
+          type: integer
+          example: 1
+          description: job skill id
+        joblist_id:
+          type: integer
+          example: 1
+          description: JobList id
+        tag_id:
+          type: integer
+          example: 1
+          description: Tag id
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobVisas:
+      required:
+        - test
+      type: object
+      properties:
+        job_visa_id:
+          type: integer
+          example: 1
+          description: Job visa id
+        joblist_id:
+          type: integer
+          example: 1
+          description: Job list id
+        visas_type_id:
+          type: integer
+          example: 1
+          description: Type visa id
+        country_id:
+          type: integer
+          example: 1
+          description: List country id
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    JobLanguages:
+      required:
+        - test
+      type: object
+      properties:
+        job_language_id:
+          type: integer
+          example: 1
+          description: job language id
+        joblist_id:
+          type: integer
+          example: 1
+          description: Job list id
+        language_id:
+          type: integer
+          example: 1
+          description: List language id
+        proficiency_id:
+          type: integer
+          example: 1
+          description: Proficiency id of category = language
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'  
+    Profeciency:
+      required:
+        - test
+      type: object
+      properties:
+        proficiency_id:
+          type: integer
+          example: 1
+        proficiency_level:
+          type: string
+          example: senior
+        category:
+          type: string
+          example: seniority
+          description: Either 'language', 'seniority' or 'level'
+        weight:
+          type: number
+          example: 50.0
+          description: Only exist on profeciencies of category = level
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        en:
+          type: string
+          example: senior
+          description: English translation
+        pt:
+          type: string
+          example: senior
+          description: Portuguese translation
+        es:
+          type: string
+          example: sénior
+          description: Spanish translation
+        unofficial_translations:
+          type: string
+          example: {"fr": "french", "it": "italian"}
+          description: It can be Array|Null, default is null, it can contain any translation with the key as a languageIso
+    JobListPaginated:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/JobList'
+        curent_page:
+          type: integer
+          example: 1
+          description: the current page
+        last_page:
+          type: integer
+          example: 1
+          description: the last page
+        per_page:
+          type: integer
+          example: 100
+          description: the default list max size
+    JobListShow:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items: 
+            $ref: '#/components/schemas/JobList'
+        message:
+          type: string
+          example: job found successfully | job created successfully | job updated successfully
     PaginatedResults:
       type: object
       properties:
@@ -2363,8 +2854,7 @@ components:
         total:
           type: integer
           example: 3
-    
-  
+          
   securitySchemes:
     bearerAuth:
       type: http

@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('job_visas', function (Blueprint $table) {
             $table->bigIncrements('job_visa_id', true);
             $table->unsignedBigInteger('joblist_id');
-            $table->unsignedBigInteger('visas_id');
+            $table->unsignedInteger('visas_type_id');
+            $table->unsignedInteger('country_id');
             $table->timestamps();
         });
     }

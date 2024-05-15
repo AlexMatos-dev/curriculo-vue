@@ -23,6 +23,16 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
+		Schema::table('companies_social_networks', function(Blueprint $table) {
+			$table->foreign('social_network_type_id')->references('social_network_type_id')->on('companies_social_networks_types')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('companies_social_networks_types', function(Blueprint $table) {
+			$table->foreign('author_company_id')->references('company_id')->on('companies')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
 		Schema::table('recruiters', function(Blueprint $table) {
 			$table->foreign('person_id')->references('person_id')->on('persons')
 						->onDelete('restrict')
@@ -68,11 +78,6 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->foreign('job_english_level')->references('proficiency_id')->on('proficiency')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
 						->onDelete('restrict')
@@ -104,7 +109,12 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->foreign('visas_id')->references('visas_id')->on('visas')
+			$table->foreign('visas_type_id')->references('typevisas_id')->on('type_visas')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->foreign('country_id')->references('lcountry_id')->on('listcountries')
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
@@ -376,6 +386,12 @@ class CreateForeignKeys extends Migration {
 		Schema::table('companies_social_networks', function(Blueprint $table) {
 			$table->dropForeign('companies_social_networks_company_id_foreign');
 		});
+		Schema::table('companies_social_networks', function(Blueprint $table) {
+			$table->dropForeign('companies_social_networks_social_network_type_id_foreign');
+		});
+		Schema::table('companies_social_networks_types', function(Blueprint $table) {
+			$table->dropForeign('companies_social_networks_types_author_company_id_foreign');
+		});
 		Schema::table('recruiters', function(Blueprint $table) {
 			$table->dropForeign('recruiters_person_id_foreign');
 		});
@@ -403,9 +419,6 @@ class CreateForeignKeys extends Migration {
 		Schema::table('jobslist', function(Blueprint $table) {
 			$table->dropForeign('jobslist_job_seniority_foreign');
 		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobslist_job_english_level_foreign');
-		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->dropForeign('job_skills_joblist_id_foreign');
 		});
@@ -425,7 +438,10 @@ class CreateForeignKeys extends Migration {
 			$table->dropForeign('job_visas_joblist_id_foreign');
 		});
 		Schema::table('job_visas', function(Blueprint $table) {
-			$table->dropForeign('job_visas_visas_id_foreign');
+			$table->dropForeign('job_visas_visas_type_id_foreign');
+		});
+		Schema::table('job_visas', function(Blueprint $table) {
+			$table->dropForeign('job_visas_country_id_foreign');
 		});
 		Schema::table('jobs_invites', function(Blueprint $table) {
 			$table->dropForeign('jobs_invites_job_id_foreign');

@@ -35,4 +35,12 @@ class Controller
             return false;
         return $curriculumObj;
     }
+
+    public function getJobBySession()
+    {
+        $jobListObj = Session()->get('job');
+        if(!$jobListObj)
+            return false;
+        return $jobListObj;
+    }
 }

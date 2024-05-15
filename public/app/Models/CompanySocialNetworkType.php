@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JobModality extends Model
+class CompanySocialNetworkType extends Model
 {
-    protected $primaryKey = 'job_modality_id';
-    protected $table = 'job_modalities';
+    protected $primaryKey = 'social_network_type_id';
+    protected $table = 'companies_social_networks_types';
     public $timestamps = true;
 
     /**
@@ -17,6 +17,8 @@ class JobModality extends Model
      */
     protected $fillable = [
         'name',
-        'description'
+        'description',
+        'author_company',
+        'validated'
     ];
 }

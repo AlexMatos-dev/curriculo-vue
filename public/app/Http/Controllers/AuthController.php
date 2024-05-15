@@ -7,6 +7,7 @@ use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Helpers\Validator;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -29,7 +30,6 @@ class AuthController extends Controller
         $person = Person::where('person_email', $credentials['email']) ->first();
         if(!$person || !Hash::check($credentials['password'], $person->person_password))
             return response()->json(['message' => 'invalid credentials'], 401);
-        $token = auth('api')->login($person);
         $key = "lastLoginOf--{$person->person_id}";
         $personType = '';
         if(Cache::has($key)){
@@ -38,9 +38,13 @@ class AuthController extends Controller
             $personType = request('personType');
             Cache::put($key, $personType);
         }
-        $dataToReturn = $this->respondWithToken($token)->getOriginalContent();
-        $dataToReturn['lastLogin'] = $personType;
-        return response()->json($dataToReturn);
+        $token = $person->createToken('auth_token')->plainTextToken;
+        $person->last_login = Carbon::now();
+        $person->save();
+        return response()->json([
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+        ]);
     }
 
     /**
@@ -97,16 +101,6 @@ class AuthController extends Controller
     {
         auth('api')->logout();
         return response()->json(['message' => 'Successfully logged out']);
-    }
-
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function refresh()
-    {
-        return response()->json($this->respondWithToken(auth('api')->refresh())->getOriginalContent());
     }
 
     /**

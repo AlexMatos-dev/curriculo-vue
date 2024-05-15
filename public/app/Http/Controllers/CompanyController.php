@@ -102,14 +102,15 @@ class CompanyController extends Controller
      */
     public function manageCompanyAdmin()
     {
-        $actions = ['add', 'remove', 'grant', 'revoke'];
+        $actions = ['add', 'remove', 'grant', 'revoke', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
         $person = auth('api')->user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
-        if(!$targetPerson || $person->person_id == $targetPerson->person_id)
+        if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
             return response()->json(['message' => 'person is invalid'], 400);
+        $data = [];
         switch(request('action')){
             case 'add':
                 $result = $company->syncAdmins(request('person_id'));
@@ -123,29 +124,34 @@ class CompanyController extends Controller
             case 'revoke':
                 $result = $company->hadleAdminPivilegies(request('person_id'), false);
             break;
+            case 'list':
+                $data = $company->getAdmins();
+                $result = true;
+            break;
         }
         if(!$result)
             return response()->json(['message' => 'action not completed with success'], 500);
-        return response()->json(['message' => 'action performed']);
+        return response()->json(['message' => 'action performed', 'data' => $data]);
     }
 
     /**
-     * Manages company recruiters, this method can ADD a new recruiter or REMOVE a current recruit
+     * Manages company recruiters, this method can ADD a new recruiter, REMOVE a current recruit or LIST all recruiters of company
      * Obs: Only admins with privilegies can perform an action!
-     * @param String action - possible values ['add', 'remove']
+     * @param String action - possible values ['add', 'remove or 'list]
      * @param Int person_id - required
      * @return \Illuminate\Http\JsonResponse
      */
     public function manageCompanyRecruiter()
     {
-        $actions = ['add', 'remove'];
+        $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
         $person = auth('api')->user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
-        if(!$targetPerson || $person->person_id == $targetPerson->person_id)
+        if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
             return response()->json(['message' => 'person is invalid'], 400);
+        $data = [];
         switch(request('action')){
             case 'add':
                 $result = $company->addRecruiter($targetPerson->person_id);
@@ -153,9 +159,13 @@ class CompanyController extends Controller
             case 'remove':
                 $result = $company->removeRecruiter($targetPerson->person_id);
             break;
+            case 'list':
+                $data = $company->getRecruiters();
+                $result = true;
+            break;
         }
         if(!$result)
             return response()->json(['message' => 'action not completed with success'], 500);
-        return response()->json(['message' => 'action performed']);
+        return response()->json(['message' => 'action performed', 'data' => $data]);
     }
 }

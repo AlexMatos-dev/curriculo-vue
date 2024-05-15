@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-use App\Helpers\TranslatorHandler;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
-class Person extends Authenticatable implements JWTSubject
+class Person extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     const PROFESSIONAL_PERSON_ACCOUNT = 'professional';
     const RECRUITER_PERSON_ACCOUNT    = 'recruiter';
@@ -33,7 +32,8 @@ class Person extends Authenticatable implements JWTSubject
         'person_password',
         'person_ddi',
         'person_phone',
-        'person_langue'
+        'person_langue',
+        'last_login'
     ];
 
     /**
@@ -44,26 +44,6 @@ class Person extends Authenticatable implements JWTSubject
     protected $hidden = [
         'person_password'
     ];
-
-    /**
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
 
     public function language()
     {
@@ -76,19 +56,16 @@ class Person extends Authenticatable implements JWTSubject
      */
     public function sendRequestChangePasswordCodeEmail()
     {
-        $emailTranslations = [
+        $languageISO = $this->language()->llangue_acronyn;
+        $languageISO = 'fr';
+        $translatedText = (new Translation())->getTranslations([
             'your change password code',
             'the code will expire in 30 minutes and can be used only once',
             'in case you did not request this email, please ignore',
             'thanks',
-            'team'
-        ];
-        $translationsForEmail = Translation::whereIn('en', $emailTranslations)->get();
-        $languageISO = $this->language()->llangue_acronyn;
-        $translatedText = [];
-        foreach($translationsForEmail as $translation){
-            $translatedText[$translation->en] = $translation->getTranslationByIsoCode($languageISO);
-        }
+            'team',
+            'Your password change code!'
+        ], $languageISO);
         $code = strtoupper($this->generatePasswordCode());
         $renderedEmail = view('email_templates/password_reset_code', [
             'code' => $code,
@@ -96,7 +73,7 @@ class Person extends Authenticatable implements JWTSubject
             'languageIso' => $languageISO
         ]);
         $emailObj = new \App\Helpers\Mail();
-        $resultOfEmailSend = $emailObj->sendMail($this->person_email, TranslatorHandler::translate('Your password change code!', $languageISO), $renderedEmail);
+        $resultOfEmailSend = $emailObj->sendMail($this->person_email, $translatedText['Your password change code!'], $renderedEmail);
         if(!$resultOfEmailSend['success'])
             return false;
         Cache::put("resetPasswordCode--{$this->person_id}", "$code", 1800);

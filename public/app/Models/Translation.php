@@ -88,4 +88,14 @@ class Translation extends Model
             return false;
         return $this->addTranslationsToUnofficialTranslations($translatedText, $languageIso);
     }
+
+    public function getTranslations(Array $textToTranslate, String $languageISO = 'en')
+    {
+        $translationsObjects = Translation::whereIn('en', $textToTranslate)->get();
+        $translatedText = [];
+        foreach($translationsObjects as $translation){
+            $translatedText[$translation->en] = $translation->getTranslationByIsoCode($languageISO);
+        }
+        return $translatedText;
+    }
 }

@@ -17,7 +17,8 @@ class JobVisa extends Model
      */
     protected $fillable = [
         'joblist_id',
-        'visas_id'
+        'visas_type_id',
+        'country_id'
     ];
 
     public function joblist()
@@ -25,8 +26,13 @@ class JobVisa extends Model
         return $this->belongsTo(JobList::class, 'joblist_id')->first();
     }
 
-    public function visa()
+    public function visaType()
     {
-        return $this->belongsTo(Visa::class, 'visas_id')->first();
+        return $this->belongsTo(TypeVisas::class, 'visa_type_id')->first();
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(ListCountry::class, 'country_id')->first();
     }
 }

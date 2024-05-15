@@ -11,7 +11,7 @@ class CreateCompaniesSocialNetworksTable extends Migration {
 			$table->bigIncrements('social_network_id', true);
 			$table->string('social_network_profile', 150);
 			$table->bigInteger('company_id')->unsigned();
-			$table->string('social_network_type', 50);
+			$table->unsignedInteger('social_network_type_id');
 		});
 	}
 

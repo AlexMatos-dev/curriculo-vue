@@ -39,10 +39,12 @@ class SkillController extends Controller
             'skill_name' => 'numeric|required',
             'skproficiency_level' => 'numeric|required'
         ]);
-        Validator::checkExistanceOnTable([
+        $objects = Validator::checkExistanceOnTable([
             'skill_name' => ['data' => request('skill_name'), 'object' => Tag::class],
             'skproficiency_level' => ['data' => request('skproficiency_level'), 'object' => Proficiency::class]
         ]);
+        if($objects['skproficiency_level']->category != Proficiency::CATEGORY_LEVEL)
+            Validator::throwResponse('invalid proficiency type');
         $skill = Skill::create($this->request->all());
         if(!$skill)
             Validator::throwResponse('skill not created', 500);
@@ -65,10 +67,12 @@ class SkillController extends Controller
             'skill_name' => 'numeric|required',
             'skproficiency_level' => 'numeric|required'
         ]);
-        Validator::checkExistanceOnTable([
+        $objects = Validator::checkExistanceOnTable([
             'skill_name' => ['data' => request('skill_name'), 'object' => Tag::class],
             'skproficiency_level' => ['data' => request('skproficiency_level'), 'object' => Proficiency::class]
         ]);
+        if($objects['skproficiency_level']->category != Proficiency::CATEGORY_LEVEL)
+            Validator::throwResponse('invalid proficiency, must be level type');
         $skill->update($this->request->all());
         return response()->json($skill);
     }

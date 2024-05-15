@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('degree_types', function (Blueprint $table) {
-            $table->increments('degree_type_id')->primary();
+        Schema::create('degree_types', function (Blueprint $table)
+        {
+            $table->increments('degree_type_id');
             $table->string('name', 200);
             $table->timestamps();
         });
