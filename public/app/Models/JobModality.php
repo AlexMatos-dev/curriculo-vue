@@ -8,7 +8,7 @@ class JobModality extends Model
 {
     protected $primaryKey = 'job_modality_id';
     protected $table = 'job_modalities';
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
