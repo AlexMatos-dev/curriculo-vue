@@ -4,6 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobListController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
+use App\Http\Controllers\PresentationController;
+use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
@@ -26,28 +29,19 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function ()
     Route::post('profile', [AuthController::class, 'profile']);
 });
 
-Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(function ()
-{
-    Route::resource('experience', ExperienceController::class);
-    Route::resource('education', EducationController::class);
-    Route::resource('skill', SkillController::class);
-    Route::resource('visa', VisaController::class);
-    Route::resource('link', LinkController::class);
-    Route::resource('curriculum', CurriculumController::class);
-    Route::resource('experience', ExperienceController::class);
-    Route::resource('education', EducationController::class);
+Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(function(){
+  Route::resource('experience',ExperienceController::class);
+  Route::resource('education',EducationController::class);
+  Route::resource('skill', SkillController::class);
+  Route::resource('visa', VisaController::class);
+  Route::resource('link', LinkController::class);
+  Route::resource('curriculum', CurriculumController::class);
+  Route::resource('reference', ReferenceController::class);
+  Route::resource('certification', CertificationController::class);
+  Route::resource('presentation', PresentationController::class);
 });
 
-Route::middleware('auth:sanctum')->group(function ()
-{
-    Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
-    Route::prefix('joblist')->middleware('job')->group(function ()
-    {
-        Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
-        Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
-        Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
-    });
-});
+Route::middleware('auth:sanctum')->apiResource('/joblist', JobListController::class);
 
 Route::prefix('person')->middleware('auth:sanctum')->group(function ()
 {

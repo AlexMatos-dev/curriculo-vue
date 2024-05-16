@@ -98,22 +98,22 @@ class MyCurriculum extends Controller
             'api/curriculum/curriculum' => ['methods' => ['GET', 'POST']],
             'api/curriculum/curriculum/{curriculum}' => ['methods' => ['GET', 'DELETE']],
 
-            'api/curriculum/education' => ['methods' => ['POST'], 'curriculum_id' => 'edcurriculum_id'],
+            'api/curriculum/education' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'edcurriculum_id'],
             'api/curriculum/education/{education}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'edcurriculum_id'],
 
-            'api/curriculum/experience' => ['methods' => ['POST'], 'curriculum_id' => 'excurriculum_id'],
+            'api/curriculum/experience' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'excurriculum_id'],
             'api/curriculum/experience/{experience}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'excurriculum_id'],
             
-            'api/curriculum/certification' => ['methods' => ['POST'], 'curriculum_id' => 'cercurriculum_id'],
+            'api/curriculum/certification' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'cercurriculum_id'],
             'api/curriculum/certification/{certification}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'cercurriculum_id'],
 
-            'api/curriculum/reference' => ['methods' => ['POST'], 'curriculum_id' => 'refcurriculum_id'],
+            'api/curriculum/reference' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'refcurriculum_id'],
             'api/curriculum/reference/{reference}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'refcurriculum_id'],
 
-            'api/curriculum/presentation' => ['methods' => ['POST'], 'curriculum_id' => 'precurriculum_id'],
+            'api/curriculum/presentation' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'precurriculum_id'],
             'api/curriculum/presentation/{presentation}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'precurriculum_id'],
             
-            'api/curriculum/skill' => ['methods' => ['POST'], 'curriculum_id' => 'skcurriculum_id'],
+            'api/curriculum/skill' => ['methods' => ['GET', 'POST'], 'curriculum_id' => 'skcurriculum_id'],
             'api/curriculum/skill/{skill}' => ['methods' => ['GET', 'DELETE', 'PUT'], 'curriculum_id' => 'skcurriculum_id']
         ];
         if($key)

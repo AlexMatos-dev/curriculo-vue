@@ -25,5 +25,7 @@ class DatabaseSeeder extends Seeder
         (new CountrySeeder())->run();
         (new BrStateSeeder)->run();
         (new BrCitySeeder)->run();
+        (new ProfessionalsSeederFake())->run();
+        (new CurriculumSeeder())->run();
     }
 }

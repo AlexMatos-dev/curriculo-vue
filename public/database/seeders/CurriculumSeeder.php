@@ -15,7 +15,8 @@ class CurriculumSeeder extends Seeder
     {
         Curriculum::create([
             'cprofes_id' => 1,
-            'clengua_id' => 131
+            'clengua_id' => 1,
+            'curriculum_type'=>'teste',
         ]);
     }
 }

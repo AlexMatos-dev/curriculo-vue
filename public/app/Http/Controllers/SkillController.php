@@ -59,7 +59,10 @@ class SkillController extends Controller
      */
     public function update()
     {
-        $skill = Skill::find(request('skill'));
+        $skillObj = Skill::find(request('skill'));
+        if(!$skillObj)
+            Validator::throwResponse('skill not found', 400);
+        $skill = $skillObj->isFromProfessionalCurriculum($this->getProfessionalBySession()->professional_id);
         if(!$skill)
             Validator::throwResponse('skill not found', 400);
         Validator::validateParameters($this->request, [
@@ -97,7 +100,7 @@ class SkillController extends Controller
      * @param Int skill - required (skill id)
      * @return \Illuminate\Http\JsonResponse 
      */
-    public function destroy(Skill $skillObj)
+    public function destroy()
     {
         $skillObj = Skill::find(request('skill'));
         if(!$skillObj)
