@@ -2909,6 +2909,12 @@ paths:
         - presentation - curriculum
       summary: Updates a presentation
       parameters:
+        - in: path
+          name: presentation__id
+          schema:
+            type: integer
+            example: 1
+          required: true
         - in: query
           name: presentation_text
           schema:
