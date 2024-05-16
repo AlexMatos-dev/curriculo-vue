@@ -11,6 +11,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
@@ -29,16 +30,17 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function ()
     Route::post('profile', [AuthController::class, 'profile']);
 });
 
-Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(function(){
-  Route::resource('experience',ExperienceController::class);
-  Route::resource('education',EducationController::class);
-  Route::resource('skill', SkillController::class);
-  Route::resource('visa', VisaController::class);
-  Route::resource('link', LinkController::class);
-  Route::resource('curriculum', CurriculumController::class);
-  Route::resource('reference', ReferenceController::class);
-  Route::resource('certification', CertificationController::class);
-  Route::resource('presentation', PresentationController::class);
+Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(function ()
+{
+    Route::resource('experience', ExperienceController::class);
+    Route::resource('education', EducationController::class);
+    Route::resource('skill', SkillController::class);
+    Route::resource('visa', VisaController::class);
+    Route::resource('link', LinkController::class);
+    Route::resource('curriculum', CurriculumController::class);
+    Route::resource('reference', ReferenceController::class);
+    Route::resource('certification', CertificationController::class);
+    Route::resource('presentation', PresentationController::class);
 });
 
 Route::middleware('auth:sanctum')->apiResource('/joblist', JobListController::class);
@@ -84,4 +86,9 @@ Route::prefix('social_network')->middleware('auth:sanctum')->group(function ()
 Route::prefix('proficiency')->group(function ()
 {
     Route::get('index', [ProficiencyController::class, 'index']);
+});
+
+Route::prefix('job_modality')->group(function ()
+{
+    Route::get('index', [JobModalityController::class, 'index']);
 });

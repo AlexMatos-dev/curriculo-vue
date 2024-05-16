@@ -3417,7 +3417,19 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Profeciency'
-
+  /api/job_modality/index:
+    get:
+      tags:
+        - Job modality
+      sumary: List of jobs modalities
+      description: Get all the jobs modalities
+      responses:
+        '202':
+        description: A list of jobs modalities
+        content:
+          application/json:
+          schema:
+            $ref: '#/components/schemas/Job_modalities'
 components:
   schemas:
     Login:
@@ -4260,7 +4272,67 @@ components:
         total:
           type: integer
           example: 3
-
+    Profeciency:
+      type: object
+        proficiency_id:
+          type: integer
+          example: 1
+        proficiency_level:
+          type: string
+          example: a1 - beginner basica1 - beginner basic
+        category:
+          type: string
+          example: language
+        weight:
+          type: integer
+          example: 10
+        translation_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: a1 - beginner basic
+        pt:
+          type: string
+          example: a1 - iniciante básico
+        es:
+          type: string
+          example: a1 - básico
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Job_modalities:
+      type: object
+        job_modalities_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: remote
+        pt:
+          type: string
+          example: remoto
+        es:
+          type: string
+          example: remota
+        description_en:
+          type: string
+          example: distance work, outside the office or company
+        description_pt:
+          type: string
+          example: trabalho a distancia, fora do escritório ou empresa
+        description_es:
+          type: string
+          example: trabajar de forma remota, fuera de la oficina o empresa
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
   securitySchemes:
     bearerAuth:
       type: http
