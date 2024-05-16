@@ -2091,7 +2091,7 @@ paths:
         - in: query
           name: exstart_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: Start date of the experience
           required: true
@@ -2099,7 +2099,7 @@ paths:
         - in: query
           name: exend_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: End date of the experience
           required: false
@@ -2145,6 +2145,13 @@ paths:
         - experience - curriculum
       summary: Updates a experience
       parameters:
+        - in: path
+          name: experience__id
+          schema:
+            type: integer
+            example: 1
+            description: Experience id
+          required: true
         - in: query
           name: exjob_title
           schema:
@@ -2159,7 +2166,6 @@ paths:
             example: Enterprise Example
             description: Coompany name of experience
           required: true
-
         - in: query
           name: exstart_date
           schema:
@@ -2167,9 +2173,8 @@ paths:
             example: 2024-01-01
             description: Start date of the experience
           required: true
-
         - in: query
-          name: exstart_date
+          name: edend_date
           schema:
             type: string
             example: 2024-01-01
@@ -2351,14 +2356,14 @@ paths:
         - in: query
           name: edstart_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: Start date of the education
           required: true
         - in: query
           name: edend_date
           schema:
-            type: datee
+            type: string
             example: 2024-01-01
             description: End date of the education
           required: false
@@ -2402,6 +2407,13 @@ paths:
         - education - curriculum
       summary: Updates a education
       parameters:
+        - in: path
+          name: education__id
+          schema:
+            type: integer
+            example: 1
+            description: Education id
+          required: true
         - in: query
           name: eddegree
           schema:
@@ -2426,14 +2438,14 @@ paths:
         - in: query
           name: edstart_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: Start date of the education
           required: true
         - in: query
           name: edend_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: End date of the education
           required: false
@@ -2597,14 +2609,14 @@ paths:
         - in: query
           name: cerissuing_organization
           schema:
-            type: String
+            type: string
             example: Zend
             description: Certification issuing organization
           required: true
         - in: query
           name: cerissue_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: Issue certification date
           required: true
@@ -2618,14 +2630,14 @@ paths:
         - in: query
           name: cerdescription
           schema:
-            type: String
+            type: string
             example: Ceeretification Zend for PHP development.
             description: Certification description
           required: true
         - in: query
           name: cerlink
           schema:
-            type: String
+            type: string
             example: http://framework.zend.com
             description: Certificatin Link.
           required: true
@@ -2663,6 +2675,13 @@ paths:
         - certification - curriculum
       summary: Updates a certification
       parameters:
+        - in: path
+          name: certification__id
+          schema:
+            type: integer
+            example: 1
+            description: Certification id
+          required: true
         - in: query
           name: certification_name
           schema:
@@ -2673,14 +2692,14 @@ paths:
         - in: query
           name: cerissuing_organization
           schema:
-            type: String
+            type: string
             example: Zend
             description: Certification issuing organization
           required: true
         - in: query
           name: cerissue_date
           schema:
-            type: date
+            type: string
             example: 2024-01-01
             description: Issue certification date
           required: true
@@ -2694,14 +2713,14 @@ paths:
         - in: query
           name: cerdescription
           schema:
-            type: String
+            type: string
             example: Ceeretification Zend for PHP development.
             description: Certification description
           required: true
         - in: query
           name: cerlink
           schema:
-            type: String
+            type: string
             example: http://framework.zend.com
             description: Certificatin Link.
           required: true
@@ -3098,6 +3117,14 @@ paths:
         - reference - curriculum
       summary: Updates a reference
       parameters:
+        - in: path
+          name: reference__id
+          schema:
+            type: integer
+            example: 1.
+            description: Reference id.
+          required: true
+
         - in: query
           name: reference_name
           schema:
@@ -3790,6 +3817,187 @@ components:
         curriculum_file:
           type: string
           example: base64File | null
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Education:
+      required:
+        - test
+      type: object
+      properties:
+        education_id:
+          type: integer
+          example: 1
+        edcurriculum_id:
+          type: integer
+          example: 1
+        eddegree:
+          type: string
+          example: Analista de sistemas
+        degree_type:
+          type: integer
+          example: 1
+          description: DegreeType id
+        edfield_of_study:
+          type: integer
+          example: 1
+          description: AreaOfStudy id
+        edinstitution:
+          type: string
+          example: Faculdade Positivo
+        edstart_date:
+          type: string
+          example: 2020-02-02
+        edend_date:
+          type: string
+          example: 2021-02-02
+        eddescription:
+          type: string
+          example: Estudei diagramas e etc...
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        name:
+          type: string
+          example: doctoral
+          description: The degree type name
+        area_of_study_en:
+          type: string
+          example: engineering
+          description: The area of study english translation
+        area_of_study_pt:
+          type: string
+          example: Engenharia
+          description: The area of study portuguese translation
+        area_of_study_es:
+          type: string
+          example: ingeniería
+          description: The area of study spanish translation
+        degree_type_en:
+          type: string
+          example: doctoral
+          description: The degree type english translation
+        degree_type_pt:
+          type: string
+          example: doutorado
+          description: The degree type english portuguese translation
+        degree_type_es:
+          type: string
+          example: doctorado
+          description: The degree type english spanish translation
+    Experience:
+      required:
+        - test
+      type: object
+      properties:
+        experience_id:
+          type: integer
+          example: 1
+        excurriculum_id:
+          type: integer
+          example: 1
+        exjob_title:
+          type: string
+          example: Analista de sistemas
+        excompany_name:
+          type: string
+          example: Bosh
+        exstart_date:
+          type: string
+          example: 2020-02-02
+        exend_date:
+          type: string
+          example: 2021-02-02
+        exdescription:
+          type: string
+          example: Criei o sistema...
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Reference:
+      required:
+        - test
+      type: object
+      properties:
+        reference_id:
+          type: integer
+          example: 1
+        refcurriculum_id:
+          type: integer
+          example: 1
+        reference_name:
+          type: string
+          example: Design do google
+        reference_email:
+          type: string
+          example: glassdoor@gmail.com
+        refrelationship:
+          type: string
+          example: Glass Door
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Certification:
+      required:
+        - test
+      type: object
+      properties:
+        certifi_id:
+          type: integer
+          example: 1
+        cercurriculum_id:
+          type: integer
+          example: 1
+        certification_name:
+          type: string
+          example: Sistemas de informação
+        cerissuing_organization:
+          type: string
+          example: Universidade Positivo
+        cerissue_date:
+          type: string
+          example: 2020-02-02 00:00:00
+        cert_hours:
+          type: integer
+          example: 10
+        cerdescription:
+          type: string
+          example: Desenvolvimento e criação de sistemas
+        cerlink:
+          type: string
+          example: https://www.link.com
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Presentation:
+      required:
+        - test
+      type: object
+      properties:
+        presentation_id:
+          type: integer
+          example: 1
+        precurriculum_id:
+          type: integer
+          example: 1
+        presentation_text:
+          type: string
+          example: Olá, sou o Bob
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'

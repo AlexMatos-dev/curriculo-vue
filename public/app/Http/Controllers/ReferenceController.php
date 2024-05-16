@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\Reference;
 use App\Models\Curriculum;
 
@@ -11,16 +12,13 @@ class ReferenceController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * @param Int refcurriculum_id
+     * @param Int per_page
      */
     public function index(Request $request)
     {
-        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
-
-        if($curriculum){
-            $reference = Reference::where('refcurriculum_id',$curriculum->curriculum_id );
-            $reference =  $reference->paginate($request->pere_page);
-            return response()->json($reference);
-        }
+        $reference = Reference::where('refcurriculum_id', $request->refcurriculum_id)->paginate(request('per_page', 10));
+        return response()->json($reference);
     }
 
     /**
@@ -37,12 +35,11 @@ class ReferenceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'refcurriculum_id'  =>'required',
-        'reference_name'    =>'required',
-        'reference_email'   =>'required',
-        'refrelationship'   =>'required'
+            'refcurriculum_id'  =>'required|integer',
+            'reference_name'    =>'required',
+            'reference_email'   =>'required',
+            'refrelationship'   =>'required'
         ]);
-
         $reference = Reference::create($request->all());
 
         return response()->json($reference);
@@ -68,15 +65,19 @@ class ReferenceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Reference $reference)
+    public function update(Request $request, $referenceId = null)
     {
+        $reference = Reference::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('reference_id', $referenceId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'references.refcurriculum_id');
+        })->first();
+        if(!$reference)
+            Validator::throwResponse('reference not found', 400);
         $request->validate([
-            'refcurriculum_id'  =>'required',
             'reference_name'    =>'required',
             'reference_email'   =>'required',
             'refrelationship'   =>'required'
         ]);
-
         $reference->update($request->all());
 
         return response()->json($reference);
@@ -85,10 +86,15 @@ class ReferenceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reference $reference)
+    public function destroy($referenceId)
     {
+        $reference = Reference::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('reference_id', $referenceId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'references.refcurriculum_id');
+        })->first();
+        if(!$reference)
+            Validator::throwResponse('reference not found', 400);
         $reference->delete();
-
         return response()->json($reference);
     }
 }

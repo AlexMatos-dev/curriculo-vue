@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\Certification;
-use App\Models\Curriculum;
 use Illuminate\Http\Request;
 
 class CertificationController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * @param Int cercurriculum_id
+     * @param Int per_page - default 10
      */
     public function index(Request $request)
     {
-        $curriculum = Curriculum::where('curriculum_id', $request->curriculum_id)->first();
-
-        if($curriculum){
-            $certification = Certification::where('cercurriculum_id',$curriculum->curriculum_id );
-            $certification =  $certification->paginate($request->pere_page);
-            return response()->json($certification);
-        }
-
+        $certifications = Certification::where('cercurriculum_id', $request->cercurriculum_id)->paginate(request('per_page', 10));
+        return response()->json($certifications);
     }
 
     /**
@@ -38,14 +34,13 @@ class CertificationController extends Controller
     {
         $request->validate([
             'cercurriculum_id'          => 'required',
-            'certification_name'        => 'required',
-            'cerissuing_organization'   => 'required',
-            'cerissue_date'             => 'required',
-            'cert_hours'                => 'required',
-            'cerdescription'            => 'required',
-            'cerlink'                   => 'required'
-    ]);
-
+            'certification_name'        => 'required|max:150',
+            'cerissuing_organization'   => 'required|max:200',
+            'cerissue_date'             => 'required|date_format:Y-m-d|before:now',
+            'cert_hours'                => 'required|integer',
+            'cerdescription'            => 'max:500',
+            'cerlink'                   => 'max:100|url'
+        ]);
         $certification = Certification::create($request->all());
 
         return response()->json($certification);
@@ -71,17 +66,22 @@ class CertificationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Certification $certification)
+    public function update(Request $request, $certificationId = null)
     {
+        $certification = Certification::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('certifi_id', $certificationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'certifications.cercurriculum_id');
+        })->first();
+        if(!$certification)
+            Validator::throwResponse('certification not found', 400);
         $request->validate([
-            'certification_name'        => 'required',
-            'cerissuing_organization'   => 'required',
-            'cerissue_date'             => 'required',
-            'cert_hours'                => 'required',
-            'cerdescription'            => 'required',
-            'cerlink'                   => 'required'
+            'certification_name'        => 'required|max:150',
+            'cerissuing_organization'   => 'required|max:200',
+            'cerissue_date'             => 'required|date_format:Y-m-d|before:now',
+            'cert_hours'                => 'required|integer',
+            'cerdescription'            => 'max:500',
+            'cerlink'                   => 'max:100|url'
         ]);
-
         $certification->update($request->all());
 
         return response()->json($certification);
@@ -90,8 +90,14 @@ class CertificationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Certification $certification)
+    public function destroy($certificationId)
     {
+        $certification = Certification::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('certifi_id', $certificationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'certifications.cercurriculum_id');
+        })->first();
+        if(!$certification)
+            Validator::throwResponse('certification not found', 400);
         $certification->delete();
 
         return response()->json($certification);

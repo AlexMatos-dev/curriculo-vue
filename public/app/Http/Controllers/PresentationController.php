@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Validator;
 use App\Models\Education;
 use App\Models\Presentation;
 use Illuminate\Http\Request;
@@ -13,8 +14,8 @@ class PresentationController extends Controller
      */
     public function index(Request $request)
     {
-        $presentation = Presentation::where('precurriculum_id', $this->getCurriculumBySession()->curriculum_id);
-        $presentation = $presentation->paginate($request->per_page);
+        $presentation = Presentation::where('precurriculum_id', $request->precurriculum_id);
+        $presentation = $presentation->paginate(request('per_page', 10));
         return response()->json($presentation);
     }
 
@@ -32,11 +33,10 @@ class PresentationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'precurriculum_id'   =>  'required',
-            'presentation_text'  =>  'required'
+            'precurriculum_id'  => 'required|integer',
+            'presentation_text' => 'required'
 
         ]);
-
         $presentation = Presentation::create($request->all());
 
         return response()->json($presentation);
@@ -61,14 +61,18 @@ class PresentationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Presentation $presentation)
+    public function update(Request $request, $presentationId = null)
     {
+        $presentation = Presentation::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('presentation_id', $presentationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'presentations.precurriculum_id');
+        })->first();
+        if(!$presentation)
+            Validator::throwResponse('presentation not found', 400);
         $request->validate([
-            'precurriculum_id'   =>  'required',
             'presentation_text'  =>  'required'
-
         ]);
-
+        
         $presentation->update($request->all());
 
         return response()->json($presentation);
@@ -77,8 +81,14 @@ class PresentationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Presentation $presentation)
+    public function destroy($presentationId)
     {
+        $presentation = Presentation::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('presentation_id', $presentationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'presentations.precurriculum_id');
+        })->first();
+        if(!$presentation)
+            Validator::throwResponse('presentation not found', 400);
         $presentation->delete();
 
         return response()->json($presentation);

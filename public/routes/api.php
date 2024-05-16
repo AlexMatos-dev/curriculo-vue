@@ -29,18 +29,19 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function ()
     Route::post('profile', [AuthController::class, 'profile']);
 });
 
-Route::prefix('curriculum')->middleware('authenticate', 'curriculum')->group(function(){
+Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(function(){
   Route::resource('experience',ExperienceController::class);
   Route::resource('education',EducationController::class);
   Route::resource('skill', SkillController::class);
   Route::resource('visa', VisaController::class);
   Route::resource('link', LinkController::class);
   Route::resource('curriculum', CurriculumController::class);
-  Route::resource('experience', ExperienceController::class);
-  Route::resource('education', EducationController::class);
+  Route::resource('reference', ReferenceController::class);
+  Route::resource('certification', CertificationController::class);
+  Route::resource('presentation', PresentationController::class);
 });
 
-Route::middleware('authenticate')->apiResource('/joblist', JobListController::class);
+Route::middleware('auth:sanctum')->apiResource('/joblist', JobListController::class);
 
 Route::prefix('person')->middleware('auth:sanctum')->group(function ()
 {
