@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
 use Illuminate\Support\Facades\Route;
 
@@ -91,4 +92,9 @@ Route::prefix('proficiency')->group(function ()
 Route::prefix('job_modality')->group(function ()
 {
     Route::get('index', [JobModalityController::class, 'index']);
+});
+
+Route::prefix('type_visas')->group(function ()
+{
+    Route::get('index', [TypeVisasController::class, 'index']);
 });

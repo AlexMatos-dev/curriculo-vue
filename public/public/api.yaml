@@ -3430,6 +3430,19 @@ paths:
           application/json:
           schema:
             $ref: '#/components/schemas/Job_modalities'
+  /api/type_visas/index:
+    get:
+      tags:
+        - type visas
+      sumary: List of type visas
+      description: get all the type visas
+      responses:
+        '202':
+        description: A list of type visas
+        content:
+          application/json:
+          schema:
+            $ref: '#/components/schemas/type_visas'
 components:
   schemas:
     Login:
@@ -4333,6 +4346,32 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    type_visas:
+      type: object
+        typevisas_id:
+          type: integer
+          example: 1
+        type_name:
+          type: string
+          example: schengen visa
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        translation_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: schengen visa
+        pt:
+          type: string
+          example: visto Schengen
+        es:
+          type: string
+          example: visto Schengen
   securitySchemes:
     bearerAuth:
       type: http
