@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('job_skill_id', true);
             $table->unsignedBigInteger('joblist_id');
             $table->unsignedBigInteger('tag_id');
+            $table->unsignedInteger('proficiency_id');
             $table->timestamps();
         });
     }

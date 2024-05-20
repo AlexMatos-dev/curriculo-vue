@@ -46,4 +46,25 @@ class Proficiency extends Model
             break;
         }
     }
+
+    /**
+     * Gets all proficiencies by category name
+     * @param String name
+     * @param Bool asArray - To return an array
+     * @return Array - Of Proficiency objects or parsed as array
+     */
+    public function getProficiencies($name = '', $asArray = false)
+    {
+        if(!in_array($name, [$this::CATEGORY_LANGUAGE, $this::CATEGORY_SENIORITY, $this::CATEGORY_LEVEL]))
+            return null;
+        $data = Proficiency::where('category', $name)->get(); 
+        if($asArray){
+            $results = [];
+            foreach($data as $obj){
+                $results[$obj->proficiency_id] = $obj->proficiency_id;
+            }
+            return $results;
+        }
+        return $data;
+    }
 }

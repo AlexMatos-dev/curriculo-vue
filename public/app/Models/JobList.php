@@ -25,7 +25,6 @@ class JobList extends Model
         'job_seniority',
         'job_salary',
         'job_description',
-        'job_skills',
         'job_experience_description',
         'experience_in_months',
         'job_benefits'
@@ -77,8 +76,11 @@ class JobList extends Model
      * @param Int offset
      * @return Array
      */
-    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = null, $offset = null)
+    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null)
     {
+        $limit = !is_numeric($limit) ? 100 : $limit;
+        $limit = $limit > 100 ? 100 : $limit;
+        $limit = $limit < 0 ? 1 : $limit;
         $query = JobList::leftJoin('companies AS company', function($join){
             $join->on('jobslist.company_id', '=', 'company.company_id');
         })->leftJoin('job_skills AS skills', function($join){
@@ -88,14 +90,16 @@ class JobList extends Model
         })->leftJoin('job_visas AS job_visas', function($join){
             $join->on('jobslist.job_id', '=', 'job_visas.joblist_id');
         })->where('company.paying', $paying);
+        if ($request->has("company_id")) 
+            $query->whereIn("jobslist.company_id", $request->company_id);
         if ($request->has("job_modality_id")) 
-            $query->where("jobslist.job_modality_id", $request->job_modality_id);
+            $query->whereIn("jobslist.job_modality_id", $request->job_modality_id);
         if ($request->has("job_country"))
-            $query->where("jobslist.job_country", $request->job_country);
+            $query->whereIn("jobslist.job_country", $request->job_country);
         if ($request->has("job_city"))
-            $query->where("jobslist.job_city", $request->job_city);
+            $query->whereIn("jobslist.job_city", $request->job_city);
         if ($request->has("job_seniority"))
-            $query->where("jobslist.job_seniority", $request->job_seniority);
+            $query->whereIn("jobslist.job_seniority", $request->job_seniority);
         if ($request->has("job_salary_start"))
             $query->where("jobslist.job_salary", ">=", $request->job_salary_start);
         if ($request->has("job_salary_end"))
@@ -114,6 +118,10 @@ class JobList extends Model
             $query->whereIn("job_visas.country_id", $request->job_visas_countries);
         if ($request->has("experience_in_months"))
             $query->where("jobslist.experience_in_months", $request->experience_in_months);
+        if ($request->has("job_description"))
+            $query->where("jobslist.job_description", 'like', '%'.$request->job_description.'%');
+        if ($request->has("job_experience_description"))
+            $query->where("jobslist.job_experience_description", 'like', '%'.$request->job_experience_description.'%');
         if($limit)
             $query->limit($limit);
         if($offset)
@@ -220,7 +228,7 @@ class JobList extends Model
      * @param Int notPayingCoeficient - default 5: Paying jobs until one nonPaying job to be added to list
      * @return Array ['results' => [], 'status' => ['paying' => 0, 'nonPaying' => 0]]
      */
-    public function processListedJobs($data = [], $maxJobs = 100, $notPayingCoeficient = 5)
+    public function processListedJobs($data = [], $maxJobs = 100, \Illuminate\Http\Request $searchParameters = null, $notPayingCoeficient = 5)
     {
         $results = [];
         $tracker = 1;
@@ -236,14 +244,16 @@ class JobList extends Model
             if(in_array($payingJob->job_id, $repeated))
                 continue;
             $repeated[] = $payingJob->job_id;
+            $payingJob->match = $this->generateCompatilityMatchOfJob($payingJob, $searchParameters);
             $paying[] = $payingJob;
         }
         $nonPaying = [];
-        foreach($data['nonPaying'] as $payingJob){
-            if(in_array($payingJob->job_id, $repeated))
+        foreach($data['nonPaying'] as $nonPayingJob){
+            if(in_array($nonPayingJob->job_id, $repeated))
                 continue;
-            $repeated[] = $payingJob->job_id;
-            $nonPaying[] = $payingJob;
+            $repeated[] = $nonPayingJob->job_id;
+            $nonPayingJob->match = $this->generateCompatilityMatchOfJob($nonPayingJob, $searchParameters);
+            $nonPaying[] = $nonPayingJob;
         }
         if(empty($paying)){
             $results = $nonPaying;
@@ -293,6 +303,108 @@ class JobList extends Model
     }
 
     /**
+     * Returns a number wiht the match of this Job by Request parametes
+     * @param JobList $jobList
+     * @param \Illuminate\Http\Request $parameters
+     * @return Float|Null
+     */
+    public function generateCompatilityMatchOfJob($jobList, $parameters = null)
+    {
+        if(!$parameters || !is_object($parameters))
+            return null;
+        $validParameters = [
+            'equal'   => [],
+            'like'    => ['job_description', 'job_experience_description'],
+            'in'      => ['job_salary::job_salary_start|job_salary_end', 'experience_in_months::experience_in_months_start|experience_in_months_end'],
+            'inArray' => ['company_id', 'job_modality_id', 'job_city', 'job_country', 'job_seniority'],
+            'many'    => ['job_skills::tags_id', 'job_languages::llangue_id', 'job_visas::typevisas_id', 'job_visas_countries::lcountry_id']
+        ];
+        $match = 0;
+        $totalKeys = 0;
+        // Gather all parameters
+        foreach($validParameters as $checkType => $keys){
+            foreach($keys as $key){
+                if($checkType == 'many'){
+                    $data = explode('::', $key);
+                    $keyName = $data[0];
+                    $keyId = count($data) == 2 ? $data[1] : null;
+                    $keyValue = $parameters->has($keyName) ? $parameters->{$keyName} : null; 
+                }else{
+                    $keyValue = $parameters->has($key) ? $parameters->{$key} : null;
+                }
+                if(!$keyValue)
+                    continue;
+                $totalKeys++;
+            }
+        }
+        $matchCoeficient = $totalKeys > 0 ? $matchCoeficient = 100 / $totalKeys : 100;
+        // Read values
+        foreach($validParameters as $checkType => $keys){
+            foreach($keys as $key){
+                if($checkType == 'many'){
+                    $data = explode('::', $key);
+                    $keyName = $data[0];
+                    $keyId = count($data) == 2 ? $data[1] : null;
+                    $keyValue = $parameters->has($keyName) ? $parameters->{$keyName} : null; 
+                }else{
+                    $keyValue = $parameters->has($key) ? $parameters->{$key} : null;
+                }
+                if(!$keyValue)
+                    continue;
+                switch($checkType){
+                    case 'equal':
+                        if($keyValue == $jobList->{$key})
+                            $match = $match + $matchCoeficient;
+                    break;
+                    case 'like':
+                        if(is_numeric(strpos($jobList->{$key}, $keyValue)))
+                            $match = $match + $matchCoeficient;
+                    break;
+                    case 'in':
+                        $dataArray = explode('::', $keyValue);
+                        if(count($dataArray) != 2)
+                            break;
+                        $values = explode('|', $dataArray[1]);
+                        if(count($values) != 2)
+                            break;
+                        $attr = $dataArray[0];
+                        $fromValue = $values[0];
+                        $toValue   = $values[1];
+                        if(!$fromValue || !$toValue)
+                            $match = $match + ($matchCoeficient / 2);
+                        if($fromValue >= $jobList->{$attr} && $toValue <= $jobList->{$attr})
+                            $match = $match + ($matchCoeficient / 2);
+                    break;
+                    case 'many':
+                        if(!is_array($keyValue) || count($keyValue) < 1)
+                            break;
+                        $valid = [];
+                        $attrName = str_replace('job_', '', $keyName);
+                        $objectValue = $jobList->{$attrName};
+                        foreach($objectValue as $valObj){
+                            if(in_array($valObj->{$keyId}, $keyValue))
+                                $valid[] = $valObj->{$keyId};
+                        }
+                        $totalSize = count($keyValue);
+                        $thisVal = ($matchCoeficient / $totalSize) * count($valid);
+                        $match = $match + $thisVal;
+                    break;
+                    case 'inArray':
+                        $objectValue = $jobList->{$key};
+                        $thisVal = $matchCoeficient / count($keyValue);
+                        if(in_array($objectValue, $keyValue)){
+                            $match = $match + $thisVal;
+                        }
+                    break;
+                }
+            }
+        }
+        $matchValue = number_format((float)$match, 2, '.', '');
+        $matchValue = $matchValue > 100 ? 100 : $matchValue;
+        return $matchValue < 0 ? 0 : $matchValue;
+    }
+
+    /**
      * Syncs job skills by deleting all skills of $this JobList and them adding the sents skills
      * @param Array $skills - Array of object Tag
      * @return Bool
@@ -309,6 +421,11 @@ class JobList extends Model
         return true;
     }
 
+    /**
+     * Syncs job languages by deleting all languages of $this JobList and them adding the sents Languages
+     * @param Array $languages - Array of object Language
+     * @return Bool
+     */
     public function sycnLanguages($languages = [])
     {
         JobLanguage::where('joblist_id', $this->job_id)->delete();
@@ -317,6 +434,24 @@ class JobList extends Model
                 'joblist_id' => $this->job_id,
                 'language_id' => $language->llangue_id,
                 'proficiency_id' => $language->proficiency_id
+            ]);
+        }
+        return true;
+    }
+
+    /**
+     * Syncs job visas by deleting all visas of $this JobList and them adding the sents visas
+     * @param Array $visas - Array of object Visas
+     * @return Bool
+     */
+    public function sycnVisas($visas = [])
+    {
+        JobVisa::where('joblist_id', $this->job_id)->delete();
+        foreach($visas as $visa){
+            JobVisa::create([
+                'joblist_id' => $this->job_id,
+                'visas_type_id' => $visa->visas_type_id,
+                'country_id' => $visa->country_id
             ]);
         }
         return true;

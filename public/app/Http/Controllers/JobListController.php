@@ -23,12 +23,13 @@ use Illuminate\Http\Request;
 class JobListController extends Controller
 {
     /**
-     * Perform a search accordingly to sent parameters and returns a list
+     * Perform a search accordingly to sent parameters and returns a list ofjobs paginated and with a 'match' percentage
      * @param Int page - default 1
-     * @param Int job_modality_id
-     * @param Int company_id
-     * @param Int job_country
-     * @param Int job_seniority
+     * @param Array job_modality_id
+     * @param Array company_id
+     * @param Array job_city
+     * @param Array job_country
+     * @param Array job_seniority
      * @param Float job_salary_start
      * @param Float job_salary_end
      * @param String job_description
@@ -49,11 +50,11 @@ class JobListController extends Controller
     {
         Validator::validateParameters($this->request, [
             'page' => 'integer',
-            'company_id' => 'integer',
-            'job_modality_id' => 'integer',
-            'job_city' => 'integer',
-            'job_country' => 'integer',
-            'job_seniority' => 'integer',
+            'company_id' => 'array',
+            'job_modality_id' => 'array',
+            'job_city' => 'array',
+            'job_country' => 'array',
+            'job_seniority' => 'array',
             'job_salary_start' => 'numeric',
             'job_salary_end' => 'numeric',
             'job_description' => 'max:500',
@@ -61,20 +62,6 @@ class JobListController extends Controller
             'experience_in_months_start' => 'integer',
             'experience_in_months_end' => 'integer'
         ]);
-        $objects = Validator::checkExistanceOnTable([
-            'company_id' => ['object' => \App\Models\Company::class, 'data' => $request->company_id, 'required' => false],
-            'job_modality_id' => ['object' => \App\Models\JobModality::class, 'data' => $request->job_modality_id, 'required' => false],
-            'job_city' => ['object' => \App\Models\ListCity::class, 'data' => $request->job_city, 'required' => false],
-            'job_country' => ['object' => \App\Models\ListCountry::class, 'data' => $request->job_country, 'required' => false],
-            'job_seniority' => ['object' => \App\Models\Proficiency::class, 'data' => $request->job_seniority, 'required' => false, 
-                'attrToCheck' => 'category', 'expectedValue' => \App\Models\Proficiency::CATEGORY_SENIORITY
-            ]
-        ]);
-        if($request->job_city && $request->job_country){
-            $cityData = $objects['job_city']->getCountry();
-            if($cityData->lcountry_id != $request->job_country)
-                Validator::throwResponse('city is not from sent country');
-        }
         $page = request('page', 1);
         $perPage = 100;
         $jobListObj = new JobList();
@@ -86,7 +73,7 @@ class JobListController extends Controller
         $results = $jobListObj->processListedJobs([
             'paying'    => $paying,
             'nonPaying' => $nonPaying
-        ], $perPage);
+        ], $perPage, $this->request);
         $lastPage = ceil($total / $perPage);
         if($page < 1)
             $page = 1;
@@ -102,7 +89,7 @@ class JobListController extends Controller
             $results = $jobListObj->processListedJobs([
                 'paying'    => $paying,
                 'nonPaying' => $nonPaying
-            ], $perPage);
+            ], $perPage, $this->request);
         }
         return response()->json([
             'data' => $results['results'],
