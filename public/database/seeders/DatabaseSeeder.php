@@ -26,5 +26,6 @@ class DatabaseSeeder extends Seeder
         (new BrStateSeeder)->run();
         (new BrCitySeeder)->run();
         (new CurriculumSeeder())->run();
+        (new CummonCurrencySeeder())->run();
     }
 }
