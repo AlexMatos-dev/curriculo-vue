@@ -38,4 +38,10 @@ Por fim, executar o ``composer install`` ou ``composer update`` para instalar as
 
 #### Configurações adicionais (opcional)
 
-Para ter acesso ao swagger da aplicação, execute os comandos a seguir em sequência ``npm install `` e após ``npm run dev`` para habilitar o acesso ao SWAGGER atráves da rota "``localhost/swagger``".
+Para ter acesso ao swagger da aplicação, execute os comandos a seguir em sequência ``npm install `` e após ``npm run dev`` ou ``npm run build`` para habilitar o acesso ao SWAGGER atráves da rota "``/swagger``".
+
+#### Dados adicionais
+
+O sistema conta com alguns Seeders que geram dados falsos e aleatórios. Abaixo estão alguns deles:
+* Dados de vagas: ``php artisan db:seed --class=CreateFakeJobData``
+* Dados de profissionais: ``php artisan db:seed --class=CreateFakeProfessionals``
