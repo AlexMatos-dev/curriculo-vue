@@ -128,8 +128,14 @@ class Validator
             if(!array_key_exists('object', $data) || !array_key_exists('data', $data))
                 self::throwResponse('invalid parameters for validation', 500);
             try {
+                $key = array_key_exists('id', $data) ? $data['id'] : $key;
                 $objInstance = new $data['object']();
-                $foundObject = $objInstance->find($data['data']);
+                if(is_array($data['data'])){
+                    $result = $objInstance::whereIn($key, $data['data'])->get();
+                    $foundObject = count($result) == count($data['data']) ? $result : null;
+                }else{
+                    $foundObject = $objInstance->find($data['data']);
+                }
             } catch (\Throwable $th) {
                 self::throwResponse("$key is not valid", 400);
             }

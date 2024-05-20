@@ -26,6 +26,12 @@ class CreateFakeJobData extends Seeder
      */
     public function run(): void
     {
+        $limit = false;
+        while(!is_numeric($limit)){
+            $limit = $this->command->ask('Enter the number of JobList records to create');
+        }
+        if($limit < 1)
+            $limit = 1;
         $faker = Faker::create('pt_BR');
         // -- Start of Essential Data --
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
@@ -35,6 +41,7 @@ class CreateFakeJobData extends Seeder
         $seniorities = Proficiency::where('category', Proficiency::CATEGORY_SENIORITY)->get()->toArray();
         $languagesArray = ListLangue::all()->toArray();
         $languageProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LANGUAGE)->get()->toArray();
+        $skillsProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LEVEL)->get()->toArray();
         $skills = Tag::all()->toArray();
         $visasArray = TypeVisas::all()->toArray();
         $countriesArray = ListCountry::all()->toArray();
@@ -126,8 +133,8 @@ class CreateFakeJobData extends Seeder
             'senior' => ['salary' => [7000,20000], 'exp' => 10],
         ];
         $fakeCompanies = Company::where('company_type', 'fake')->inRandomOrder()->get()->toArray();
-        for($o = 0; $o < 30; $o++){
-            if($created > 30)
+        for($o = 0; $o < $limit; $o++){
+            if($created > $limit)
                 break;
             $job = null;
             try {
@@ -149,12 +156,13 @@ class CreateFakeJobData extends Seeder
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
                         $thisSkill = $skills[array_rand($skills)];
+                        $thisProficiency = $skillsProfeciency[array_rand($skillsProfeciency)];
                         JobSkill::create([
                             'joblist_id' => $job->job_id,
-                            'tag_id' => $thisSkill['tags_id']
+                            'tag_id' => $thisSkill['tags_id'],
+                            'proficiency_id' => $thisProficiency['proficiency_id']
                         ]);
                     }
-
                     $langData = [];
                     for($i = 0; $i < 3; $i++){
                         $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   

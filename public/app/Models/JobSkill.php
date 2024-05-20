@@ -17,7 +17,8 @@ class JobSkill extends Model
      */
     protected $fillable = [
         'joblist_id',
-        'tag_id'
+        'tag_id',
+        'proficiency_id'
     ];
 
     public function joblist()
@@ -28,5 +29,10 @@ class JobSkill extends Model
     public function tag()
     {
         return $this->belongsTo(Tag::class, 'tag_id')->first();
+    }
+
+    public function proficiency()
+    {
+        return $this->belongsTo(Proficiency::class, 'proficiency_id')->first();
     }
 }

@@ -37,6 +37,10 @@ info:
     status: 500
     message: Descrição do erro
     ---------------------------------------------------
+    All request different than "GET" methods must include a Bearer token!
+    ---------------------------------------------------
+    Except:   /api/login  &  /api/register
+    ---------------------------------------------------
 
   termsOfService: http://swagger.io/terms/
   contact:
@@ -70,6 +74,8 @@ tags:
   - name: visa - curriculum
     description: Visa routes and methods
   - name: link - curriculum
+    description: Link routes and methods
+  - name: commom_currency
     description: Link routes and methods
 paths:
   /api/login:
@@ -383,6 +389,236 @@ paths:
             application/json:
               example: {"message": "person not updated"}
 
+  /api/professional/index:
+    get:
+      tags:
+        - professional
+      summary: List all professionals
+      description: retrieves a list of professionals with optional filters.
+      parameters:
+        - name: skill_name
+          in: query
+          description: Array of tags (skills) id
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                skill_name:
+                  type: integer
+                  example: 1
+        - name: skproficiency_level
+          in: query
+          description: Array of profeciencies ids of category = 'level' | The position on array matches the skill_name attribute
+          example: 3
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                skproficiency_level:
+                  type: integer
+                  example: 1
+        - name: area_of_study
+          in: query
+          description: Array area of study id from professional experiences
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                area_of_study:
+                  type: integer
+                  example: 1
+        - name: dpgender
+          in: query
+          description: Array of gender id
+          example: 3
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                dpgender:
+                  type: integer
+                  example: 1
+        - name: dpcity_id
+          in: query
+          description: Array of professional city id from ListCity
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                dpcity_id:
+                  type: integer
+                  example: 1
+        - name: dpstate_id
+          in: query
+          description: Array of professional state id from ListState
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                dpstate_id:
+                  type: integer
+                  example: 1
+        - name: dpcountry_id
+          in: query
+          description: Array of professional country id from ListCountry
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                dpcountry_id:
+                  type: integer
+                  example: 1
+        - name: lalangue_id
+          in: query
+          description: Array of professional language id from ListLanguage
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                lalangue_id:
+                  type: integer
+                  example: 1
+        - name: laspeaking_level
+          in: query
+          description: Array of proficiency id of category = 'language' id from ListLanguage | The position on array matches the lalangue_id attribute to set the speaking profeciency at the language
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                laspeaking_level:
+                  type: integer
+                  example: 1
+        - name: lalistening_level
+          in: query
+          description: Array of proficiency id of category = 'language' id from ListLanguage | The position on array matches the lalangue_id attribute to set the listening profeciency at the language
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                lalistening_level:
+                  type: integer
+                  example: 1
+        - name: lawriting_level
+          in: query
+          description: Array of proficiency id of category = 'language' id from ListLanguage | The position on array matches the lalangue_id attribute to set the writing profeciency at the language
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                lawriting_level:
+                  type: integer
+                  example: 1
+        - name: lareading_level
+          in: query
+          description: Array of proficiency id of category = 'language' id from ListLanguage | The position on array matches the lalangue_id attribute to set the reading profeciency at the language
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                lareading_level:
+                  type: integer
+                  example: 1
+        - name: visa_type
+          in: query
+          description: Array of TypeVisa id
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                visa_type:
+                  type: integer
+                  example: 1
+        - name: vicountry_id
+          in: query
+          description: Array of ListCountry id | The position on array matches the visa_type attribute to set the country of it
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                vicountry_id:
+                  type: integer
+                  example: 1
+        - name: certification_name
+          in: query
+          description: The certifcation name from the professional Certifications 
+          example: php 9
+          schema:
+            type: string
+        - name: exjob_title
+          in: query
+          description: The experience from the professional Experiences
+          example: backend developer
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: The page for list (max 100 record per page)
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of professionals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfessionalPaginated'
   /api/professional/update:
     post:
       tags:
@@ -828,34 +1064,74 @@ paths:
       parameters:
         - name: job_modality_id
           in: query
-          description: search for jobs with this job modality
+          description: Array of job modalities id
           example: 1
           schema:
-            type: integer
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_modality_id:
+                  type: integer
+                  example: 1
         - name: company_id
           in: query
-          description: search for jobs of this company id
+          description: Array of companies id
           example: 3
           schema:
-            type: integer
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                company_id:
+                  type: integer
+                  example: 1
         - name: job_city
           in: query
-          description: search for jobs with this city id
-          example: 3
+          description: Array of job city id
+          example: 1
           schema:
-            type: integer
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_city:
+                  type: integer
+                  example: 1
         - name: job_country
           in: query
-          description: search for jobs with this country id
+          description: Array of job country id
           example: 3
           schema:
-            type: integer
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_country:
+                  type: integer
+                  example: 1
         - name: job_seniority
           in: query
-          description: search for jobs with this Proficiency id of category 'seniority'
-          example: Intern
+          description: Array of proficiencies ids of category 'seniority'
+          example: 1
           schema:
-            type: string
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_seniority:
+                  type: integer
+                  example: 1
         - name: job_salary_start
           in: query
           description: search for jobs with given starting salary
@@ -890,6 +1166,12 @@ paths:
           in: query
           description: search for jobs with experience bellow sent experience_in_months_end
           example: 10
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: The page for list (max 100 record per page)
+          example: 1
           schema:
             type: integer
       responses:
@@ -3421,41 +3703,39 @@ paths:
     get:
       tags:
         - Job modality
-      sumary: List of jobs modalities
       description: Get all the jobs modalities
       responses:
         '200':
-        description: A list of jobs modalities
-        content:
-          application/json:
-          schema:
-            $ref: '#/components/schemas/Job_modalities'
+          description: A list of jobs modalities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job_modalities'
   /api/type_visas/index:
     get:
       tags:
         - type visas
-      sumary: List of type visas
       description: get all the type visas
       responses:
         '200':
-        description: A list of type visas
-        content:
-          application/json:
-          schema:
-            $ref: '#/components/schemas/type_visas'
-  /api/cummon_currency/index:
+          description: A list of type visas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/type_visas'
+  
+  /api/common_currency/index:
     get:
       tags:
-        - cummon currency
-      sumary: List of cummon currency
-      description: get all the cummon currency
+        - commom currency
+      description: get all the common currency
       responses:
         '200':
-        description: A list of cummons currency
-        content:
-          application/json:
-          schema:
-            $ref: '#components/schemas/cummon_currency'
+          description: A list of commons currency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/common_currency'
 components:
   schemas:
     Login:
@@ -4222,6 +4502,165 @@ components:
           type: string
           example: {"fr": "french", "it": "italian"}
           description: It can be Array|Null, default is null, it can contain any translation with the key as a languageIso
+    Language:
+      required:
+        - test
+      type: object
+      properties:
+        lang_id:
+          type: integer
+          example: 1
+        lacurriculum_id:
+          type: integer
+          example: 1,
+          description: Curriculum id
+        lalangue_id:
+          type: integer
+          example: 1
+          description: ListLang id
+        laspeaking_level:
+          type: integer
+          example: 1
+          description: Proficiency id of category = 'language'
+        lalistening_level:
+          type: integer
+          example: 1
+          description: Proficiency id of category = 'language'
+        lawriting_level:
+          type: integer
+          example: 1
+          description: Proficiency id of category = 'language'
+        lareading_level:
+          type: integer
+          example: 1
+          description: Proficiency id of category = 'language'
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    Professional:
+      required:
+        - test
+      type: object
+      properties:
+        professional_id:
+          type: integer
+          example: 1
+        person_id:
+          type: integer
+          example: 1
+        professional_slug:
+          type: string
+          example: john-carson-1915185
+          description: The slug of professional
+        professional_firstname:
+          type: string
+          example: John
+          description: The first name of professional
+        professional_lastname:
+          type: string
+          example: Carson
+          description: The last name of professional
+        professional_email:
+          type: string
+          example: professional@gmail.com
+          description: Professional email
+        professional_phone:
+          type: string
+          example: +5541954646565
+          description: Professional phone
+        professional_photo:
+          type: string
+          example: base64-img
+          description: Professional photo image enconded as base64
+        professional_cover:
+          type: string
+          example: base64-img
+          description: Professional cover image enconded as base64
+        paying:
+          type: integer
+          example: 0
+          description: If account is on a plan (paying user)
+        currently_working:
+          type: integer
+          example: 0
+          description: If currently working
+        avaliable_to_travel:
+          type: integer
+          example: 1
+          description: Avaliability to travel
+        dpdate_of_birth:
+          type: string
+          example: 2020-01-01 00:00:00
+          description: Date of birth
+        dpgender:
+          type: integer
+          example: 1
+          description: Gender id
+        dpcity_id:
+          type: integer
+          example: 1
+          description: Gender id
+        dpstate_id:
+          type: integer
+          example: 1
+          description: ListState id
+        dppostal_code:
+          type: string
+          example: 95959559-9
+          description: Postal code
+        dpcountry_id:
+          type: integer
+          example: 1
+          description: ListCountry id
+        skills:
+          type: array
+          description: Professional skills array
+          items:
+            $ref: '#/components/schemas/Skill'
+        visas:
+          type: array
+          description: Professional skills array
+          items:
+            $ref: '#/components/schemas/Visa'
+        languages:
+          type: array
+          description: Professional languages array
+          items:
+            $ref: '#/components/schemas/Language'
+        match:
+          type: number
+          description: The porcentage value of match (0 to 100%)
+          example: 100.00
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+    ProfessionalPaginated:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Professional'
+        curent_page:
+          type: integer
+          example: 1
+          description: the current page
+        last_page:
+          type: integer
+          example: 1
+          description: the last page
+        per_page:
+          type: integer
+          example: 100
+          description: the default list max size
     JobListPaginated:
       required:
         - test
@@ -4298,40 +4737,9 @@ components:
         total:
           type: integer
           example: 3
-    Profeciency:
-      type: object
-        proficiency_id:
-          type: integer
-          example: 1
-        proficiency_level:
-          type: string
-          example: a1 - beginner basica1 - beginner basic
-        category:
-          type: string
-          example: language
-        weight:
-          type: integer
-          example: 10
-        translation_id:
-          type: integer
-          example: 1
-        en:
-          type: string
-          example: a1 - beginner basic
-        pt:
-          type: string
-          example: a1 - iniciante básico
-        es:
-          type: string
-          example: a1 - básico
-        created_at:
-          type: string
-          example: '2024-04-23T14:16:25.000000Z'
-        updated_at:
-          type: string
-          example: '2024-04-23T14:16:25.000000Z'
     Job_modalities:
       type: object
+      properties:
         job_modalities_id:
           type: integer
           example: 1
@@ -4361,6 +4769,7 @@ components:
           example: '2024-04-23T14:16:25.000000Z'
     type_visas:
       type: object
+      properties:
         typevisas_id:
           type: integer
           example: 1
@@ -4385,9 +4794,10 @@ components:
         es:
           type: string
           example: visto Schengen
-    cummon_currency:
+    common_currency:
       type: object
-        cummon_currency_id:
+      properties:
+        common_currency_id:
           type: integer
           example: 1
         currency:
