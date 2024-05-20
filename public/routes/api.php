@@ -4,13 +4,21 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobListController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
+use App\Http\Controllers\PresentationController;
+use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\CommonCurrencyController;
+use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
+use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
+use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +78,37 @@ Route::prefix('company')->middleware('auth:sanctum')->group(function (){
     });
 });
 
-Route::prefix('recruiter')->middleware('auth:sanctum')->group(function (){
+Route::prefix('recruiter')->middleware('auth:sanctum', 'recruiter')->group(function (){
     Route::post('update', [RecruiterController::class, 'update']);
+});
+
+Route::prefix('social_network')->group(function ()
+{
+    Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
+    Route::middleware('auth:sanctum', 'companyadmin')->group(function ()
+    {
+        Route::post('store', [CompanySocialNetworkController::class, 'store']);
+        Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
+        Route::delete('destroy/{social_network_id}', [CompanySocialNetworkController::class, 'destroy']);
+    });
+});
+
+Route::prefix('proficiency')->group(function ()
+{
+    Route::get('index', [ProficiencyController::class, 'index']);
+});
+
+Route::prefix('job_modality')->group(function ()
+{
+    Route::get('index', [JobModalityController::class, 'index']);
+});
+
+Route::prefix('type_visas')->group(function ()
+{
+    Route::get('index', [TypeVisasController::class, 'index']);
+});
+
+Route::prefix('common_currency')->group(function ()
+{
+    Route::get('index', [CommonCurrencyController::class, 'index']);
 });

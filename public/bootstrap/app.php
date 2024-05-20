@@ -24,6 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('job', [
             \App\Http\Middleware\MyJob::class
         ]);
+        $middleware->group('professional', [
+            \App\Http\Middleware\ProfessionalProfile::class
+        ]);
+        $middleware->group('recruiter', [
+            \App\Http\Middleware\RecruiterProfile::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
