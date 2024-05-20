@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cummon_currency', function (Blueprint $table)
+        Schema::create('common_currencies', function (Blueprint $table)
         {
-            $table->id();
+            $table->increments('common_currency_id');
             $table->string('currency', 5)->unique();
             $table->string('currency_symbol', 10);
             $table->string('currency_name', 100);
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cummon_currency');
+        Schema::dropIfExists('common_currencies');
     }
 };

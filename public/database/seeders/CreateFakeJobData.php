@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\CommonCurrency;
 use App\Models\Company;
 use App\Models\JobList;
 use App\Models\JobModality;
@@ -17,8 +18,6 @@ use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\Object_;
-use stdClass;
 
 class CreateFakeJobData extends Seeder
 {
@@ -40,6 +39,7 @@ class CreateFakeJobData extends Seeder
         $visasArray = TypeVisas::all()->toArray();
         $countriesArray = ListCountry::all()->toArray();
         $professions = ListProfession::all()->toArray();
+        $currencies = CommonCurrency::all()->toArray();
         $dataForJobLanguage = [];
         foreach($languagesArray as $langData){
             for($i = 0; $i < 3; $i++){
@@ -143,7 +143,8 @@ class CreateFakeJobData extends Seeder
                     'job_description' => $professions[array_rand($professions)]['profession_name'],
                     'job_experience_description' => $faker->text(80),
                     'experience_in_months' => $jobData['exp'],
-                    'job_benefits' => $faker->text(500)
+                    'job_benefits' => $faker->text(500),
+                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id']
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){

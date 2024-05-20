@@ -6,12 +6,12 @@ use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\PresentationController;
 use App\Http\Controllers\CertificationController;
+use App\Http\Controllers\CommonCurrencyController;
 use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
-use App\Http\Controllers\CummonCurrencyController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
@@ -74,10 +74,10 @@ Route::prefix('recruiter')->middleware('auth:sanctum')->group(function ()
     Route::post('update', [RecruiterController::class, 'update']);
 });
 
-Route::prefix('social_network')->middleware('auth:sanctum')->group(function ()
+Route::prefix('social_network')->group(function ()
 {
     Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
-    Route::middleware('companyadmin')->group(function ()
+    Route::middleware('auth:sanctum', 'companyadmin')->group(function ()
     {
         Route::post('store', [CompanySocialNetworkController::class, 'store']);
         Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
@@ -100,7 +100,7 @@ Route::prefix('type_visas')->group(function ()
     Route::get('index', [TypeVisasController::class, 'index']);
 });
 
-Route::prefix('cummon_currency')->group(function ()
+Route::prefix('common_currency')->group(function ()
 {
-    Route::get('index', [CummonCurrencyController::class, 'index']);
+    Route::get('index', [CommonCurrencyController::class, 'index']);
 });
