@@ -430,7 +430,7 @@ class CreateForeignKeys extends Migration {
 			$table->dropForeign('jobslist_job_seniority_foreign');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobslist_jwage_currency_foreign');
+			$table->dropForeign('jobslist_wage_currency_foreign');
 		});
 		Schema::table('job_skills', function(Blueprint $table) {
 			$table->dropForeign('job_skills_joblist_id_foreign');

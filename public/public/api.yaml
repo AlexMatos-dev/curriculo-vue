@@ -3729,6 +3729,13 @@ paths:
       tags:
         - commom currency
       description: get all the common currency
+      parameters:
+      - name: currency
+        in: query
+        description: The currency
+        example: USD
+        schema:
+          type: string
       responses:
         '200':
           description: A list of commons currency
@@ -4808,7 +4815,19 @@ components:
           example: $
         currency_name:
           type: string
-          example: Dolar
+          example: us dollar
+        en:
+          type: string
+          example: us dollar
+        pt:
+          type: string
+          example: dólar americano
+        es:
+          type: string
+          example: dólar estadounidense
+        unofficial_translations:
+          type: string
+          example: Null|JsonArray of dynamic 'languageISO' => 'translation'
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
