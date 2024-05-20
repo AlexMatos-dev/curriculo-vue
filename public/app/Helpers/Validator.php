@@ -129,7 +129,6 @@ class Validator
                 self::throwResponse('invalid parameters for validation', 500);
             try {
                 $key = array_key_exists('id', $data) ? $data['id'] : $key;
-                dd($data);
                 $objInstance = new $data['object']();
                 if(is_array($data['data'])){
                     $result = $objInstance::whereIn($key, $data['data'])->get();
