@@ -75,6 +75,8 @@ tags:
     description: Visa routes and methods
   - name: link - curriculum
     description: Link routes and methods
+  - name: commom_currency
+    description: Link routes and methods
 paths:
   /api/login:
     post:
@@ -3721,6 +3723,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/type_visas'
+  
+  /api/common_currency/index:
+    get:
+      tags:
+        - commom currency
+      description: get all the common currency
+      responses:
+        '200':
+          description: A list of commons currency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/common_currency'
 components:
   schemas:
     Login:
@@ -4779,6 +4794,27 @@ components:
         es:
           type: string
           example: visto Schengen
+    common_currency:
+      type: object
+      properties:
+        common_currency_id:
+          type: integer
+          example: 1
+        currency:
+          type: string
+          example: USD
+        currency_symbol:
+          type: string
+          example: $
+        currency_name:
+          type: string
+          example: Dolar
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
   securitySchemes:
     bearerAuth:
       type: http
