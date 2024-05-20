@@ -11,6 +11,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\CummonCurrencyController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
@@ -97,4 +98,9 @@ Route::prefix('job_modality')->group(function ()
 Route::prefix('type_visas')->group(function ()
 {
     Route::get('index', [TypeVisasController::class, 'index']);
+});
+
+Route::prefix('cummon_currency')->group(function ()
+{
+    Route::get('index', [CummonCurrencyController::class, 'index']);
 });
