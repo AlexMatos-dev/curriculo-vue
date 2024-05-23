@@ -12,7 +12,7 @@ class CreateCompaniesTable extends Migration {
 			$table->string('company_slug', 150);
 			$table->string('company_register_number', 100);
 			$table->string('company_name', 300);
-			$table->string('company_type', 50);
+			$table->unsignedInteger('company_type');
 			$table->mediumText('company_logo')->charset('binary')->nullable();
             $table->mediumText('company_cover_photo')->charset('binary')->nullable();
 			$table->string('company_video', 150)->nullable();
