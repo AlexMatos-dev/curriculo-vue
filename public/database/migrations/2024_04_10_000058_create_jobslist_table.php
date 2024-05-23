@@ -19,6 +19,7 @@ class CreateJobsListTable extends Migration {
 			$table->integer('experience_in_months')->nullable();
 			$table->string('job_experience_description', 100)->nullable();
 			$table->text('job_benefits')->nullable();
+			$table->unsignedInteger('wage_currency')->nullable();
 			$table->timestamps();
 		});
 	}

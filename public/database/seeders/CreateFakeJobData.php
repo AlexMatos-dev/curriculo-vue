@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CommonCurrency;
 use App\Models\Company;
+use App\Models\CompanyType;
 use App\Models\JobList;
 use App\Models\JobModality;
 use App\Models\JobSkill;
@@ -17,8 +19,6 @@ use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\Object_;
-use stdClass;
 
 class CreateFakeJobData extends Seeder
 {
@@ -27,6 +27,12 @@ class CreateFakeJobData extends Seeder
      */
     public function run(): void
     {
+        $limit = false;
+        while(!is_numeric($limit)){
+            $limit = $this->command->ask('Enter the number of JobList records to create');
+        }
+        if($limit < 1)
+            $limit = 1;
         $faker = Faker::create('pt_BR');
         // -- Start of Essential Data --
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
@@ -36,10 +42,13 @@ class CreateFakeJobData extends Seeder
         $seniorities = Proficiency::where('category', Proficiency::CATEGORY_SENIORITY)->get()->toArray();
         $languagesArray = ListLangue::all()->toArray();
         $languageProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LANGUAGE)->get()->toArray();
+        $skillsProfeciency = Proficiency::where('category', Proficiency::CATEGORY_LEVEL)->get()->toArray();
         $skills = Tag::all()->toArray();
         $visasArray = TypeVisas::all()->toArray();
         $countriesArray = ListCountry::all()->toArray();
         $professions = ListProfession::all()->toArray();
+        $currencies = CommonCurrency::all()->toArray();
+        $companyTypes = CompanyType::all()->toArray();
         $dataForJobLanguage = [];
         foreach($languagesArray as $langData){
             for($i = 0; $i < 3; $i++){
@@ -99,7 +108,7 @@ class CreateFakeJobData extends Seeder
                     'company_slug' => Str::slug($companyName),
                     'company_register_number' => $faker->uuid(),
                     'company_name' => $companyName,
-                    'company_type' => 'fake',
+                    'company_type' => $companyTypes[array_rand($companyTypes)]['company_type_id'],
                     'company_logo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                     'company_cover_photo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                     'company_video' => $faker->url('youtube'),
@@ -125,16 +134,16 @@ class CreateFakeJobData extends Seeder
             'middle' => ['salary' => [4000,7000], 'exp' => 5],
             'senior' => ['salary' => [7000,20000], 'exp' => 10],
         ];
-        $fakeCompanies = Company::where('company_type', 'fake')->inRandomOrder()->get()->toArray();
-        for($o = 0; $o < 30; $o++){
-            if($created > 30)
+        $companiesData = Company::inRandomOrder()->get()->toArray();
+        for($o = 0; $o < $limit; $o++){
+            if($created > $limit)
                 break;
             $job = null;
             try {
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
                 $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
                 $job = JobList::create([
-                    'company_id' => $fakeCompanies[array_rand($fakeCompanies)]['company_id'],
+                    'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
                     'job_city' => $cityObj->lcity_id,
                     'job_country' => $countryObj->lcountry_id,
@@ -143,17 +152,19 @@ class CreateFakeJobData extends Seeder
                     'job_description' => $professions[array_rand($professions)]['profession_name'],
                     'job_experience_description' => $faker->text(80),
                     'experience_in_months' => $jobData['exp'],
-                    'job_benefits' => $faker->text(500)
+                    'job_benefits' => $faker->text(500),
+                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id']
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
                         $thisSkill = $skills[array_rand($skills)];
+                        $thisProficiency = $skillsProfeciency[array_rand($skillsProfeciency)];
                         JobSkill::create([
                             'joblist_id' => $job->job_id,
-                            'tag_id' => $thisSkill['tags_id']
+                            'tag_id' => $thisSkill['tags_id'],
+                            'proficiency_id' => $thisProficiency['proficiency_id']
                         ]);
                     }
-
                     $langData = [];
                     for($i = 0; $i < 3; $i++){
                         $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   

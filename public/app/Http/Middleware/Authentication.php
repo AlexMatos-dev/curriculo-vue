@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Authentication
 {
+    private $request;
+
     /**
      * Handle an incoming request.
      *
@@ -15,10 +17,45 @@ class Authentication
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $this->request = $request;
+        if($this->isException())
+            return $next($request);
         if(!$request->header('Authorization'))
             return response()->json(['message' => 'token not provided'], 401);
         if(!auth('api')->check())
             return response()->json(['message' => 'invalid token', 'generateToken' => true], 401);
         return $next($request);
+    }
+
+    /**
+     * Validates wheter current request is an exception
+     * @return Bool
+     */
+    public function isException()
+    {
+        $route = (object) [
+            'uri' => $this->request->route()->uri(),
+            'method' => $this->request->method()
+        ];
+        $exceptionRoutes = $this->getExceptionRoutes($route->uri);
+        if(!$exceptionRoutes || !in_array($route->method, $exceptionRoutes['methods']))
+            return false;
+        return true;
+    }
+
+    /**
+     * Returns the exception route array list or the expected key by parameter
+     * @param String key
+     * @return Array (List of routes or Route methods)
+     */
+    public function getExceptionRoutes($key = null)
+    {
+        $routesList = [
+            'api/joblist' => ['methods' => ['GET']],
+            'api/professional' => ['methods' => ['GET']],
+        ];
+        if($key)
+            return array_key_exists($key, $routesList) ? $routesList[$key] : null;
+        return $routesList;
     }
 }

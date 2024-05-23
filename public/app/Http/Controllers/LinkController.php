@@ -58,16 +58,14 @@ class LinkController extends Controller
      */
     public function update()
     {
+        $link = (new Link())->isFromProfessionalCurriculum(request('link'), $this->getProfessionalBySession()->professional_id);
+        if(!$link)
+            Validator::throwResponse('link not found', 400);
         Validator::validateParameters($this->request, [
             'link_id' => 'numeric|required',
             'link_type' => 'required|max:100',
             'url' => 'required|max:100'
         ]);
-        $link = Link::find(request('link_id'));
-        if(!$link)
-            Validator::throwResponse('link not found', 400);
-        if(!in_array(request('link_type'), Link::LINK_TYPES))
-            Validator::throwResponse('link type not valid', 400);
         $link->update($this->request->all());
         if(!$link)
             Validator::throwResponse('link not updated', 500);

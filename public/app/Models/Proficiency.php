@@ -27,23 +27,38 @@ class Proficiency extends Model
 
     /**
      * Get category constant by name
-     * @param String name
-     * @return Stirng|null
+     * @param string $name
+     * @return string|null
      */
-    public function getCategory($name = '')
+    public static function getCategory($name = '')
+    {
+        $categories = [
+            'language' => self::CATEGORY_LANGUAGE,
+            'seniority' => self::CATEGORY_SENIORITY,
+            'level' => self::CATEGORY_LEVEL,
+        ];
+
+        return $categories[$name] ?? null;
+    }
+  
+    /**
+     * Gets all proficiencies by category name
+     * @param String name
+     * @param Bool asArray - To return an array
+     * @return Array - Of Proficiency objects or parsed as array
+     */
+    public function getProficiencies($name = '', $asArray = false)
     {
         if(!in_array($name, [$this::CATEGORY_LANGUAGE, $this::CATEGORY_SENIORITY, $this::CATEGORY_LEVEL]))
             return null;
-        switch($name){
-            case 'language':
-                return $this::CATEGORY_LANGUAGE;
-            break;
-            case 'seniority':
-                return $this::CATEGORY_SENIORITY;
-            break;
-            case 'level':
-                return $this::CATEGORY_LEVEL;
-            break;
+        $data = Proficiency::where('category', $name)->get(); 
+        if($asArray){
+            $results = [];
+            foreach($data as $obj){
+                $results[$obj->proficiency_id] = $obj->proficiency_id;
+            }
+            return $results;
         }
+        return $data;
     }
 }

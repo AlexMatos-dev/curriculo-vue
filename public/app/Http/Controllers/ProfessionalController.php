@@ -10,8 +10,10 @@ use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListState;
 use App\Models\Professional;
+use App\Models\ProfessionalProfession;
 use App\Models\Profile;
- 
+use Carbon\Carbon;
+use Database\Seeders\CreateFakeProfessionals;
 
 class ProfessionalController extends Controller
 {
@@ -164,12 +166,141 @@ class ProfessionalController extends Controller
                 $result = $professional->removeJobModality(request('job_modality_id'));
             break;
             case 'list':
-                $result =  $professional->getJobModalities();
+                $result =  $professional->getJobModalities(false);
                 $data = is_array($result) ? $result : [];
+                $result = true;
             break;
         }
         if(!$result)
             return response()->json(['message' => 'action not completed with success'], 500);
         return response()->json(['message' => 'action performed', 'data' => $data]);
+    }
+
+    /**
+     * Manages professions of professional, this method can ADD, REMOVE or LIST all ProfessionProfessions of professional
+     * @param String action - possible values ['add', 'remove', 'list']
+     * @param String lprofession_id - only required when 'action' = 'add'
+     * @param String started_working_at
+     * @param String observations
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function manageProfessionalProfessions()
+    {
+        $actions = ['add', 'remove', 'list'];
+        if(!in_array(request('action'), $actions))
+            return response()->json(['message' => 'invalid action'], 400);
+        $person = auth('api')->user();
+        $professional = $person->getProfile(Profile::PROFESSIONAL);
+        if(!$professional)
+            return response()->json(['message' => 'professional not found'], 400);
+        $data = null;
+        switch(request('action')){
+            case 'add':
+                Validator::validateParameters($this->request, [
+                    'lprofession_id' => 'numeric|required',
+                    'started_working_at' => 'date_format:Y-m-d',
+                    'observations' => 'max:500'
+                ]);
+                Validator::checkExistanceOnTable([
+                    'profession' => ['data' => request('lprofession_id'), 'object' => ProfessionalProfession::class],
+                ]);
+                $started_working_at = request('started_working_at') ? Carbon::parse(request('started_working_at'))->format('Y-m-d H:i:s') : null;
+                $result = $professional->syncProfessionalProfessions(request('lprofession_id'), $started_working_at, request('observations'));
+            break;
+            case 'remove':
+                $result = $professional->removeProfessionProfession(request('lprofession_id'));
+            break;
+            case 'list':
+                $result =  $professional->getProfessionProfessions(false);
+                $data = is_array($result) ? $result : [];
+                $result = true;
+            break;
+        }
+        if(!$result)
+            return response()->json(['message' => 'action not completed with success'], 500);
+        return response()->json(['message' => 'action performed', 'data' => $data]);
+    }
+
+    /**
+     * Perform a search accordingly to sent parameters and returns a list of professionals paginated and with a 'match' percentage
+     * @param Int page - default 1
+     * @param Array skill_name
+     * @param Array skproficiency_level
+     * @param Array area_of_study
+     * @param String certification_name
+     * @param String exjob_title
+     * @param Array dpgender
+     * @param Array dpcity_id
+     * @param Array dpstate_id
+     * @param Array dpcountry_id
+     * @param Array lalangue_id
+     * @param Array laspeaking_level
+     * @param Array lalistening_level
+     * @param Array lawriting_level
+     * @param Array lareading_level
+     * @param Array visa_type
+     * @param Array vicountry_id
+     * @return \Illuminate\Http\JsonResponse - Schema [
+     *      "data": Array,
+     *      "curent_page": int,
+     *      "per_page": int,
+     *      "last_page": int,
+     * ]
+     */
+    public function index()
+    {
+        Validator::validateParameters($this->request, [
+            'page' => 'integer',
+            'skill_name' => 'array',
+            'skproficiency_level' => 'array',
+            'area_of_study' => 'array',
+            'certification_name' => '',
+            'exjob_title' => '',
+            'dpgender' => 'array',
+            'dpstate_id' => 'array',
+            'dpcountry_id' => 'array',
+            'lalangue_id' => 'array',
+            'laspeaking_level' => 'array',
+            'lalistening_level' => 'array',
+            'lawriting_level' => 'array',
+            'lareading_level' => 'array',
+            'visa_type' => 'array',
+            'vicountry_id' => 'array'
+        ]);
+        $page = request('page', 1);
+        $perPage = request('per_page') > 100 ? 100 : request('per_page', 100);
+        $professional = new Professional();
+        $paying = $professional->listProfessionals($this->request, true);
+        $paying = $professional->splitJoinDataFromListedProfessions($paying, $this->request);
+        $nonPaying = $professional->listProfessionals($this->request, false);
+        $nonPaying = $professional->splitJoinDataFromListedProfessions($nonPaying, $this->request);
+        $total = count($paying) + count($nonPaying);
+        $results = $professional->processListedProfessions([
+            'paying'    => $paying,
+            'nonPaying' => $nonPaying
+        ], $perPage);
+        $lastPage = ceil($total / $perPage);
+        if($page < 1)
+            $page = 1;
+        if($page >= $lastPage)
+            $page = $lastPage;
+        if($page > 1){
+            $nonPayingOffset = $results['status']['nonPaying'];
+            $nonPaying = $professional->listProfessionals($this->request, false, $perPage, $nonPayingOffset);
+            $nonPaying = $professional->splitJoinDataFromListedProfessions($nonPaying, $this->request);
+            $payingOffset = $results['status']['paying'];
+            $paying = $professional->listProfessionals($this->request, true, $perPage, $payingOffset);
+            $paying = $professional->splitJoinDataFromListedProfessions($paying, $this->request);
+            $results = $professional->processListedProfessions([
+                'paying'    => $paying,
+                'nonPaying' => $nonPaying
+            ], $perPage);
+        }
+        return response()->json([
+            'data' => $results['results'],
+            'curent_page' => $page,
+            'per_page' => $perPage,
+            'last_page' => $lastPage
+        ]);
     }
 }

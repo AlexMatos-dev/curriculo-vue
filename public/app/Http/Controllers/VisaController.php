@@ -67,6 +67,9 @@ class VisaController extends Controller
      */
     public function update()
     {
+        $visa = (new Visa())->isFromProfessionalCurriculum(request('visa'), $this->getProfessionalBySession()->professional_id);
+        if(!$visa)
+            Validator::throwResponse('visa not found', 400);
         Validator::validateParameters($this->request, [
             'vicountry_id' => 'numeric|required',
             'visa_type' => 'numeric|required',
@@ -76,9 +79,6 @@ class VisaController extends Controller
             'listCountry' => ['data' => request('vicountry_id'), 'object' => ListCountry::class],
             'visa_type' => ['data' => request('visa_type'), 'object' => TypeVisas::class]
         ]);
-        $visa = Visa::find(request('visa'));
-        if(!$visa)
-            Validator::throwResponse('visa not found', 400);
         $country = $visa->country();
         $isDifferent = false;
         if($country->country_name != $objects['listCountry']->lcountry_id){

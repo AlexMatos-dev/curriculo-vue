@@ -13,15 +13,15 @@ class EducationController extends Controller
 {
     /**
      * Get all experiences by curriculum_id.
-     * @param Int curriculum_id - required
+     * @param Int edcurriculum_id
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
     {
-        $education = Education::where('edcurriculum_id', $this->getCurriculumBySession()->curriculum_id);
-        $education = $education->paginate($request->per_page);
-        return response()->json($education);
+        return response()->json(
+            (new Education())->list($request->edcurriculum_id, request('per_page', 10))
+        );
     }
 
     /**
@@ -34,7 +34,6 @@ class EducationController extends Controller
 
     /**
      * Store a new Education in storage.
-     * @param Int edcurriculum_id - required
      * @param String eddegree - required
      * @param Int edfield_of_study - required
      * @param String edinstitution - required
@@ -50,19 +49,21 @@ class EducationController extends Controller
             'eddegree'          => 'required',
             'edfield_of_study'  => 'required|numeric',
             'edinstitution'     => 'required',
-            'edstart_date'      => 'required|date_format:Y-m-d',
+            'edstart_date'      => 'required|date_format:Y-m-d|before:now',
             'degree_type'       => 'required|numeric',
-            'edend_date'        => 'date_format:Y-m-d',
+            'edend_date'        => 'date_format:Y-m-d|before:now',
             'eddescription'     => 'max:400'
         ]);
-        Validator::checkExistanceOnTable($request, [
+        Validator::checkExistanceOnTable([
             'edfield_of_study' => ['object' => AreaOfStudy::class, 'data' => request('edfield_of_study')],
             'degree_type' => ['object' => DegreeType::class, 'data' => request('degree_type')]
         ]);
-        Validator::validateDates($request, [
-            'edstart_date' => 'lower:edend_date',
-            'edend_date' => 'bigger:edstart_date'
-        ]);
+        if(request('edstart_date') && request('edend_date')){
+            Validator::validateDates($request, [
+                'edstart_date' => 'lower:edend_date',
+                'edend_date' => 'bigger:edstart_date'
+            ]);
+        }
         $education = Education::create($request->all());
 
         return response()->json($education);
@@ -87,7 +88,6 @@ class EducationController extends Controller
 
     /**
      * Update the specified Education in storage.
-     * @param Int edcurriculum_id - required
      * @param String eddegree - required
      * @param Int edfield_of_study - required
      * @param String edinstitution - required
@@ -96,26 +96,33 @@ class EducationController extends Controller
      * @param Date edend_date
      * @param String eddescription
      */
-    public function update(Request $request, Education $education)
+    public function update(Request $request, $educationId = null)
     {
+        $education = Education::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('education_id', $educationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'educations.edcurriculum_id');
+        })->first();
+        if(!$education)
+            Validator::throwResponse('education not found', 400);
         $request->validate([
-            'edcurriculum_id'   => 'required',
             'eddegree'          => 'required',
             'edfield_of_study'  => 'required|numeric',
             'edinstitution'     => 'required',
-            'edstart_date'      => 'required|date_format:Y-m-d',
+            'edstart_date'      => 'required|date_format:Y-m-d|before:now',
             'degree_type'       => 'required|numeric',
-            'edend_date'        => 'date_format:Y-m-d',
+            'edend_date'        => 'date_format:Y-m-d|before:now',
             'eddescription'     => 'max:400'
         ]);
-        Validator::checkExistanceOnTable($request, [
+        Validator::checkExistanceOnTable([
             'edfield_of_study' => ['object' => AreaOfStudy::class, 'data' => request('edfield_of_study')],
             'degree_type' => ['object' => DegreeType::class, 'data' => request('degree_type')]
         ]);
-        Validator::validateDates($request, [
-            'edstart_date' => 'lower:edend_date',
-            'edend_date' => 'bigger:edstart_date'
-        ]);
+        if(request('edstart_date') && request('edend_date')){
+            Validator::validateDates($request, [
+                'edstart_date' => 'lower:edend_date',
+                'edend_date' => 'bigger:edstart_date'
+            ]);
+        }
         $education->update($request->all());
         return response()->json($education);
     }
@@ -124,8 +131,14 @@ class EducationController extends Controller
      * Remove the specified Education from storage.
      * @param Int education_id - required
      */
-    public function destroy(Education $education)
+    public function destroy($educationId)
     {
+        $education = Education::where('curriculums.cprofes_id', $this->getProfessionalBySession()->professional_id)->where('education_id', $educationId)
+        ->leftJoin('curriculums', function($join){
+            $join->on('curriculums.curriculum_id', '=', 'educations.edcurriculum_id');
+        })->first();
+        if(!$education)
+            Validator::throwResponse('education not found', 400);
         $education->delete();
         return response()->json($education);
     }

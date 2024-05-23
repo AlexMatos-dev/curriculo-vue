@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JobModality extends Model
+class CommonCurrency extends Model
 {
-    protected $primaryKey = 'job_modality_id';
-    protected $table = 'job_modalities';
+    protected $primaryKey = 'common_currency_id';
+    protected $table = 'common_currencies';
     public $timestamps = true;
 
     /**
@@ -16,7 +16,8 @@ class JobModality extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'description'
+        'currency',
+        'currency_symbol',
+        'currency_name'
     ];
 }

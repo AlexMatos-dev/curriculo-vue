@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('areas_of_study', function (Blueprint $table) {
-            $table->increments('area_of_study_id')->primary();
+        Schema::create('areas_of_study', function (Blueprint $table)
+        {
+            $table->increments('area_of_study_id');
             $table->string('name', 200);
             $table->timestamps();
         });
