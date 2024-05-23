@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Company;
 use App\Models\CompanyAdmin;
+use App\Models\CompanyType;
 use App\Models\Person;
 use App\Models\Professional;
 use App\Models\Profile;
@@ -25,6 +26,7 @@ class ProfileSeeder extends Seeder
     {
         $faker = Faker::create('pt_BR');
         $defaultPassword = Hash::make('12345');
+        $companiesType = CompanyType::all()->toArray();
         $personData = [
             'company' => [
                 'person_username' => 'company X',
@@ -78,7 +80,7 @@ class ProfileSeeder extends Seeder
                         'company_slug' => Str::slug($companyName),
                         'company_register_number' => $faker->uuid(),
                         'company_name' => $companyName,
-                        'company_type' => 'fake',
+                        'company_type' => $companiesType[array_rand($companiesType)]['company_type_id'],
                         'company_logo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                         'company_cover_photo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                         'company_video' => $faker->url('youtube'),

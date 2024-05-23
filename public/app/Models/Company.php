@@ -32,6 +32,11 @@ class Company extends Model
         'paying'
     ];
 
+    public function companyType()
+    {
+        return $this->belongsTo(CompanyType::class, 'company_type');
+    }
+
     /**
      * Creates or Updates $this Company by sent data
      * @param Array - Schema [$attrName => $attrValue]

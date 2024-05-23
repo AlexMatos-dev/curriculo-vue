@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CommonCurrency;
 use App\Models\Company;
+use App\Models\CompanyType;
 use App\Models\JobList;
 use App\Models\JobModality;
 use App\Models\JobSkill;
@@ -47,6 +48,7 @@ class CreateFakeJobData extends Seeder
         $countriesArray = ListCountry::all()->toArray();
         $professions = ListProfession::all()->toArray();
         $currencies = CommonCurrency::all()->toArray();
+        $companyTypes = CompanyType::all()->toArray();
         $dataForJobLanguage = [];
         foreach($languagesArray as $langData){
             for($i = 0; $i < 3; $i++){
@@ -106,7 +108,7 @@ class CreateFakeJobData extends Seeder
                     'company_slug' => Str::slug($companyName),
                     'company_register_number' => $faker->uuid(),
                     'company_name' => $companyName,
-                    'company_type' => 'fake',
+                    'company_type' => $companyTypes[array_rand($companyTypes)]['company_type_id'],
                     'company_logo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                     'company_cover_photo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
                     'company_video' => $faker->url('youtube'),
@@ -132,7 +134,7 @@ class CreateFakeJobData extends Seeder
             'middle' => ['salary' => [4000,7000], 'exp' => 5],
             'senior' => ['salary' => [7000,20000], 'exp' => 10],
         ];
-        $fakeCompanies = Company::where('company_type', 'fake')->inRandomOrder()->get()->toArray();
+        $companiesData = Company::inRandomOrder()->get()->toArray();
         for($o = 0; $o < $limit; $o++){
             if($created > $limit)
                 break;
@@ -141,7 +143,7 @@ class CreateFakeJobData extends Seeder
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
                 $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
                 $job = JobList::create([
-                    'company_id' => $fakeCompanies[array_rand($fakeCompanies)]['company_id'],
+                    'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
                     'job_city' => $cityObj->lcity_id,
                     'job_country' => $countryObj->lcountry_id,

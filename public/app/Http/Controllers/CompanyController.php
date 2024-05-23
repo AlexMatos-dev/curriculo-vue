@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\Company;
+use App\Models\CompanyType;
 use App\Models\Person;
 use App\Models\Profile;
 
@@ -13,7 +14,7 @@ class CompanyController extends Controller
      * Updates logged person Company account.
      * @param String company_register_number - required
      * @param String company_name - required
-     * @param String company_type - required
+     * @param Int    company_type - required
      * @param String company_video
      * @param String company_email
      * @param String company_phone
@@ -28,7 +29,7 @@ class CompanyController extends Controller
         Validator::validateParameters($this->request, [
             'company_register_number' => 'required|max:100',
             'company_name' => 'required|max:300',
-            'company_type' => 'required|max:50',
+            'company_type' => 'required|integer',
             'company_video' => 'max:150',
             'company_email' => 'required|email|max:150',
             'company_phone' => 'max:20',
@@ -36,6 +37,9 @@ class CompanyController extends Controller
             'company_description' => 'max:500',
             'company_number_employees' => 'numeric|not_in:0',
             'company_benefits' => 'max:4294967295'
+        ]);
+        Validator::checkExistanceOnTable([
+            'company_type' => ['object' => CompanyType::class, 'data' => request('company_type')]
         ]);
         $person = auth('api')->user();
         $dataToSet = [
