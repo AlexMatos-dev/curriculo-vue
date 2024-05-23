@@ -836,8 +836,8 @@ paths:
             type: string
         - name: company_type
           in: query
-          description: Company type - undefined, must check
-          example: timber & wood crafts
+          description: Company type
+          example: 1
           schema:
             type: string
         - name: company_video
