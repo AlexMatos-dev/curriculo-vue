@@ -43,7 +43,7 @@ Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(fun
   Route::resource('education', EducationController::class);  
 });
 
-Route::get('joblist', [JobListController::class, 'index']);
+Route::get('joblist/index', [JobListController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('joblist', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
@@ -61,7 +61,7 @@ Route::prefix('person')->middleware('auth:sanctum')->group(function (){
 });
 
 Route::prefix('professional')->group(function (){
-    Route::get('/', [ProfessionalController::class, 'index']);
+    Route::get('index', [ProfessionalController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function(){
         Route::post('update', [ProfessionalController::class, 'update']);
         Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
