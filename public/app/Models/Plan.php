@@ -22,4 +22,15 @@ class Plan extends Model
         'plan_days_period',
         'plan_months_period'
     ];
+
+    /**
+     * Checks sent profile type object and validates whether it can or can't send emails
+     * @param Object object
+     * @param String objectType
+     */
+    public function canSendEmails(Object $object, String $objectType)
+    {
+        // Not implemented nor defined
+        return true;
+    }
 }

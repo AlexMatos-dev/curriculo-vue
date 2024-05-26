@@ -29,7 +29,8 @@ class VisasTypeSeeder extends Seeder
             Translation::create([
                 'en' => $visaType['en'],
                 'pt' => $visaType['pt'],
-                'es' => $visaType['es']
+                'es' => $visaType['es'],
+                'category' => Translation::CATEGORY_VISA_TYPE
             ]);
         }
     }

@@ -13,6 +13,8 @@ class CreateRecruitersTable extends Migration {
 			$table->bigInteger('company_id')->unsigned();
 			$table->tinyInteger('paying')->default(0);
 			$table->mediumText('recruiter_photo', 2097152)->charset('binary')->nullable();
+			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

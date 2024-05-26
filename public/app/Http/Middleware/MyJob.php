@@ -23,14 +23,14 @@ class MyJob extends Controller
     {
         $jobList = JobList::find(request('joblist_id'));
         if(!$jobList)
-            Validator::throwResponse('job not found', 401);
+            Validator::throwResponse('job not found', 403);
         if(!$this->isException()){
             $person = auth('api')->user();
             $company = $person->getProfile(Profile::COMPANY);
             if(!$company)
-                Validator::throwResponse('company not found', 401);
+                Validator::throwResponse('company not found', 403);
             if($jobList->company_id != $company->company_id)
-                Validator::throwResponse('not your job', 401);
+                Validator::throwResponse('not your job', 403);
         }
         Session()->put('job', $jobList);
         return $next($request);

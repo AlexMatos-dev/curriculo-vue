@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->validateCsrfTokens(except: [
+            'async/asyncactions'
+        ]);
         $middleware->group('authenticate', [
             \App\Http\Middleware\Authentication::class,
         ]);
@@ -30,7 +33,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('recruiter', [
             \App\Http\Middleware\RecruiterProfile::class
         ]);
+        $middleware->group('company_recruiter', [
+            \App\Http\Middleware\CompanyOrRecruiter::class
+        ]);
+        $middleware->group('async', [
+            \App\Http\Middleware\AsynActions::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        
     })->create();

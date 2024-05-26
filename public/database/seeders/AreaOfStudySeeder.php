@@ -30,7 +30,8 @@ class AreaOfStudySeeder extends Seeder
             Translation::create([
                 'en' => $areaOfStudy['en'],
                 'pt' => $areaOfStudy['pt'],
-                'es' => $areaOfStudy['es']
+                'es' => $areaOfStudy['es'],
+                'category' => Translation::CATEGORY_AREA_OF_STUDIES
             ]);
         }
     }

@@ -35,6 +35,11 @@ class Professional extends Model
         return $this->belongsTo(Person::class, 'person_id')->first();
     }
 
+    public function getFullName()
+    {
+        return ucwords($this->professional_firstname) . ' ' .  ucwords($this->professional_lastname);
+    }
+
     /**
      * Creates or Updates $this Professional by sent data
      * @param Array - Schema [$attrName => $attrValue]
@@ -198,13 +203,13 @@ class Professional extends Model
      * @param Int offset
      * @return Array
      */
-    public function listProfessionals(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null)
+    public function listProfessionals(\Illuminate\Http\Request $request, $paying = false, $limit = 10000, $offset = null)
     {
         $proficiencyObj = new Proficiency();
         $requestParamArray = $request->all();
         $requestKeysArray = array_keys($requestParamArray);
-        $limit = !is_numeric($limit) ? 100 : $limit;
-        $limit = $limit > 100 ? 100 : $limit;
+        $limit = !is_numeric($limit) ? 10000 : $limit;
+        $limit = $limit > 10000 ? 10000 : $limit;
         $limit = $limit < 0 ? 1 : $limit;
 
         $queryParametersFinal = [];

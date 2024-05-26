@@ -59,7 +59,8 @@ class CompanySocialNetworkTypeSeeder extends Seeder
             Translation::create([
                 'en' => $type['description']['en'],
                 'pt' => $type['description']['pt'],
-                'es' => $type['description']['es']
+                'es' => $type['description']['es'],
+                'category' => Translation::CATEGORY_COMPANY_SOCIAL_NETWORK_TYPE
             ]);
         }
     }

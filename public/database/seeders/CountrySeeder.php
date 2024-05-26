@@ -30,7 +30,8 @@ class CountrySeeder extends Seeder
             Translation::create([
                 'en' => $data['en'],
                 'pt' => $data['pt'],
-                'es' => $data['es']
+                'es' => $data['es'],
+                'category' => Translation::CATEGORY_COUNTRY
             ]);
         }
     }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigInteger('profile_type_id');
             $table->string('profile_type', 20);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

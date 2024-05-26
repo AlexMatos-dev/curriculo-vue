@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('pt', 300);
             $table->string('es', 300);
             $table->json('unofficial_translations')->nullable();
+            $table->string('category', 100)->nullable();
             $table->timestamps();
         });
     }

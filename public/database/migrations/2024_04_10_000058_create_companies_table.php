@@ -24,6 +24,7 @@ class CreateCompaniesTable extends Migration {
 			$table->longText('company_benefits')->nullable();
 			$table->tinyInteger('paying')->default(0);
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

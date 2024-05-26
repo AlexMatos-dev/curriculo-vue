@@ -29,7 +29,8 @@ class CommonCurrencySeeder extends Seeder
             Translation::create([
                 'en' => $currency['name'],
                 'pt' => $currency['pt'],
-                'es' => $currency['es']
+                'es' => $currency['es'],
+                'category' => Translation::CATEGORY_COMMON_CURRENCIES
             ]);
         }
     }
