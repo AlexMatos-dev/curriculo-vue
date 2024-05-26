@@ -20,6 +20,14 @@ class Controller
         return $companyObj;
     }
 
+    public function getPersonBySession()
+    {
+        $personObj = Session()->get('person');
+        if(!$personObj)
+            return false;
+        return $personObj;
+    }
+
     public function getProfessionalBySession()
     {
         $professionalObj = Session()->get('professional');
@@ -42,5 +50,18 @@ class Controller
         if(!$jobListObj)
             return false;
         return $jobListObj;
+    }
+
+    public function getObjectFromSession()
+    {
+        $object = Session()->get($this->getObjectType());
+        if(!$object)
+            return false;
+        return $object;
+    }
+
+    public function getObjectType()
+    {
+        return Session()->get('objectType');
     }
 }

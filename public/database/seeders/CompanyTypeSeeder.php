@@ -26,7 +26,8 @@ class CompanyTypeSeeder extends Seeder
             Translation::create([
                 'en' => $translatedName['en'],
                 'pt' => $translatedName['pt'],
-                'es' => $translatedName['es']
+                'es' => $translatedName['es'],
+                'category' => Translation::CATEGORY_COMPANY_TYPE
             ]);
         }
     }

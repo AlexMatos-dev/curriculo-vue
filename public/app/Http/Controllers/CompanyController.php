@@ -155,7 +155,6 @@ class CompanyController extends Controller
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
             return response()->json(['message' => 'person is invalid'], 400);
-        $data = [];
         switch(request('action')){
             case 'add':
                 $result = $company->addRecruiter($targetPerson->person_id);
@@ -164,12 +163,11 @@ class CompanyController extends Controller
                 $result = $company->removeRecruiter($targetPerson->person_id);
             break;
             case 'list':
-                $data = $company->getRecruiters();
                 $result = true;
             break;
         }
         if(!$result)
             return response()->json(['message' => 'action not completed with success'], 500);
-        return response()->json(['message' => 'action performed', 'data' => $data]);
+        return response()->json(['message' => 'action performed', 'data' => $company->getRecruiters()]);
     }
 }

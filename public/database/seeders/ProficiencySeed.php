@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Proficiency;
 use App\Models\Translation;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ProficiencySeed extends Seeder
@@ -32,7 +31,8 @@ class ProficiencySeed extends Seeder
             Translation::create([
                 'en' => $data['en'],
                 'pt' => $data['pt'],
-                'es' => $data['es']
+                'es' => $data['es'],
+                'category' => Translation::CATEGORY_PROFICIENCY
             ]);
         }
     }

@@ -4,14 +4,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\JobListController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\EducationController;
-use App\Http\Controllers\PresentationController;
-use App\Http\Controllers\CertificationController;
 use App\Http\Controllers\CommonCurrencyController;
-use App\Http\Controllers\ReferenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
@@ -43,7 +41,7 @@ Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(fun
   Route::resource('education', EducationController::class);  
 });
 
-Route::get('joblist', [JobListController::class, 'index']);
+Route::get('joblist/index', [JobListController::class, 'index']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('joblist', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
@@ -61,12 +59,15 @@ Route::prefix('person')->middleware('auth:sanctum')->group(function (){
 });
 
 Route::prefix('professional')->group(function (){
-    Route::get('/', [ProfessionalController::class, 'index']);
+    Route::get('index', [ProfessionalController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function(){
         Route::post('update', [ProfessionalController::class, 'update']);
-        Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
-        Route::post('updateprofessionaljobmodality', [ProfessionalController::class, 'manageProfessionalJobModality']);
-        Route::post('updateprofessionalprofession', [ProfessionalController::class, 'manageProfessionalProfessions']);
+        Route::middleware('professional')->group(function(){
+            Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
+            Route::post('updateprofessionaljobmodality', [ProfessionalController::class, 'manageProfessionalJobModality']);
+            Route::post('updateprofessionalprofession', [ProfessionalController::class, 'manageProfessionalProfessions']);
+            Route::get('jobapplication', [JobAppliedController::class, 'professionalJobApplication']);
+        });
     });
 });
 
@@ -111,4 +112,12 @@ Route::prefix('type_visas')->group(function ()
 Route::prefix('common_currency')->group(function ()
 {
     Route::get('index', [CommonCurrencyController::class, 'index']);
+});
+
+Route::prefix('job_applied')->middleware('auth:sanctum')->group(function (){
+    Route::get('status', [JobAppliedController::class, 'listStatus']);
+    Route::middleware('company_recruiter')->group(function(){
+        Route::get('index', [JobAppliedController::class, 'companyJobApplication']);
+        Route::post('changejobappliedstatus', [JobAppliedController::class, 'changeJobAppliedStatus']);
+    });
 });

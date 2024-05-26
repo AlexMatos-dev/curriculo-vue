@@ -3,13 +3,14 @@
 namespace App\Http\Middleware;
 
 use App\Helpers\Validator;
-use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProfessionalProfile
+class AsynActions
 {
+    private $allowedOrigin = ['api.jobifull.eu'];
+
     /**
      * Handle an incoming request.
      *
@@ -17,12 +18,8 @@ class ProfessionalProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
-        $professional = $person->getProfile(Profile::PROFESSIONAL);
-        if(!$professional)
-            Validator::throwResponse('professional profile not found', 403);
-        Session()->put('person', $person);
-        Session()->put('professional', $professional);
+        if(!in_array($_SERVER['HTTP_HOST'], $this->allowedOrigin))
+            Validator::throwResponse('not allowed', 500);
         return $next($request);
     }
 }

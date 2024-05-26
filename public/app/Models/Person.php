@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Person extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, SoftDeletes;
 
     const PROFESSIONAL_PERSON_ACCOUNT = 'professional';
     const RECRUITER_PERSON_ACCOUNT    = 'recruiter';
@@ -57,7 +58,6 @@ class Person extends Authenticatable
     public function sendRequestChangePasswordCodeEmail()
     {
         $languageISO = $this->language()->llangue_acronyn;
-        $languageISO = 'fr';
         $translatedText = (new Translation())->getTranslations([
             'your change password code',
             'the code will expire in 30 minutes and can be used only once',
@@ -135,5 +135,20 @@ class Person extends Authenticatable
     {
         $uuid = str_replace(['.', '/', ','], '', microtime(true));
         return Str::slug("$firstValue $lastValue $uuid");
+    }
+
+    /**
+     * Returns person language iso by person id
+     * @param Int personId
+     * @return String|False
+     */
+    public function getLanguageIso($personId = null)
+    {
+        $person = Person::leftJoin('listlangues', function($join){
+            $join->on('persons.person_langue', '=', 'listlangues.llangue_id');
+        })->where('persons.person_id', $personId)->first();
+        if(!$person)
+            return false;
+        return $person->llangue_acronyn;
     }
 }

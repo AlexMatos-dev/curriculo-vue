@@ -30,7 +30,8 @@ class GenderSeeder extends Seeder
             Translation::create([
                 'en' => $gender['en'],
                 'pt' => $gender['pt'],
-                'es' => $gender['es']
+                'es' => $gender['es'],
+                'category' => Translation::CATEGORY_GENDER
             ]);
         }
     }

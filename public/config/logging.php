@@ -127,6 +127,10 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'asynclog' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/asyncMethods.log')
+        ]
     ],
 
 ];

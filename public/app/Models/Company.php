@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
-{
+{   
+    use SoftDeletes;
+
     protected $primaryKey = 'company_id';
     protected $table = 'companies';
     public $timestamps = true;
@@ -200,7 +203,8 @@ class Company extends Model
             return true;
         if(!Profile::where('profile_type_id', $recruiter->recruiter_id)->where('profile_type', Profile::RECRUITER)->delete())
             return false;
-        return $recruiter->delete();
+        $result = $recruiter->delete();
+        return $result;
     }
 
     /**

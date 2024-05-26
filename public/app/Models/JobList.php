@@ -76,10 +76,10 @@ class JobList extends Model
      * @param Int offset
      * @return Array
      */
-    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null)
+    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 10000, $offset = null)
     {
-        $limit = !is_numeric($limit) ? 100 : $limit;
-        $limit = $limit > 100 ? 100 : $limit;
+        $limit = !is_numeric($limit) ? 10000 : $limit;
+        $limit = $limit > 10000 ? 10000 : $limit;
         $limit = $limit < 0 ? 1 : $limit;
         $query = JobList::leftJoin('companies AS company', function($join){
             $join->on('jobslist.company_id', '=', 'company.company_id');

@@ -17,6 +17,7 @@ class CreateDatapersonTable extends Migration {
 			$table->string('dppostal_code', 20)->nullable();
 			$table->integer('dpcountry_id')->unsigned()->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 
