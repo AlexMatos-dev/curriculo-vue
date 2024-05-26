@@ -119,17 +119,7 @@ class JobApplied extends Model
             return false;
         $languageISO = (new Person())->getLanguageIso($professional->person_id);
         $languageISO = !$languageISO ? 'en' : $languageISO;
-        $translatedText = (new Translation())->getTranslations([
-            'we have some news about a job you applied',
-            'you appliance status has changed',
-            'from the company',
-            'the job offer',
-            'team',
-            'see notification and details on your notifications page or click in the button below',
-            'see notification',
-            'update on your job application',
-            $data['status']
-        ], $languageISO);
+        $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
         $renderedView = view('email_templates.job_application_changed_status', [
             'personName' => $professional->getFullName(),
             'jobName' => $jobApplied->job_description,

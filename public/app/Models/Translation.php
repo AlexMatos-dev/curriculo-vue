@@ -114,4 +114,23 @@ class Translation extends Model
         }
         return $translatedText;
     }
+
+    public function getTranslationsByCategory($category, $languageISO = 'en')
+    {
+        if(!$category)
+            return [];
+        $translations = Translation::where('category', $category)->get();
+        $results = [];
+        $officialLanguage = in_array($languageISO, $this::OFFICIAL_LANGUAGES) ? true : false;
+        foreach($translations as $translation){
+            if(!$officialLanguage){
+                $translation->getTranslationByIsoCode($languageISO);
+                $text = $translation->getTranslationByIsoCode($languageISO);
+            }else{
+                $text = $translation->{$languageISO};
+            }
+            $results[$translation->en] = $text;
+        }
+        return $results;
+    }
 }

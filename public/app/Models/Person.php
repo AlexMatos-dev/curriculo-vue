@@ -58,14 +58,7 @@ class Person extends Authenticatable
     public function sendRequestChangePasswordCodeEmail()
     {
         $languageISO = $this->language()->llangue_acronyn;
-        $translatedText = (new Translation())->getTranslations([
-            'your change password code',
-            'the code will expire in 30 minutes and can be used only once',
-            'in case you did not request this email, please ignore',
-            'thanks',
-            'team',
-            'Your password change code!'
-        ], $languageISO);
+        $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
         $code = strtoupper($this->generatePasswordCode());
         $renderedEmail = view('email_templates/password_reset_code', [
             'code' => $code,
