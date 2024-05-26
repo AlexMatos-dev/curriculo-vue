@@ -30,7 +30,8 @@ class LanguageSeeder extends Seeder
             Translation::create([
                 'en' => $language['en'],
                 'pt' => $language['pt'],
-                'es' => $language['es']
+                'es' => $language['es'],
+                'category' => Translation::CATEGORY_LANGUAGE
             ]);
         }
     }

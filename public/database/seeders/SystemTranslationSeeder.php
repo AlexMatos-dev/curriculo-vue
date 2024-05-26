@@ -25,6 +25,7 @@ class SystemTranslationSeeder extends Seeder
                 'en' => $translation['en'],
                 'pt' => $translation['pt'],
                 'es' => $translation['es'],
+                'category' => Translation::CATEGORY_SYSTEM_TRANSLATIONS
             ]);
         }
     }

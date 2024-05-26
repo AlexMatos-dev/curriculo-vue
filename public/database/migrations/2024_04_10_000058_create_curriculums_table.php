@@ -14,6 +14,7 @@ class CreateCurriculumsTable extends Migration {
 			$table->string('curriculum_type', 50);
             $table->mediumText('curriculum_file', 2097152)->charset('binary')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

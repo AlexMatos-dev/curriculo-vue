@@ -8,6 +8,21 @@ class Translation extends Model
 {
     const OFFICIAL_LANGUAGES = ['en', 'pt', 'es'];
 
+    const CATEGORY_SYSTEM_TRANSLATIONS         = 'system_translation';
+    const CATEGORY_AREA_OF_STUDIES             = 'area_of_studies_translation';
+    const CATEGORY_COMMON_CURRENCIES           = 'common_currencies_translation';
+    const CATEGORY_COMPANY_SOCIAL_NETWORK_TYPE = 'company_social_network_type_translation';
+    const CATEGORY_COMPANY_TYPE                = 'company_type_translation';
+    const CATEGORY_COUNTRY                     = 'country_translation';
+    const CATEGORY_DEGREE_TYPE                 = 'degree_type_translation';
+    const CATEGORY_GENDER                      = 'gender_translation';
+    const CATEGORY_JOB_MODALITY                = 'job_modality_translation';
+    const CATEGORY_LANGUAGE                    = 'language_translation';
+    const CATEGORY_PROFESSION                  = 'profession_translation';
+    const CATEGORY_PROFICIENCY                 = 'proficiency_translation';
+    const CATEGORY_TAG                         = 'tag_translation';
+    const CATEGORY_VISA_TYPE                   = 'visa_type_translation';
+
     protected $primaryKey = 'translation_id';
     protected $table = 'translations';
     public $timestamps = true;
@@ -21,7 +36,8 @@ class Translation extends Model
         'en',
         'pt',
         'es',
-        'unofficial_translations'
+        'unofficial_translations',
+        'category'
     ];
 
     /**
@@ -97,5 +113,24 @@ class Translation extends Model
             $translatedText[$translation->en] = $translation->getTranslationByIsoCode($languageISO);
         }
         return $translatedText;
+    }
+
+    public function getTranslationsByCategory($category, $languageISO = 'en')
+    {
+        if(!$category)
+            return [];
+        $translations = Translation::where('category', $category)->get();
+        $results = [];
+        $officialLanguage = in_array($languageISO, $this::OFFICIAL_LANGUAGES) ? true : false;
+        foreach($translations as $translation){
+            if(!$officialLanguage){
+                $translation->getTranslationByIsoCode($languageISO);
+                $text = $translation->getTranslationByIsoCode($languageISO);
+            }else{
+                $text = $translation->{$languageISO};
+            }
+            $results[$translation->en] = $text;
+        }
+        return $results;
     }
 }

@@ -17,6 +17,7 @@ class CreatePersonsTable extends Migration {
 			$table->unsignedInteger('person_langue');
 			$table->dateTime('last_login')->nullable();
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

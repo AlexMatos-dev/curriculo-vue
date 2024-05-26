@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DataPerson extends Model 
 {
+    use SoftDeletes;
+    
     protected $primaryKey = 'dpperson_id';
     protected $table = 'dataperson';
     public $timestamps = true;

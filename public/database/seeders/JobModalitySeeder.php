@@ -40,7 +40,8 @@ class JobModalitySeeder extends Seeder
                 Translation::create([
                     'en' => $en,
                     'pt' => $data['namePt'],
-                    'es' => $data['nameEs']
+                    'es' => $data['nameEs'],
+                    'category' => Translation::CATEGORY_JOB_MODALITY
                 ]);
             }
 
@@ -49,7 +50,8 @@ class JobModalitySeeder extends Seeder
                 Translation::create([
                     'en' => $data['description'],
                     'pt' => $data['ptDescription'],
-                    'es' => $data['esDescription']
+                    'es' => $data['esDescription'],
+                    'category' => Translation::CATEGORY_JOB_MODALITY
                 ]);
             }
         }

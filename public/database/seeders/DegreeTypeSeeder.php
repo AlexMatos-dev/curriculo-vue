@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\DegreeType;
 use App\Models\Translation;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DegreeTypeSeeder extends Seeder
@@ -32,7 +31,8 @@ class DegreeTypeSeeder extends Seeder
             Translation::create([
                 'en' => $degreeType['en'],
                 'pt' => $degreeType['pt'],
-                'es' => $degreeType['es']
+                'es' => $degreeType['es'],
+                'category' => Translation::CATEGORY_DEGREE_TYPE
             ]);
         }
     }

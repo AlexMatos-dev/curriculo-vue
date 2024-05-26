@@ -11,7 +11,9 @@ class CreateJobsAppliedsTable extends Migration {
 			$table->bigIncrements('applied_id', true);
 			$table->bigInteger('job_id')->unsigned();
 			$table->bigInteger('professional_id')->unsigned();
+			$table->string('status', 10);
 			$table->timestamps();
+			$table->softDeletes();
 		});
 	}
 

@@ -27,15 +27,15 @@ class MyCurriculum extends Controller
         $person = auth('api')->user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
-            Validator::throwResponse('professional not found', 401);
+            Validator::throwResponse('professional not found', 403);
         Session()->put('professional', $professional);
         if(($this->request->route()->getPrefix() != 'api/curriculum' || ($this->isException()) && !request($this->curriculumId)))
             return $next($request);
         $curriculum = Curriculum::where('curriculum_id', request($this->curriculumId))->where('cprofes_id', $professional->professional_id)->first();
         if(!$curriculum)
-            Validator::throwResponse('curriculum not found', 400);
+            Validator::throwResponse('curriculum not found', 403);
         if(!$this->checkCurriculumType($curriculum))
-            Validator::throwResponse('curriculum type is invalid for this request', 400);
+            Validator::throwResponse('curriculum type is invalid for this request', 403);
         Session()->put('curriculum', $curriculum);
         return $next($request);
     }

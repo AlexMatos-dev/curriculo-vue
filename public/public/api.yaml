@@ -77,6 +77,8 @@ tags:
     description: Link routes and methods
   - name: commom_currency
     description: Link routes and methods
+  - name: job_applied
+    description: Link routes and methods
 paths:
   /api/login:
     post:
@@ -786,6 +788,49 @@ paths:
               example: {"message":"action performed", "data": "Array|Null"}
         '400':
           description: Save error or professional not found
+          content:
+            application/json:
+              examples:
+                invalid action:
+                  value:
+                    message: invalid action
+                  summary: The action is invalid
+                professional not found:
+                  value:
+                    message: No professional was found
+                  summary: The professional was not created
+        '500':
+          description: The action was not completed
+          content:
+            application/json:
+              example: {"message": "action not completed with success"}
+  /api/professional/updateprofessionalprofession:
+    post:
+      tags:
+        - professional
+      summary: Manages porfessions of professional, this method can ADD a new profession, REMOVE a current profession or LIST all profession of professional
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+            example: add (ADD or REMOVE or LIST)
+            description: Either ADD, REMOVE or LIST
+        - name: lprofession_id
+          in: query
+          description: The listprofessions
+          example: 1
+          schema:
+            type: string
+            description: only required when 'action' = 'add' AND 'revove'
+      responses:
+        '200':
+          description: Professional data updated
+          content:
+            application/json:
+              example: {"message":"action performed", "data": "Array|Null"}
+        '400':
+          description: required parameters missing or professional not found
           content:
             application/json:
               examples:
@@ -3743,6 +3788,112 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/common_currency'
+            
+  /api/job_applied/jobapplication:
+    get:
+      tags:
+        - job applied
+      description: gets professional job applications
+      parameters:
+      - name: job_id
+        in: query
+        description: The joblist id
+        example: 1
+        schema:
+          type: integer
+      - name: company_id
+        in: query
+        description: The company id
+        example: 1
+        schema:
+          type: integer
+      - name: status
+        in: query
+        description: Status to search
+        example: applied
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list/Array of job applied objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_applied'              
+  /api/job_applied/index:
+    get:
+      tags:
+        - job applied
+      description: gets company job applications
+      parameters:
+      - name: job_id
+        in: query
+        description: The joblist id
+        example: 1
+        schema:
+          type: integer
+      - name: status
+        in: query
+        description: Status to search
+        example: applied
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list/Array of job applied objects
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_applied'
+  /api/job_applied/changejobappliedstatus:
+    post:
+      tags:
+        - job applied
+      description: Changes the job applied status | only accesible by persons with a profile of recruiter or company and which owns the job professional applied
+      parameters:
+      - name: job_applied_id
+        in: query
+        description: The jobApplied id
+        example: 1
+        schema:
+          type: integer
+        required: true
+      - name: status
+        in: query
+        description: Status to search
+        example: applied
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Current JobApplied object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_applied'
+        '400':
+          description: No job applied found or invalid status
+          content:
+            application/json:
+              example: {"message": "invalid status"}
+        '500':
+          description: Job applied status not changed
+          content:
+            application/json:
+              example: {"message": "status not changed"}
+  /api/job_applied/status:
+    get:
+      tags:
+        - job applied
+      description: List all possible JobApplied status
+      responses:
+        '200':
+          description: Array of JobApplied status
+          content:
+            application/json:
+              example: [{"applied":"applied", "validating": "validating","refused": "refused","accepted": "accepted"}]
+                
 components:
   schemas:
     Login:
@@ -4834,6 +4985,70 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    job_applied:
+      type: object
+      properties:
+        applied_id:
+          type: integer
+          example: 1
+        job_id:
+          type: integer
+          example: 1
+        professional_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          example: validating
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        company_id:
+          type: integer
+          example: 1
+        job_modality_id:
+          type: integer
+          example: 1
+        job_city:
+          type: integer
+          example: 1
+        job_country:
+          type: integer
+          example: 1
+        job_seniority:
+          type: integer
+          example: 1
+        job_salary:
+          type: number
+          example: 15783.00
+        job_description:
+          type: string
+          example: textile bleaching operator
+        job_experience_description:
+          type: string
+          example: Ut ipsa quia aliquid
+        experience_in_months:
+          type: integer
+          example: 1
+        job_benefits:
+          type: string
+          example: Sit rem reiciendis cupiditate explicabo quidem consequatur enim
+        company_slug:
+          type: string
+          example: job-info-inc-5151
+        company_register_number:
+          type: string
+          example: 42.827.028/0001-47
+        company_name:
+          type: string
+          example: job info inc
+        company_type:
+          type: integer
+          example: 1
+          
   securitySchemes:
     bearerAuth:
       type: http
