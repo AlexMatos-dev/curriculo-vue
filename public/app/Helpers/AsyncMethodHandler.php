@@ -24,16 +24,15 @@ class AsyncMethodHandler{
             break;
         }
         if($method){
-            $a = self::httpPost([
+            self::httpPost([
                 'url' => url(self::MAIN_METHOD_URL),
                 'arrayValues' => [
                     'personId' => $personId,
                     'data' => $data,
                     'method' => $method,
-                    'asyncRequest' => false
+                    'asyncRequest' => true
                 ]
             ]);
-            dd($a);
         }
     }
 

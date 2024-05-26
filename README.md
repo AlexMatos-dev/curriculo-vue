@@ -45,3 +45,4 @@ Para ter acesso ao swagger da aplicação, execute os comandos a seguir em sequ�
 O sistema conta com alguns Seeders que geram dados falsos e aleatórios. Abaixo estão alguns deles:
 * Dados de vagas: ``php artisan db:seed --class=CreateFakeJobData``
 * Dados de profissionais: ``php artisan db:seed --class=CreateFakeProfessionals``
+* Aplicações de vagas para o profissional: ``php artisan db:seed --class=CreateJobApplications``

@@ -55,19 +55,19 @@ class JobAppliedController extends Controller
         $jobAppliedObj = $jobApplied->getJobAppliedByCompanyId($this->getObjectFromSession()->company_id);
         if(!$jobAppliedObj)
             Validator::throwResponse('job applied not found', 400);
-        // if($jobAppliedObj->status == request('status'))
-        //     Validator::throwResponse('invalid status', 400);
+        if($jobAppliedObj->status == request('status'))
+            Validator::throwResponse('invalid status', 400);
         $jobAppliedObj->status = request('status');
         if(!$jobAppliedObj->save())
             Validator::throwResponse('status not changed', 500);
         $planObj = new Plan();
-        // if($this->getObjectFromSession()->paying && $planObj->canSendEmails($this->getObjectFromSession(), $this->getObjectType())){
+        if($this->getObjectFromSession()->paying && $planObj->canSendEmails($this->getObjectFromSession(), $this->getObjectType())){
             \App\Helpers\AsyncMethodHandler::sendEmailNotification(\App\Helpers\AsyncMethodHandler::NOTIFY_JOB_APPLIED_STATUS_CHANGE, [
                 'status' => request('status'),
                 'professional_id' => $jobAppliedObj->professional_id,
                 'applied_id' => $jobAppliedObj->applied_id
             ]);
-        // }
+        }
         return response()->json(['data' => $jobAppliedObj], 200);
     }
 
