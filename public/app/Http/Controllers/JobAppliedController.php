@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\JobApplied;
+use App\Models\JobList;
 use App\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
@@ -54,7 +55,7 @@ class JobAppliedController extends Controller
             'job_applied_id' => 'required',
             'status' => 'required|in:' . implode(',', $jobApplied->getStatus())
         ]);
-        $jobAppliedObj = $jobApplied->getJobAppliedByCompanyId($this->getObjectFromSession()->company_id);
+        $jobAppliedObj = $jobApplied->getJobAppliedByCompanyId($this->getObjectFromSession()->company_id, request('job_applied_id'));
         if (!$jobAppliedObj)
             Validator::throwResponse('job applied not found', 400);
         if ($jobAppliedObj->status == request('status'))
@@ -86,15 +87,13 @@ class JobAppliedController extends Controller
 
     /**
      * Handle job application
-     *
-     * @param \Illuminate\Http\Request  $request
+     * @param Int job_id - required
      * @return \Illuminate\Http\JsonResponse
      */
     public function applyForVacancy(Request $request)
     {
         $validator = FacadesValidator::make($request->all(), [
-            'job_id' => 'required|exists:jobslist,job_id',
-            'professional_id' => 'required|exists:professionals,professional_id',
+            'job_id' => 'required'
         ]);
 
         if ($validator->fails())
@@ -105,20 +104,22 @@ class JobAppliedController extends Controller
                 'errors' => $validator->errors()
             ], 400);
         }
-
+        Validator::checkExistanceOnTable([
+            'job_id' => ['object' => JobList::class, 'data' => request('job_id')]
+        ]);
+        if(JobApplied::where('professional_id', $this->getProfessionalBySession()->professional_id)->where('job_id', request('job_id'))->first())
+            Validator::throwResponse('professional already applied for this job', 400);
         try
         {
             $jobApplied = JobApplied::create([
                 'job_id' => $request->job_id,
-                'professional_id' => $request->professional_id,
+                'professional_id' => $this->getProfessionalBySession()->professional_id,
                 'status' => JobApplied::STATUS_APPLIED,
             ]);
 
             return response()->json([
-                'success' => true,
-                'message' => 'Job application successfully created',
                 'data' => $jobApplied,
-            ], 201);
+            ]);
         }
         catch (\Exception $e)
         {
@@ -128,5 +129,24 @@ class JobAppliedController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Removes a job applied
+     * @param Int job_id - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelJobApplied()
+    {
+        Validator::validateParameters($this->request, [
+            'job_id' => 'required'
+        ]);
+        $jobApplied = new JobApplied();
+        $jobAppliedObj = $jobApplied->getJobAppliedByJobId(request('job_id'));
+        if(!$jobAppliedObj || !$jobAppliedObj->isFromPorfessional($this->getProfessionalBySession()->professional_id))
+            Validator::throwResponse('no job applied found', 400);
+        if(!$jobApplied->delete())
+            Validator::throwResponse('an error occured, job applied not removed', 500);
+        Validator::throwResponse('job applied removed', 200);
     }
 }

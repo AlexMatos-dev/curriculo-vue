@@ -3789,31 +3789,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/common_currency'
             
-  /api/job_applied/applyForVacancy:
-    post:
-      tags:
-        - job applied
-      description: Apply for vacancy
-      parameters:
-      - name: job_id
-        in: query
-        description: The joblist id
-        example: 1
-        schema:
-          type: integer
-      - name: professional_id
-        in: query
-        description: The professional id
-        example: 1
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: A list/Array of professionals applied
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/job_applied'  
   /api/job_applied/jobapplication:
     get:
       tags:
@@ -3896,7 +3871,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/job_applied'
+                $ref: '#/components/schemas/job_applied_response'
         '400':
           description: No job applied found or invalid status
           content:
@@ -3918,6 +3893,57 @@ paths:
           content:
             application/json:
               example: [{"applied":"applied", "validating": "validating","refused": "refused","accepted": "accepted"}]
+  /api/job_applied/applyforvacancy:
+    post:
+      tags:
+        - job applied
+      description: Apply for a job
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: JobApplied object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_applied_response'
+        '400':
+          description: JobApplied not found
+          content:
+            application/json:
+              example: {"message":"professional already applied for this job | job not found"}
+        '500':
+          description: JobApplied creation not possible
+          content:
+            application/json:
+              example: {"message":"Failed to create job application"}
+  /api/job_applied/canceljobapplied:
+    post:
+      tags:
+        - job applied
+      description: Remove applied from a job
+      responses:
+        '200':
+          description: Array of JobApplied status
+          content:
+            application/json:
+              example: {"message":"job applied removed"}
+        '400':
+          description: JobApplied not found
+          content:
+            application/json:
+              example: {"message":"no job applied found"}
+        '500':
+          description: JobApplied removal not possible
+          content:
+            application/json:
+              example: {"message":"an error occured, job applied not removed"}
                 
 components:
   schemas:
@@ -5073,6 +5099,15 @@ components:
         company_type:
           type: integer
           example: 1
+    job_applied_response:
+      type: object
+      properties:
+        data:
+          type: array
+          description: Job applied array
+          items:
+            $ref: '#/components/schemas/job_applied'
+          
           
   securitySchemes:
     bearerAuth:

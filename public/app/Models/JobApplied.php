@@ -52,11 +52,15 @@ class JobApplied extends Model
     /**
      * Fetches job applied by company id | Only first result
      * @param Int companyId
+     * @param Int jobAppliedId
      * @return JobApplied|Null
      */
-    public function getJobAppliedByCompanyId($companyId = null)
+    public function getJobAppliedByCompanyId($companyId = null, $jobAppliedId = null)
     {
-        return $this->listJobApplied(['company_id' => $companyId], true);
+        $param = ['company_id' => $companyId];
+        if($jobAppliedId)
+            $param['jobAppliedId'] = $jobAppliedId;
+        return $this->listJobApplied($param, true);
     }
 
     /**
@@ -67,6 +71,26 @@ class JobApplied extends Model
     public function getJobAppliedByApplianedId($jobAppliedId = null)
     {
         return $this->listJobApplied(['jobAppliedId' => $jobAppliedId], true);
+    }
+
+    /**
+     * Fetches job applied by job id | Only first result
+     * @param Int jobId
+     * @return JobApplied|Null
+     */
+    public function getJobAppliedByJobId($jobId = null)
+    {
+        return $this->listJobApplied(['job_id' => $jobId], true);
+    }
+
+    /**
+     * Checks if job applied is from sent professional id
+     * @param Int professional_id
+     * @return Bool
+     */
+    public function isFromPorfessional($professional_id = null)
+    {
+        return $this->professional_id == $professional_id ? true : false;
     }
 
     /**

@@ -137,6 +137,7 @@ Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
 
     Route::middleware('professional')->group(function ()
     {
-        Route::post('applyForVacancy', [JobAppliedController::class, 'applyForVacancy']);
+        Route::post('applyforvacancy', [JobAppliedController::class, 'applyForVacancy']);
+        Route::post('canceljobapplied', [JobAppliedController::class, 'cancelJobApplied']);
     });
 });
