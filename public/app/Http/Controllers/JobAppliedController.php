@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\Validator;
 use App\Models\JobApplied;
 use App\Models\Plan;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator as FacadesValidator;
 
 class JobAppliedController extends Controller
 {
@@ -50,18 +52,19 @@ class JobAppliedController extends Controller
         $jobApplied = new JobApplied();
         Validator::validateParameters($this->request, [
             'job_applied_id' => 'required',
-            'status' => 'required|in:'.implode(',', $jobApplied->getStatus())
+            'status' => 'required|in:' . implode(',', $jobApplied->getStatus())
         ]);
         $jobAppliedObj = $jobApplied->getJobAppliedByCompanyId($this->getObjectFromSession()->company_id);
-        if(!$jobAppliedObj)
+        if (!$jobAppliedObj)
             Validator::throwResponse('job applied not found', 400);
-        if($jobAppliedObj->status == request('status'))
+        if ($jobAppliedObj->status == request('status'))
             Validator::throwResponse('invalid status', 400);
         $jobAppliedObj->status = request('status');
-        if(!$jobAppliedObj->save())
+        if (!$jobAppliedObj->save())
             Validator::throwResponse('status not changed', 500);
         $planObj = new Plan();
-        if($this->getObjectFromSession()->paying && $planObj->canSendEmails($this->getObjectFromSession(), $this->getObjectType())){
+        if ($this->getObjectFromSession()->paying && $planObj->canSendEmails($this->getObjectFromSession(), $this->getObjectType()))
+        {
             \App\Helpers\AsyncMethodHandler::sendEmailNotification(\App\Helpers\AsyncMethodHandler::NOTIFY_JOB_APPLIED_STATUS_CHANGE, [
                 'status' => request('status'),
                 'professional_id' => $jobAppliedObj->professional_id,
@@ -79,5 +82,51 @@ class JobAppliedController extends Controller
     {
         $jobApplied = new JobApplied();
         return response()->json($jobApplied->getStatus());
+    }
+
+    /**
+     * Handle job application
+     *
+     * @param \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function applyForVacancy(Request $request)
+    {
+        $validator = FacadesValidator::make($request->all(), [
+            'job_id' => 'required|exists:jobslist,job_id',
+            'professional_id' => 'required|exists:professionals,professional_id',
+        ]);
+
+        if ($validator->fails())
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validator fields error',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        try
+        {
+            $jobApplied = JobApplied::create([
+                'job_id' => $request->job_id,
+                'professional_id' => $request->professional_id,
+                'status' => JobApplied::STATUS_VALIDATION,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Job application successfully created',
+                'data' => $jobApplied,
+            ], 201);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create job application',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
