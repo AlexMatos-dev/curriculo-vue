@@ -111,7 +111,7 @@ class JobAppliedController extends Controller
             $jobApplied = JobApplied::create([
                 'job_id' => $request->job_id,
                 'professional_id' => $request->professional_id,
-                'status' => JobApplied::STATUS_VALIDATION,
+                'status' => JobApplied::STATUS_APPLIED,
             ]);
 
             return response()->json([
