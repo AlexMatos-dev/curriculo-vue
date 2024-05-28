@@ -9,6 +9,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\CompanyTypeController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
@@ -140,4 +141,9 @@ Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
         Route::post('applyforvacancy', [JobAppliedController::class, 'applyForVacancy']);
         Route::post('canceljobapplied', [JobAppliedController::class, 'cancelJobApplied']);
     });
+});
+
+Route::prefix('company_types')->group(function ()
+{
+    Route::get('getCompanyTypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });

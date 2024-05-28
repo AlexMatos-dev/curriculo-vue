@@ -3944,7 +3944,18 @@ paths:
           content:
             application/json:
               example: {"message":"an error occured, job applied not removed"}
-                
+  /api/company_types/getCompanyTypes:
+    get:
+      tags:
+        - company types
+      description: get all the type visas
+      responses:
+        '200':
+          description: A list of type visas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company_types'
 components:
   schemas:
     Login:
@@ -5107,7 +5118,30 @@ components:
           description: Job applied array
           items:
             $ref: '#/components/schemas/job_applied'
-          
+    company_types:
+      type: object
+      properties:
+        company_type_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: accounting
+        pt:
+          type: string
+          example: contabilidade
+        es:
+          type: string
+          example: contabilidad
+        unofficial_translations:
+          type: string
+          example: Null|JsonArray of dynamic 'languageISO' => 'translation'
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
           
   securitySchemes:
     bearerAuth:
