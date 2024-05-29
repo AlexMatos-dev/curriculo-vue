@@ -3944,7 +3944,7 @@ paths:
           content:
             application/json:
               example: {"message":"an error occured, job applied not removed"}
-  /api/company_types/getCompanyTypes:
+  /api/company_types/getcompanytypes:
     get:
       tags:
         - company types
