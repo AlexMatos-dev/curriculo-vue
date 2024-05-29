@@ -145,5 +145,5 @@ Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
 
 Route::prefix('company_types')->group(function ()
 {
-    Route::get('getCompanyTypes', [CompanyTypeController::class, 'getCompanyTypes']);
+    Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });
