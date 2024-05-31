@@ -3948,7 +3948,20 @@ paths:
     get:
       tags:
         - company types
-      description: get all the type visas
+      description: Get the company types
+      parameters:
+      - name: name
+        in: query
+        description: The name to search
+        example: contador
+        schema:
+          type: string
+      - name: languageISO
+        in: query
+        description: One of the official translations (EN, PT or ES) - Default is EN
+        example: en
+        schema:
+          type: string
       responses:
         '200':
           description: A list of type visas
