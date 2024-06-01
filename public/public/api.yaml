@@ -228,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PersonObject'
+                $ref: '#/components/schemas/Profiles'
         '401':
           description: Authentication error
           content:
@@ -5400,7 +5400,21 @@ components:
           description: Job applied array
           items:
             $ref: '#/components/schemas/job_applied'
-          
+    Profiles:
+      type: object
+      properties:
+        person:
+          type: Object
+          $ref: '#/components/schemas/PersonObject'
+        professional:
+          type: Object
+          $ref: '#/components/schemas/Professional'
+        company:
+          type: Object
+          $ref: '#/components/schemas/CompanyObject'
+        recruiter:
+          type: Object
+          $ref: '#/components/schemas/RecruiterObject'
           
   securitySchemes:
     bearerAuth:

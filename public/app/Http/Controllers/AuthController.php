@@ -7,6 +7,7 @@ use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Helpers\Validator;
+use App\Models\Profile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
@@ -42,8 +43,9 @@ class AuthController extends Controller
         $person->last_login = Carbon::now();
         $person->save();
         return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'profiles' => Profile::wehre('person_id', $person->person_id)->get()
         ]);
     }
 
@@ -89,7 +91,17 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        return response()->json(auth('api')->user());
+        $personObj = auth('api')->user();
+        $professional = $personObj->getProfile(Profile::PROFESSIONAL);
+        if($professional)
+            $professional = $professional->gatherInformation();
+        $profiles = [
+            'person' => $personObj,
+            'professional' => $professional,
+            'company' => $personObj->getProfile(Profile::COMPANY),
+            'recruiter' => $personObj->getProfile(Profile::RECRUITER),
+        ];
+        return response()->json($profiles);
     }
 
     /**
