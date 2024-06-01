@@ -342,7 +342,7 @@ class Professional extends Model
         return $query->get();
     }
 
-    public function splitJoinDataFromListedProfessions($professionalArray = [], $request)
+    public function splitJoinDataFromListedProfessions($professionalArray = [], $request = false)
     {
         $ids = [];
         foreach($professionalArray as $professional){
@@ -390,7 +390,7 @@ class Professional extends Model
                 foreach($filteredProfessionalData[$professional->professional_id] as $professionalData){
                     
                     $id = $professionalData->{$objectsAttrsArray[$type]['id']};
-                    if(in_array($id, $usedIds[$type]))
+                    if(in_array($id, $usedIds[$type]) || !$id)
                         continue;
                     $usedIds[$type][] = $id;
                     $objectInstaceAsArray[$objectsAttrsArray[$type]['id']] = $id;
@@ -401,7 +401,8 @@ class Professional extends Model
                 }
                 $professional->{$type} = $gathered[$type];
             }
-            $professional->match = $this->generateCompatilityMatchOfProfessional($professional, $request);
+            if($request)
+                $professional->match = $this->generateCompatilityMatchOfProfessional($professional, $request);
             $results[] = $professional;
         }
         return $results;
@@ -575,5 +576,15 @@ class Professional extends Model
         $matchValue = number_format((float)$match, 2, '.', '');
         $matchValue = $matchValue > 100 ? 100 : $matchValue;
         return $matchValue < 0 ? 0 : $matchValue;
+    }
+
+    /**
+     * Gather $this professional skills, visas and languages
+     * @return Professional
+     */
+    public function gatherInformation()
+    {
+        $result = $this->splitJoinDataFromListedProfessions([$this]);
+        return !empty($result) ? $result[0] : $this;
     }
 }

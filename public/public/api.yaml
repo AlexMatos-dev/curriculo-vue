@@ -76,9 +76,11 @@ tags:
   - name: link - curriculum
     description: Link routes and methods
   - name: commom_currency
-    description: Link routes and methods
+    description: Common currency routes and methods
   - name: job_applied
-    description: Link routes and methods
+    description: Job applied routes and methods
+  - name: chat_message
+    description: Chat message routes and methods
 paths:
   /api/login:
     post:
@@ -226,7 +228,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PersonObject'
+                $ref: '#/components/schemas/Profiles'
         '401':
           description: Authentication error
           content:
@@ -3871,7 +3873,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/job_applied'
+                $ref: '#/components/schemas/job_applied_response'
         '400':
           description: No job applied found or invalid status
           content:
@@ -3893,7 +3895,337 @@ paths:
           content:
             application/json:
               example: [{"applied":"applied", "validating": "validating","refused": "refused","accepted": "accepted"}]
+  /api/job_applied/applyforvacancy:
+    post:
+      tags:
+        - job applied
+      description: Apply for a job
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: JobApplied object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/job_applied_response'
+        '400':
+          description: JobApplied not found
+          content:
+            application/json:
+              example: {"message":"professional already applied for this job | job not found"}
+        '500':
+          description: JobApplied creation not possible
+          content:
+            application/json:
+              example: {"message":"Failed to create job application"}
+  /api/job_applied/canceljobapplied:
+    post:
+      tags:
+        - job applied
+      description: Remove applied from a job
+      responses:
+        '200':
+          description: Array of JobApplied status
+          content:
+            application/json:
+              example: {"message":"job applied removed"}
+        '400':
+          description: JobApplied not found
+          content:
+            application/json:
+              example: {"message":"no job applied found"}
+        '500':
+          description: JobApplied removal not possible
+          content:
+            application/json:
+              example: {"message":"an error occured, job applied not removed"}
+              
+  /api/chat_message/professional/list:
+    get:
+      tags:
+        - chat message
+      description: List all messages related to my professional profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of Chat messages paginated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+  /api/chat_message/company/list:
+    get:
+      tags:
+        - chat message
+      description: List all messages related to my company profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of Chat messages paginated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
+  /api/chat_message/recruiter/list:
+    get:
+      tags:
+        - chat message
+      description: List all messages related to my recruiter profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Array of Chat messages paginated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResults'
                 
+  /api/chat_message/professional/sendmessage:
+    post:
+      tags:
+        - chat message
+      description: Sends a message as my professional profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+        - name: attachment
+          in: query
+          description: Base 64 of an image
+          example: base64Image
+          schema:
+            type: string
+        - name: receiverId
+          in: query
+          description: Receiver object id (either the id of a professional, company, recruiter or person)
+          example: 1
+          schema:
+            type: integer
+        - name: receiverType
+          in: query
+          description: Receiver object type name (either professional, company, recruiter or person)
+          example: professional
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat message object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chat_message'
+  /api/chat_message/company/sendmessage:
+    post:
+      tags:
+        - chat message
+      description: Sends a message as my company profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+        - name: attachment
+          in: query
+          description: Base 64 of an image
+          example: base64Image
+          schema:
+            type: string
+        - name: receiverId
+          in: query
+          description: Receiver object id (either the id of a professional, company, recruiter or person)
+          example: 1
+          schema:
+            type: integer
+        - name: receiverType
+          in: query
+          description: Receiver object type name (either professional, company, recruiter or person)
+          example: professional
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat message object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chat_message'
+  /api/chat_message/recruiter/sendmessage:
+    post:
+      tags:
+        - chat message
+      description: Sends a message as my recruiter profile
+      parameters:
+        - name: job_id
+          in: query
+          description: job id
+          example: 1
+          schema:
+            type: integer
+        - name: attachment
+          in: query
+          description: Base 64 of an image
+          example: base64Image
+          schema:
+            type: string
+        - name: receiverId
+          in: query
+          description: Receiver object id (either the id of a professional, company, recruiter or person)
+          example: 1
+          schema:
+            type: integer
+        - name: receiverType
+          in: query
+          description: Receiver object type name (either professional, company, recruiter or person)
+          example: professional
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chat message object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chat_message'
+  /api/chat_message/professional/remove:
+    delete:
+      tags:
+        - chat message
+      description: Removes a message sent by my professional profile
+      parameters:
+        - name: chat_message_id
+          in: query
+          description: Chat message id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "chat message removed"}
+        '400':
+          description: Invalid chat message id
+          content:
+            application/json:
+              example: {"message": "not owner of message"}
+        '500':
+          description: Removal error
+          content:
+            application/json:
+              example: {"message": "chat message not removed"}
+  /api/chat_message/company/remove:
+    delete:
+      tags:
+        - chat message
+      description: Removes a message sent by my company profile
+      parameters:
+        - name: chat_message_id
+          in: query
+          description: Chat message id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "chat message removed"}
+        '400':
+          description: Invalid chat message id
+          content:
+            application/json:
+              example: {"message": "not owner of message"}
+        '500':
+          description: Removal error
+          content:
+            application/json:
+              example: {"message": "chat message not removed"}
+  /api/chat_message/recruiter/remove:
+    delete:
+      tags:
+        - chat message
+      description: Removes a message sent by my recruiter profile
+      parameters:
+        - name: chat_message_id
+          in: query
+          description: Chat message id
+          example: 1
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Response message
+          content:
+            application/json:
+              example: {"message": "chat message removed"}
+        '400':
+          description: Invalid chat message id
+          content:
+            application/json:
+              example: {"message": "not owner of message"}
+        '500':
+          description: Removal error
+          content:
+            application/json:
+              example: {"message": "chat message not removed"}
+  
+  /api/company_types/getcompanytypes:
+    get:
+      tags:
+        - company types
+      description: Get the company types
+      parameters:
+      - name: name
+        in: query
+        description: The name to search
+        example: contador
+        schema:
+          type: string
+      - name: languageISO
+        in: query
+        description: One of the official translations (EN, PT or ES) - Default is EN
+        example: en
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of type visas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/company_types'
 components:
   schemas:
     Login:
@@ -4985,6 +5317,42 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    chat_message:
+      type: object
+      properties:
+        chat_message_id:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: About the job...
+        sender_message_id:
+          type: string
+          example: 1
+        sender_message_table_name:
+          type: string
+          example: professional
+        receiver_message_id:
+          type: integer
+          example: 1
+        receiver_message_table_name:
+          type: string
+          example: company
+        category:
+          type: string
+          example: message
+        job_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        chat_attachment_id:
+          type: integer
+          example: 1
     job_applied:
       type: object
       properties:
@@ -5048,6 +5416,53 @@ components:
         company_type:
           type: integer
           example: 1
+    job_applied_response:
+      type: object
+      properties:
+        data:
+          type: array
+          description: Job applied array
+          items:
+            $ref: '#/components/schemas/job_applied'
+    Profiles:
+      type: object
+      properties:
+        person:
+          type: Object
+          $ref: '#/components/schemas/PersonObject'
+        professional:
+          type: Object
+          $ref: '#/components/schemas/Professional'
+        company:
+          type: Object
+          $ref: '#/components/schemas/CompanyObject'
+        recruiter:
+          type: Object
+          $ref: '#/components/schemas/RecruiterObject'
+    company_types:
+      type: object
+      properties:
+        company_type_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: accounting
+        pt:
+          type: string
+          example: contabilidade
+        es:
+          type: string
+          example: contabilidad
+        unofficial_translations:
+          type: string
+          example: Null|JsonArray of dynamic 'languageISO' => 'translation'
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
           
   securitySchemes:
     bearerAuth:

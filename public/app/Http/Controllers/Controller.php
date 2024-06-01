@@ -64,4 +64,14 @@ class Controller
     {
         return Session()->get('objectType');
     }
+
+    public function getChatMessageObjects()
+    {
+        return [
+            'sender' => Session()->get('chatSender'),
+            'senderType' => Session()->get('chatSenderType'),
+            'receiver' => Session()->get('chatReceiver'),
+            'receiverType' => Session()->get('chatReceiverType')
+        ];
+    }
 }

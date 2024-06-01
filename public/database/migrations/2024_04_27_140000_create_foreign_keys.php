@@ -388,6 +388,16 @@ class CreateForeignKeys extends Migration {
 						->onDelete('restrict')
 						->onUpdate('restrict');
 		});
+		Schema::table('chat_messages', function(Blueprint $table) {
+			$table->foreign('chat_attachment_id')->references('chat_attachment_id')->on('chat_attachments')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
+		Schema::table('chat_messages', function(Blueprint $table) {
+			$table->foreign('job_id')->references('job_id')->on('jobslist')
+						->onDelete('restrict')
+						->onUpdate('restrict');
+		});
 	}
 
 	public function down()
@@ -619,6 +629,12 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('professionals_job_modalities', function(Blueprint $table) {
 			$table->dropForeign('professionals_job_modalities_job_modality_id_foreign');
+		});
+		Schema::table('chat_messages', function(Blueprint $table) {
+			$table->dropForeign('chat_messages_chat_attachment_id_foreign');
+		});
+		Schema::table('chat_messages', function(Blueprint $table) {
+			$table->dropForeign('chat_messages_job_id_foreign');
 		});
 	}
 }
