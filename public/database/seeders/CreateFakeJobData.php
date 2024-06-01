@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CommonCurrency;
 use App\Models\Company;
+use App\Models\CompanyAdmin;
 use App\Models\CompanyType;
 use App\Models\JobList;
 use App\Models\JobModality;
@@ -13,7 +14,9 @@ use App\Models\ListCountry;
 use App\Models\ListLangue;
 use App\Models\ListProfession;
 use App\Models\ListState;
+use App\Models\Person;
 use App\Models\Proficiency;
+use App\Models\Profile;
 use App\Models\Tag;
 use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
@@ -98,6 +101,7 @@ class CreateFakeJobData extends Seeder
         for($i = 0; $i < 5; $i++){
             if($created > 5)
                 break;
+            $person = Person::inRandomOrder()->first();
             $companyName = $faker->company();
             $companyObj = Company::where('company_name', $companyName)->first();
             if($companyObj)
@@ -119,6 +123,11 @@ class CreateFakeJobData extends Seeder
                     'company_number_employees' => $faker->randomNumber(2),
                     'company_benefits' => $faker->text(2000),
                     'paying' => $i < 2 ? true : false
+                ]);
+                CompanyAdmin::create([
+                    'company_id' => $company->company_id,
+                    'person_id' => $person->person_id,
+                    'has_privilegies' => true
                 ]);
             } catch (\Throwable $th) {
                 

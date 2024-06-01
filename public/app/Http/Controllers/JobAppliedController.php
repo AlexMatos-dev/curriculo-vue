@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
+use App\Models\ChatMessage;
+use App\Models\Company;
 use App\Models\JobApplied;
 use App\Models\JobList;
 use App\Models\Plan;
+use App\Models\Professional;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 
@@ -72,6 +75,9 @@ class JobAppliedController extends Controller
                 'applied_id' => $jobAppliedObj->applied_id
             ]);
         }
+        $professional = Professional::find($jobAppliedObj->professional_id);
+        if($professional)
+            (new ChatMessage())->makeNotification($professional, ChatMessage::TYPE_JOB_STATUS_CHANGED, request('status'), null, $jobAppliedObj->job_id);
         return response()->json(['data' => $jobAppliedObj], 200);
     }
 
@@ -116,6 +122,12 @@ class JobAppliedController extends Controller
                 'professional_id' => $this->getProfessionalBySession()->professional_id,
                 'status' => JobApplied::STATUS_APPLIED,
             ]);
+
+            $company = Company::leftJoin('jobslist', function($join){
+                $join->on('jobslist.company_id', 'companies.company_id');
+            })->where('jobslist.job_id', $request->job_id)->first();
+            if($company && $company->checkPrivacy(ChatMessage::CATEGORY_NOTIFICATION))
+                (new ChatMessage())->makeNotification($company, ChatMessage::TYPE_JOB_APPLIED, '', null, $request->job_id);
 
             return response()->json([
                 'data' => $jobApplied,

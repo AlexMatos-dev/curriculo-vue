@@ -64,9 +64,10 @@ class Validator
     /**
      * Performes a validation on sent image in binary and checks its format and size (max allowed = 2mb). 
      * @param Binary image
+     * @param Bool returnError - default = false
      * @return Bool|\Illuminate\Http\JsonResponse
      */
-    public static function validateImage($image = null)
+    public static function validateImage($image = null, $returnError = false)
     {
         if(!$image){
             self::throwResponse("invalid image", 400);

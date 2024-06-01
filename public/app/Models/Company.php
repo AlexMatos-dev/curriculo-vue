@@ -231,4 +231,17 @@ class Company extends Model
     {
         return Recruiter::where('company_id', $this->company_id)->get();
     }
+
+    /**
+     * Checkes if company can receive notifications
+     * @param Int chatMessageType - required
+     * @return Bool - True = privacy allows | False = Privacy don't allow
+     */
+    public function checkPrivacy(String $chatMessageType = '')
+    {
+        if(!in_array($chatMessageType, [\App\Models\ChatMessage::CATEGORY_MESSAGE, \App\Models\ChatMessage::CATEGORY_NOTIFICATION]))
+            return false;
+        // Not implemented
+        return true;
+    }
 }
