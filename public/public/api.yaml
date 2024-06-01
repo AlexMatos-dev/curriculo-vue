@@ -3774,7 +3774,7 @@ paths:
   /api/common_currency/index:
     get:
       tags:
-        - commom currency
+        - commom_currency
       description: get all the common currency
       parameters:
       - name: currency
@@ -3794,7 +3794,7 @@ paths:
   /api/job_applied/jobapplication:
     get:
       tags:
-        - job applied
+        - job_applied
       description: gets professional job applications
       parameters:
       - name: job_id
@@ -3825,7 +3825,7 @@ paths:
   /api/job_applied/index:
     get:
       tags:
-        - job applied
+        - job_applied
       description: gets company job applications
       parameters:
       - name: job_id
@@ -3850,7 +3850,7 @@ paths:
   /api/job_applied/changejobappliedstatus:
     post:
       tags:
-        - job applied
+        - job_applied
       description: Changes the job applied status | only accesible by persons with a profile of recruiter or company and which owns the job professional applied
       parameters:
       - name: job_applied_id
@@ -3887,7 +3887,7 @@ paths:
   /api/job_applied/status:
     get:
       tags:
-        - job applied
+        - job_applied
       description: List all possible JobApplied status
       responses:
         '200':
@@ -3928,7 +3928,7 @@ paths:
   /api/job_applied/canceljobapplied:
     post:
       tags:
-        - job applied
+        - job_applied
       description: Remove applied from a job
       responses:
         '200':
@@ -3969,7 +3969,7 @@ paths:
   /api/chat_message/company/list:
     get:
       tags:
-        - chat message
+        - chat_message
       description: List all messages related to my company profile
       parameters:
         - name: job_id
@@ -3988,7 +3988,7 @@ paths:
   /api/chat_message/recruiter/list:
     get:
       tags:
-        - chat message
+        - chat_message
       description: List all messages related to my recruiter profile
       parameters:
         - name: job_id
@@ -4008,7 +4008,7 @@ paths:
   /api/chat_message/professional/sendmessage:
     post:
       tags:
-        - chat message
+        - chat_message
       description: Sends a message as my professional profile
       parameters:
         - name: job_id
@@ -4045,7 +4045,7 @@ paths:
   /api/chat_message/company/sendmessage:
     post:
       tags:
-        - chat message
+        - chat_message
       description: Sends a message as my company profile
       parameters:
         - name: job_id
@@ -4119,7 +4119,7 @@ paths:
   /api/chat_message/professional/remove:
     delete:
       tags:
-        - chat message
+        - chat_message
       description: Removes a message sent by my professional profile
       parameters:
         - name: chat_message_id
@@ -4147,7 +4147,7 @@ paths:
   /api/chat_message/company/remove:
     delete:
       tags:
-        - chat message
+        - chat_message
       description: Removes a message sent by my company profile
       parameters:
         - name: chat_message_id
@@ -4175,7 +4175,7 @@ paths:
   /api/chat_message/recruiter/remove:
     delete:
       tags:
-        - chat message
+        - chat_message
       description: Removes a message sent by my recruiter profile
       parameters:
         - name: chat_message_id
@@ -4204,7 +4204,7 @@ paths:
   /api/company_types/getcompanytypes:
     get:
       tags:
-        - company types
+        - company_types
       description: Get the company types
       parameters:
       - name: name
