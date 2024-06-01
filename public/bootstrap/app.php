@@ -39,6 +39,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('async', [
             \App\Http\Middleware\AsynActions::class
         ]);
+        $middleware->group('chat', [
+            \App\Http\Middleware\ChatMessageHandler::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         

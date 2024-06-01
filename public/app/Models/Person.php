@@ -85,6 +85,7 @@ class Person extends Authenticatable
     /**
      * Gets the object of a Person profile target object.
      * @param String profileType (Company, Professional or Recruiter)
+     * @param Int personId
      * @return Object|Null
      */
     public function getProfile($profileType = '')
