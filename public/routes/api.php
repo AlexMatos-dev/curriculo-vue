@@ -10,6 +10,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
+use App\Http\Controllers\CompanyTypeController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\PersonController;
@@ -151,4 +152,9 @@ Route::prefix('chat_message')->middleware(['auth:sanctum'])->group(function ()
         Route::get('list', [ChatMessageController::class, 'listMessages']);
         Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
     });
+});
+
+Route::prefix('company_types')->group(function ()
+{
+    Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });
