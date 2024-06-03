@@ -13,7 +13,6 @@ use App\Models\Professional;
 use App\Models\ProfessionalProfession;
 use App\Models\Profile;
 use Carbon\Carbon;
-use Database\Seeders\CreateFakeProfessionals;
 
 class ProfessionalController extends Controller
 {
@@ -240,6 +239,7 @@ class ProfessionalController extends Controller
      * @param Array lareading_level
      * @param Array visa_type
      * @param Array vicountry_id
+     * @param Int professional_id
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
      *      "curent_page": int,
@@ -265,14 +265,15 @@ class ProfessionalController extends Controller
             'lawriting_level' => 'array',
             'lareading_level' => 'array',
             'visa_type' => 'array',
-            'vicountry_id' => 'array'
+            'vicountry_id' => 'array',
+            'professional_id' => 'integer'
         ]);
         $page = request('page', 1);
         $perPage = request('per_page') > 100 ? 100 : request('per_page', 100);
         $professional = new Professional();
-        $paying = $professional->listProfessionals($this->request, true);
+        $paying = $professional->listProfessionals($this->request, true, $perPage);
         $paying = $professional->splitJoinDataFromListedProfessions($paying, $this->request);
-        $nonPaying = $professional->listProfessionals($this->request, false);
+        $nonPaying = $professional->listProfessionals($this->request, false, $perPage);
         $nonPaying = $professional->splitJoinDataFromListedProfessions($nonPaying, $this->request);
         $total = count($paying) + count($nonPaying);
         $results = $professional->processListedProfessions([
@@ -302,5 +303,18 @@ class ProfessionalController extends Controller
             'per_page' => $perPage,
             'last_page' => $lastPage
         ]);
+    }
+
+    /**
+     * Gets professional data.
+     * @param String professional_slug - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function find($professional_slug)
+    {
+        $professional = Professional::where('professional_slug', $professional_slug)->first();
+        if(!$professional)
+            Validator::throwResponse('invalid professional slug');
+        return response()->json($professional->gatherInformation());
     }
 }

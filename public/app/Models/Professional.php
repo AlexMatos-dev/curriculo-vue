@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ModelUtils;
 use Illuminate\Database\Eloquent\Model;
 
 class Professional extends Model
@@ -196,7 +197,7 @@ class Professional extends Model
      *      'area_of_study' => Array, 'certification_name' => String, 'exjob_title' => String, 'dpgender' => Int,
      *      'dpcity_id' => Int, 'dpstate_id' => Int, 'dpcountry_id' => Int,
      *      'lalangue_id' => Array, 'laspeaking_level' => Int, 'lalistening_level' => Int, 'lawriting_level' => Int, 'lareading_level' => Int
-     *      'visa_type' => Array, 'vicountry_id' => Int
+     *      'visa_type' => Array, 'vicountry_id' => Int, 'professional_id' => Int
      * ]
      * @param Bool paying
      * @param Int limit
@@ -219,7 +220,9 @@ class Professional extends Model
         })->leftJoin('curriculums', function($join){
             $join->on('professionals.professional_id', '=', 'curriculums.cprofes_id');
         });
-
+        if($request->has('professional_id')){
+            $query->where('professionals.professional_id', $request->professional_id);
+        }
         $sizeOfParameters = 1;
         $orderBy = [];
         $skills_params = ['skproficiency_level'];
@@ -365,6 +368,13 @@ class Professional extends Model
         })->leftJoin('languages', function($join){
             $join->on('curriculums.curriculum_id', '=', 'languages.lacurriculum_id');
         })->get();
+
+        $tags = ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name');
+        $proficiencies = ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level');
+        $visaTypes = ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name');
+        $listLanguages = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name');
+        $listCountry = ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name');
+
         $filteredProfessionalData = [];
         foreach($allData as $professionalData){
             $filteredProfessionalData[$professionalData->professional_id][] = $professionalData;
@@ -374,6 +384,23 @@ class Professional extends Model
             'skills'    => Skill::class, 
             'visas'     => Visa::class, 
             'languages' => Language::class
+        ];
+        $instances = [
+            'skills' => ['object' => Skill::class, 'data' => [
+                'skproficiency_level' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'tag'],
+                'skill_name' => ['objects' => $tags, 'translated' => true, 'to' => 'language']
+            ]],
+            'visas' => ['object' => Visa::class, 'data' => [
+                'visa_type' => ['objects' => $visaTypes, 'translated' => true, 'to' => 'visa_type'],
+                'vicountry_id' => ['objects' => $listCountry, 'translated' => true, 'to' => 'country']
+            ]],
+            'languages' => ['object' => Language::class, 'data' => [
+                'lalangue_id' => ['objects' => $listLanguages, 'translated' => true, 'to' => 'language'],
+                'laspeaking_level' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'speaking_level'],
+                'lalistening_level' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'listening_level'],
+                'lawriting_level' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'writting_level'],
+                'lareading_level' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'reading_level']
+            ]]
         ];
         foreach($professionalArray as $professional){
             foreach($insert as $type => $object){
@@ -388,7 +415,6 @@ class Professional extends Model
                     'languages' => []
                 ];
                 foreach($filteredProfessionalData[$professional->professional_id] as $professionalData){
-                    
                     $id = $professionalData->{$objectsAttrsArray[$type]['id']};
                     if(in_array($id, $usedIds[$type]) || !$id)
                         continue;
@@ -397,7 +423,13 @@ class Professional extends Model
                     foreach($objectsAttrsArray[$type]['data'] as $attr){
                         $objectInstaceAsArray[$attr] = $professionalData->{$attr};
                     }
-                    $gathered[$type][] = new $object($objectInstaceAsArray);
+                    $objName = $instances[$type]['object'];
+                    $newInstaceOfObject = new $objName($objectInstaceAsArray);
+                    if(!$newInstaceOfObject->{$newInstaceOfObject->getKeyName()})
+                        $newInstaceOfObject->{$newInstaceOfObject->getKeyName()} = $professionalData->{$newInstaceOfObject->getKeyName()};
+                    $values = ModelUtils::getFillableData($newInstaceOfObject, true, $instances[$type]['data']);
+
+                    $gathered[$type][] = $values;
                 }
                 $professional->{$type} = $gathered[$type];
             }

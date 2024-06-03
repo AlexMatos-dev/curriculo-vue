@@ -134,13 +134,13 @@ paths:
             aplication/json:
               example:
                 message: invalid credentials
-  /api/auth/register:
+  /api/register:
     post:
       tags:
         - auth
       summary: Creates a new person account
       parameters:
-        - name: person_name
+        - name: person_username
           in: query
           description: Person name
           required: true
@@ -209,7 +209,7 @@ paths:
             application/json:
               example:
                 data: person not created
-  /api/auth/profile:
+  /api/profile:
     post:
       tags:
         - auth
@@ -393,6 +393,29 @@ paths:
             application/json:
               example: {"message": "person not updated"}
 
+  /api/professional/find/{professional_slug}:
+    get:
+      tags:
+        - professional
+      summary: Get a professional information by its slug
+      description: Returns information of professional
+      parameters:
+        - name: professional_slug
+          in: path
+          schema:
+            type: string
+          description: Professional id
+          example: professional-571591591
+          required: true
+      responses:
+        '200':
+          description: A list of professionals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfessionalPaginated'
   /api/professional/index:
     get:
       tags:
@@ -400,6 +423,12 @@ paths:
       summary: List all professionals
       description: retrieves a list of professionals with optional filters.
       parameters:
+        - name: professional_id
+          in: query
+          schema:
+            type: integer
+          description: Professional id
+          example: 1
         - name: skill_name
           in: query
           description: Array of tags (skills) id
@@ -1230,7 +1259,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/JobListPaginated'
-  /api/joblist/show/{joblistId}:
+  /api/joblist/{joblistId}:
     get:
       tags:
         - joblist
@@ -4248,7 +4277,7 @@ components:
             - company
     RegisterPerson:
       required:
-        - person_name
+        - person_username
         - person_email
         - person_password
         - person_langue
@@ -4256,7 +4285,7 @@ components:
         - person_phone
       type: object
       properties:
-        person_name:
+        person_username:
           type: string
           example: john
         person_email:
@@ -4293,6 +4322,11 @@ components:
             - professional
             - recruiter
             - company
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileTypesMinified'
+            
     ChangePassword:
       required:
         - code
@@ -5463,6 +5497,43 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
+    ProfileTypesMinified:
+      type: object
+      properties:
+        professionals:
+          type: array
+          items:
+            type: object
+            properties:
+              profile_type_id:
+                type: integer
+                example: 1
+              profile_type:
+                type: string
+                example: professionals
+        recruiters:
+          type: array
+          items:
+            type: object
+            properties:
+              profile_type_id:
+                type: integer
+                example: 1
+              profile_type:
+                type: string
+                example: recruiters
+        companies:
+          type: array
+          items:
+            type: object
+            properties:
+              profile_type_id:
+                type: integer
+                example: 1
+              profile_type:
+                type: string
+                example: companies
+            
           
   securitySchemes:
     bearerAuth:

@@ -39,6 +39,7 @@ class JobListController extends Controller
      * @param Int experience_in_months_end
      * @param Array job_visas
      * @param Array job_visas_countries
+     * @param Int per_page
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
      *      "curent_page": int,
@@ -60,10 +61,11 @@ class JobListController extends Controller
             'job_description' => 'max:500',
             'job_experience_description' => 'max:100',
             'experience_in_months_start' => 'integer',
-            'experience_in_months_end' => 'integer'
+            'experience_in_months_end' => 'integer',
+            'per_page' => 'integer'
         ]);
         $page = request('page', 1);
-        $perPage = 100;
+        $perPage = request('per_page', 100);
         $jobListObj = new JobList();
         $nonPaying = $jobListObj->listJobs($request, false);
         $nonPaying = $jobListObj->splitjoinDataFromListedJobs($nonPaying);

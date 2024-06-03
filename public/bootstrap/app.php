@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'async/asyncactions'
         ]);
+        $middleware->group('api', [
+            \Illuminate\Http\Middleware\HandleCors::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class
+        ]);
         $middleware->group('authenticate', [
             \App\Http\Middleware\Authentication::class,
         ]);

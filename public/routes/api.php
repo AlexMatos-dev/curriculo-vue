@@ -20,7 +20,6 @@ use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
-use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
@@ -47,11 +46,11 @@ Route::prefix('curriculum')->middleware('auth:sanctum', 'curriculum')->group(fun
 });
 
 Route::get('joblist/index', [JobListController::class, 'index']);
+Route::get('joblist/{joblist}', [JobListController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::post('joblist', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
-    Route::get('joblist/{joblist}', [JobListController::class, 'show']);
     Route::delete('joblist/{joblist}', [JobListController::class, 'destroy']);
     Route::prefix('joblist')->middleware('job')->group(function ()
     {
@@ -69,6 +68,7 @@ Route::prefix('person')->middleware('auth:sanctum')->group(function ()
 Route::prefix('professional')->group(function ()
 {
     Route::get('index', [ProfessionalController::class, 'index']);
+    Route::get('find/{professional_slug}', [ProfessionalController::class, 'find']);
     Route::middleware('auth:sanctum')->group(function ()
     {
         Route::post('update', [ProfessionalController::class, 'update']);

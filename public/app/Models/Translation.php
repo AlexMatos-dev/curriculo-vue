@@ -22,6 +22,7 @@ class Translation extends Model
     const CATEGORY_PROFICIENCY                 = 'proficiency_translation';
     const CATEGORY_TAG                         = 'tag_translation';
     const CATEGORY_VISA_TYPE                   = 'visa_type_translation';
+    const CATEGORY_PROFESSION_TYPE             = 'category_type_translation';
 
     protected $primaryKey = 'translation_id';
     protected $table = 'translations';
