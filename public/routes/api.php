@@ -26,7 +26,7 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 Route::post('requestchangepassword', [AuthController::class, 'requestChangePasswordCode']);
 Route::post('changepassword', [AuthController::class, 'changePassword']);
-Route::prefix('auth')->middleware('auth:sanctum')->group(function ()
+Route::middleware('auth:sanctum')->group(function ()
 {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
