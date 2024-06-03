@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:8080', 'http://frontend.jobifull.eu', 'https://frontend.jobifull.eu', 'http://localhost', '*'],
+    'allowed_origins' => ['http://localhost:8080', env('FRONTEND_URL',''), 'http://localhost', '*'],
 
     'allowed_origins_patterns' => [],
 
