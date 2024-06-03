@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ModelUtils;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -185,22 +186,38 @@ class JobList extends Model
         })->leftJoin('type_visas', function($join){
             $join->on('type_visas.typevisas_id', '=', 'job_visas.visas_type_id');
         })->get();
+
+        $tags = ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name');
+        $proficiencies = ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level');
+        $visaTypes = ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name');
+        $listLanguages = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name');
+        $listCountries = ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name');
+        
         // Preparing data to be consumed
         foreach($jobLanguagesArray as $jobLanguage){
             if(!in_array($jobLanguage->joblist_id, $usedAttr[$jobLanguage->joblist_id]['languagesIds'])){
-                $usedAttr[$jobLanguage->joblist_id]['languages'][] = $jobLanguage;
+                $usedAttr[$jobLanguage->joblist_id]['languages'][] = ModelUtils::getFillableData($jobLanguage, true, [
+                    'proficiency_id' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'proficiency'],
+                    'language_id' => ['objects' => $listLanguages, 'translated' => true, 'to' => 'language']
+                ]);
                 $usedAttr[$jobLanguage->joblist_id]['languagesIds'][] = $jobLanguage->job_language_id; 
             }
         }
         foreach($jobSkillsArray as $jobSkill){
             if(!in_array($jobSkill->joblist_id, $usedAttr[$jobSkill->joblist_id]['skillsIds'])){
-                $usedAttr[$jobSkill->joblist_id]['skills'][] = $jobSkill;
+                $usedAttr[$jobSkill->joblist_id]['skills'][] = ModelUtils::getFillableData($jobSkill, true, [
+                    'tag_id' => ['objects' => $tags, 'translated' => true, 'to' => 'tag'],
+                    'proficiency_id' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'proficiency']
+                ]);
                 $usedAttr[$jobSkill->joblist_id]['skillsIds'][] = $jobSkill->job_language_id; 
             }
         }
         foreach($visaTypesArray as $jobVisa){
             if(!in_array($jobVisa->joblist_id, $usedAttr[$jobVisa->joblist_id]['visasIds'])){
-                $usedAttr[$jobVisa->joblist_id]['visas'][] = $jobVisa;
+                $usedAttr[$jobVisa->joblist_id]['visas'][] = ModelUtils::getFillableData($jobVisa, true, [
+                    'visas_type_id' => ['objects' => $visaTypes, 'translated' => true, 'to' => 'visa_type'],
+                    'country_id' => ['objects' => $listCountries, 'translated' => true, 'to' => 'country'],
+                ]);
                 $usedAttr[$jobVisa->joblist_id]['visasIds'][] = $jobVisa->job_visa_id; 
             }
         }

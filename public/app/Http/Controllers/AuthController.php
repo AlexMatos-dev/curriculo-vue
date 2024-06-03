@@ -10,6 +10,7 @@ use App\Helpers\Validator;
 use App\Models\Profile;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AuthController extends Controller
 {
@@ -45,7 +46,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'profiles' => Profile::wehre('person_id', $person->person_id)->get()
+            'personType' => $personType,
+            'profiles' => (new Profile())->getProfileStatus($person->person_id)
         ]);
     }
 
@@ -95,13 +97,9 @@ class AuthController extends Controller
         $professional = $personObj->getProfile(Profile::PROFESSIONAL);
         if($professional)
             $professional = $professional->gatherInformation();
-        $profiles = [
-            'person' => $personObj,
-            'professional' => $professional,
-            'company' => $personObj->getProfile(Profile::COMPANY),
-            'recruiter' => $personObj->getProfile(Profile::RECRUITER),
-        ];
-        return response()->json($profiles);
+        $profilesData = (new Profile())->getProfilesByPersonId($personObj->person_id);
+        $profilesData['person'] = $personObj;
+        return response()->json($profilesData);
     }
 
     /**

@@ -89,11 +89,13 @@ class CreateFakeProfessionals extends Seeder
             ]);
             if(!$person)
                 continue;
+            $firstName = $faker->firstName($gender);
+            $lastName = $faker->lastName($gender);
             $professional = Professional::create([
                 'person_id' => $person->person_id,
-                'professional_slug' => '',
-                'professional_firstname' => $faker->firstName($gender),
-                'professional_lastname' => $faker->lastName($gender),
+                'professional_slug' => $person->makeSlug($firstName, $lastName),
+                'professional_firstname' => $firstName,
+                'professional_lastname' => $lastName,
                 'professional_email' => $faker->unique()->email(),
                 'professional_phone' => $faker->unique()->phoneNumber(),
                 'professional_photo' => $faker->imageUrl(360, 360, 'professional logo', true, 'professional logo'),

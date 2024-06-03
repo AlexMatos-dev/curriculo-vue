@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_profession_id')->nullable();
             $table->tinyInteger('valid_profession')->default(1);
             $table->unsignedBigInteger('person_id')->nullable();
+            $table->unsignedInteger('profession_category_id')->nullable();
             $table->timestamps();
         });
     }
