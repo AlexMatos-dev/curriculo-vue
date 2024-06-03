@@ -13,6 +13,7 @@ use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\CompanyTypeController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
+use App\Http\Controllers\ListLangueController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
@@ -147,7 +148,8 @@ Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
 
 Route::prefix('chat_message')->middleware(['auth:sanctum'])->group(function ()
 {
-    Route::middleware('chat')->prefix('{prefix}')->group(function(){
+    Route::middleware('chat')->prefix('{prefix}')->group(function ()
+    {
         Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
         Route::get('list', [ChatMessageController::class, 'listMessages']);
         Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
@@ -157,4 +159,9 @@ Route::prefix('chat_message')->middleware(['auth:sanctum'])->group(function ()
 Route::prefix('company_types')->group(function ()
 {
     Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
+});
+
+Route::prefix('langue')->group(function ()
+{
+    Route::get('getLangue', [ListLangueController::class, 'getLangue']);
 });

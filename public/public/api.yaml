@@ -4255,6 +4255,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/company_types'
+  /api/langue/getLangue:
+    get:
+      tags:
+        - Langue
+      description: get all languages
+      responses:
+        '200':
+          description: A list of languages
 components:
   schemas:
     Login:
