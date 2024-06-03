@@ -191,6 +191,7 @@ class JobList extends Model
         $proficiencies = ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level');
         $visaTypes = ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name');
         $listLanguages = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name');
+        $listCountries = ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name');
         
         // Preparing data to be consumed
         foreach($jobLanguagesArray as $jobLanguage){
@@ -214,7 +215,8 @@ class JobList extends Model
         foreach($visaTypesArray as $jobVisa){
             if(!in_array($jobVisa->joblist_id, $usedAttr[$jobVisa->joblist_id]['visasIds'])){
                 $usedAttr[$jobVisa->joblist_id]['visas'][] = ModelUtils::getFillableData($jobVisa, true, [
-                    'visas_type_id' => ['objects' => $visaTypes, 'translated' => true, 'to', 'visa_type']
+                    'visas_type_id' => ['objects' => $visaTypes, 'translated' => true, 'to' => 'visa_type'],
+                    'country_id' => ['objects' => $listCountries, 'translated' => true, 'to' => 'country'],
                 ]);
                 $usedAttr[$jobVisa->joblist_id]['visasIds'][] = $jobVisa->job_visa_id; 
             }

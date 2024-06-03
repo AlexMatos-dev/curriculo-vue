@@ -4875,6 +4875,46 @@ components:
           type: number
           example: 50.50
           description: Float from 0 until 100
+        tag:
+          type: object
+          properties:
+            tags_name:
+              type: string
+              example: php
+              description: The tag name
+            en:
+              type: string
+              example: php
+              description: The tag name in english
+            pt:
+              type: string
+              example: php
+              description: The tag name in portuguese
+            es:
+              type: string
+              example: php
+              description: The tag name in spanish
+          description: Tag information
+        proficiency:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information 
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4899,9 +4939,49 @@ components:
           example: 1
           description: Country id
         visa_type:
-          type: integer
-          example: 1
-          description: Visa type id
+          type: object
+          properties:
+            type_name:
+              type: string
+              example: vitem ix
+              description: The visa type name
+            en:
+              type: string
+              example: vitem ix
+              description: The visa type in english
+            pt:
+              type: string
+              example: vitem ix
+              description: The visa type in portuguese
+            es:
+              type: string
+              example: vitem ix
+              description: The visa type in spanish
+          description: Visa information
+        country:
+          type: object
+          properties:
+            lcountry_name:
+              type: string
+              example: brazil
+              description: The country name
+            lcountry_acronyn:
+              type: string
+              example: br
+              description: The country iso code
+            en:
+              type: string
+              example: vitem ix
+              description: The country in english
+            pt:
+              type: string
+              example: vitem ix
+              description: The country in portuguese
+            es:
+              type: string
+              example: vitem ix
+              description: The country in spanish
+          description: Visa information
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4925,6 +5005,46 @@ components:
           type: integer
           example: 1
           description: Tag id
+        tag:
+          type: object
+          properties:
+            tags_name:
+              type: string
+              example: php
+              description: The tag name
+            en:
+              type: string
+              example: php
+              description: The tag name in english
+            pt:
+              type: string
+              example: php
+              description: The tag name in portuguese
+            es:
+              type: string
+              example: php
+              description: The tag name in spanish
+          description: Tag information
+        proficiency:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information 
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4952,6 +5072,50 @@ components:
           type: integer
           example: 1
           description: List country id
+        visa_type:
+          type: object
+          properties:
+            type_name:
+              type: string
+              example: vitem ix
+              description: The visa type name
+            en:
+              type: string
+              example: vitem ix
+              description: The visa type in english
+            pt:
+              type: string
+              example: vitem ix
+              description: The visa type in portuguese
+            es:
+              type: string
+              example: vitem ix
+              description: The visa type in spanish
+          description: Visa information
+        country:
+          type: object
+          properties:
+            lcountry_name:
+              type: string
+              example: brazil
+              description: The country name
+            lcountry_acronyn:
+              type: string
+              example: br
+              description: The country iso code
+            en:
+              type: string
+              example: vitem ix
+              description: The country in english
+            pt:
+              type: string
+              example: vitem ix
+              description: The country in portuguese
+            es:
+              type: string
+              example: vitem ix
+              description: The country in spanish
+          description: Visa information
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4979,6 +5143,50 @@ components:
           type: integer
           example: 1
           description: Proficiency id of category = language
+        proficiency:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information
+        language:
+          type: object
+          properties:
+            llangue_acronyn:
+              type: string
+              example: en
+              description: The language ISO code
+            llangue_name:
+              type: string
+              example: advanced
+              description: The language name
+            en:
+              type: string
+              example: advanced
+              description: The language in english
+            pt:
+              type: string
+              example: avançado
+              description: The language in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The language in spanish
+          description: Language information
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -5058,6 +5266,110 @@ components:
           type: integer
           example: 1
           description: Proficiency id of category = 'language'
+        speaking_level:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information
+        listening_level:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information
+        writting_level:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information
+        reading_level:
+          type: object
+          properties:
+            proficiency_level:
+              type: string
+              example: advanced
+              description: The proficiency name
+            en:
+              type: string
+              example: advanced
+              description: The proficiency name in english
+            pt:
+              type: string
+              example: avançado
+              description: The proficiency name in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The proficiency name in spanish
+          description: Proficiency information
+        language:
+          type: object
+          properties:
+            llangue_acronyn:
+              type: string
+              example: en
+              description: The language ISO code
+            llangue_name:
+              type: string
+              example: advanced
+              description: The language name
+            en:
+              type: string
+              example: advanced
+              description: The language in english
+            pt:
+              type: string
+              example: avançado
+              description: The language in portuguese
+            es:
+              type: string
+              example: avanzado
+              description: The language in spanish
+          description: Language information
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
