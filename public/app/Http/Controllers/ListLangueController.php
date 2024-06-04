@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Models\ListLangue;
 use Illuminate\Http\Request;
 
@@ -9,8 +10,8 @@ class ListLangueController extends Controller
 {
     public function getLangue()
     {
-        $langue = ListLangue::all();
+        $langues = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name', true, true);
 
-        return response()->json($langue, 200);
+        return response()->json($langues, 200);
     }
 }

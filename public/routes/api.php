@@ -161,7 +161,7 @@ Route::prefix('company_types')->group(function ()
     Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });
 
-Route::prefix('langue')->group(function ()
+Route::prefix('language')->group(function ()
 {
-    Route::get('getLangue', [ListLangueController::class, 'getLangue']);
+    Route::get('getlanguage', [ListLangueController::class, 'getLangue']);
 });

@@ -102,11 +102,13 @@ class ModelUtils
      * Gets all sent $object as an array indexed by its id and translated
      * @param Object $object
      * @param String relationAttr 
+     * @param Bool noKey - default = false
+     * @param Bool addId - default = false
      * @return Array schema [
      *      $objectId => $object
      * ]
      */
-    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '')
+    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false)
     {
         try {
             $foundObjectArray = $object::leftJoin('translations', function($join) use($object, $relationAttr){
@@ -115,11 +117,17 @@ class ModelUtils
             $data = [];
             $attributes = array_merge($object->getFillable(), (new Translation())->getFillable());
             foreach($foundObjectArray as $objectData){
-                $ranInstance = self::makeInstance($object);
+                $rawInstance = self::makeInstance($object);
                 foreach($attributes as $attributeName){
-                    $ranInstance->{$attributeName} = $objectData->{$attributeName};
+                    $rawInstance->{$attributeName} = $objectData->{$attributeName};
                 }
-                $data[$objectData->{$object->getKeyName()}] = $ranInstance;
+                if($addId)
+                    $rawInstance->{$objectData->getKeyName()} = $objectData->{$objectData->getKeyName()};
+                if($noKey){
+                    $data[] = $rawInstance;
+                }else{
+                    $data[$objectData->{$object->getKeyName()}] = $rawInstance;
+                }
             }
             return $data;
         } catch (\Throwable $th) {

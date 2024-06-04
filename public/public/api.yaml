@@ -4255,7 +4255,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/company_types'
-  /api/langue/getLangue:
+  /api/languages/getlanguages:
     get:
       tags:
         - Langue
@@ -4263,6 +4263,10 @@ paths:
       responses:
         '200':
           description: A list of languages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListLanguage'
 components:
   schemas:
     Login:
@@ -5853,6 +5857,30 @@ components:
               profile_type:
                 type: string
                 example: companies
+    ListLanguage:
+      type: object
+      properties:
+        llangue_id:
+          type: string
+          example: 1
+        llangue_name:
+          type: string
+          example: portuguese
+        llangue_acronyn:
+          type: string
+          example: pt
+        en:
+          type: string
+          example: portuguese
+        pt:
+          type: string
+          example: português
+        es:
+          type: string
+          example: portugués 
+        unofficial_translations:
+          type: string
+          example: Json or Null
             
           
   securitySchemes:
