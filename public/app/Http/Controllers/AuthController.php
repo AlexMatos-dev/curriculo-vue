@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
@@ -47,7 +48,8 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer',
             'personType' => $personType,
-            'profiles' => (new Profile())->getProfileStatus($person->person_id)
+            'profiles' => (new Profile())->getProfileStatus($person->person_id),
+            'person' => $person
         ]);
     }
 

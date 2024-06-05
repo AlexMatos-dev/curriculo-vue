@@ -4334,6 +4334,10 @@ components:
             - professional
             - recruiter
             - company
+        person:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisterPerson'
         profiles:
           type: array
           items:
