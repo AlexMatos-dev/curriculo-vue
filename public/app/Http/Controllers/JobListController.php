@@ -9,7 +9,6 @@ use App\Models\JobList;
 use App\Models\JobModality;
 use App\Models\JobSkill;
 use App\Models\JobVisa;
-use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListLangue;
 use App\Models\Proficiency;
@@ -28,6 +27,7 @@ class JobListController extends Controller
      * @param Array job_modality_id
      * @param Array company_id
      * @param Array job_city
+     * @param Array job_state
      * @param Array job_country
      * @param Array job_seniority
      * @param Float job_salary_start
@@ -54,6 +54,7 @@ class JobListController extends Controller
             'company_id' => 'array',
             'job_modality_id' => 'array',
             'job_city' => 'array',
+            'job_state' => 'array',
             'job_country' => 'array',
             'job_seniority' => 'array',
             'job_salary_start' => 'numeric',
@@ -120,7 +121,8 @@ class JobListController extends Controller
     /**
      * Creates a new JobList by sent parameters
      * @param Int job_modality_id - required
-     * @param Int job_city
+     * @param String job_city
+     * @param String job_state
      * @param Int job_country
      * @param Int job_seniority
      * @param Float job_salary
@@ -139,7 +141,8 @@ class JobListController extends Controller
         try{
             Validator::validateParameters($request, [
                 'job_modality_id'   => 'required|integer',
-                'job_city'          => 'integer',
+                'job_city'          => 'string|max:300',
+                'job_state'          => 'string|max:300',
                 'job_country'       => 'integer',
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
@@ -151,21 +154,19 @@ class JobListController extends Controller
             ]);
             $objects = Validator::checkExistanceOnTable([
                 'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
-                'job_city'          => ['object' => ListCity::class,    'data' => $request->job_city,          'required' => false],
                 'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
                 'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
-            if($request->job_city && !$request->job_country)
+            if($request->job_state && !$request->job_country)
                 Validator::throwResponse('a country is required');
-            if($request->job_city && $request->job_country){
-                $cityData = $objects['job_city']->getCountry();
-                if($cityData->lcountry_id != $request->job_country)
-                    Validator::throwResponse('city is not from sent country');
-            }
+            if($request->job_city && !$request->job_state)
+                Validator::throwResponse('a state is required');
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse('invalid proficiency, must be seniority type');
             $data = $request->all();
             unset($data['job_skills']);
+            $data['job_city'] = mb_strtolower($data['job_city']);
+            $data['job_state'] = mb_strtolower($data['job_state']);
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $jobList = JobList::create($data);
@@ -180,7 +181,8 @@ class JobListController extends Controller
      * Update JobList by sent parameters
      * @param Int jobListId - required
      * @param Int job_modality_id - required
-     * @param Int job_city
+     * @param String job_city
+     * @param String job_state
      * @param Int job_country
      * @param Int job_seniority
      * @param Float job_salary
@@ -204,7 +206,8 @@ class JobListController extends Controller
         try{
             Validator::validateParameters($request, [
                 'job_modality_id'   => 'required|integer',
-                'job_city'          => 'integer',
+                'job_city'          => 'string|max:300',
+                'job_state'         => 'string|max:300',
                 'job_country'       => 'integer',
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
@@ -215,24 +218,24 @@ class JobListController extends Controller
             ]);
             $objects = Validator::checkExistanceOnTable([
                 'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
-                'job_city'          => ['object' => ListCity::class,    'data' => $request->job_city,          'required' => false],
                 'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
                 'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
-            if($request->job_city && !$request->job_country)
+            if($request->job_state && !$request->job_country)
                 Validator::throwResponse('a country is required');
-            if($request->job_city && $request->job_country){
-                $cityData = $objects['job_city']->getCountry();
-                if($cityData->lcountry_id != $request->job_country)
-                    Validator::throwResponse('city is not from sent country');
-            }
+            if($request->job_city && !$request->job_state)
+                Validator::throwResponse('a state is required');
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse('invalid proficiency, must be seniority type');
             $data = $request->all();
             unset($data['job_skills']);
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
+            $data['job_city'] = mb_strtolower($data['job_city']);
+            $data['job_state'] = mb_strtolower($data['job_state']);
             $result = $jobList->update($data);
+            if(!$result)
+                Validator::throwResponse('job not updated', 500);
             return response()->json(["message" => "job updated successfully", 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){

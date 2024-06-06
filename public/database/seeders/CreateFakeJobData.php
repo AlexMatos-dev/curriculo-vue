@@ -9,14 +9,11 @@ use App\Models\CompanyType;
 use App\Models\JobList;
 use App\Models\JobModality;
 use App\Models\JobSkill;
-use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListLangue;
 use App\Models\ListProfession;
-use App\Models\ListState;
 use App\Models\Person;
 use App\Models\Proficiency;
-use App\Models\Profile;
 use App\Models\Tag;
 use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
@@ -71,29 +68,6 @@ class CreateFakeJobData extends Seeder
                     'country_id' => $randomCountry['lcountry_id']
                 ];
             }
-        }
-
-        // Create fake state
-        $stateObj = ListState::where('lstates_name', 'estado cwb')->first();
-        if(!$stateObj){
-            $stateObj = ListState::create([
-                'lstates_name' => 'estado cwb',
-                'lstates_parent_id' => null,
-                'lstates_level' => 1,
-                'lstacountry_id' => $countryObj->lcountry_id
-            ]);
-            if(!$stateObj)
-                return;
-        }
-        // Create fake city
-        $cityObj = ListCity::where('lcity_name', 'cwb')->first();
-        if(!$cityObj){
-            $cityObj = ListCity::create([
-                'lcity_name' => 'cwb',
-                'lcitstates_id' => $stateObj->lstates_id
-            ]);
-            if(!$cityObj)
-                return;
         }
         // -- End of Essential Data --
         // Create Companies
@@ -154,7 +128,7 @@ class CreateFakeJobData extends Seeder
                 $job = JobList::create([
                     'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
-                    'job_city' => $cityObj->lcity_id,
+                    'job_city' => $faker->city(),
                     'job_country' => $countryObj->lcountry_id,
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),

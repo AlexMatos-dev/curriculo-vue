@@ -13,7 +13,6 @@ use App\Models\Experience;
 use App\Models\JobModality;
 use App\Models\Language;
 use App\Models\Link;
-use App\Models\ListCity;
 use App\Models\ListCountry;
 use App\Models\ListLangue;
 use App\Models\Person;
@@ -51,14 +50,6 @@ class CreateFakeProfessionals extends Seeder
         $brCountry = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$brCountry)
             return;
-        $brCity = ListCity::where('listcountries.lcountry_acronyn', 'br')->leftJoin('liststates', function($join){
-            $join->on('listcities.lcitstates_id', '=', 'liststates.lstates_id');
-        })->leftJoin('listcountries', function($join){
-            $join->on('liststates.lstacountry_id', '=', 'listcountries.lcountry_id');
-        })->get();
-        if(empty($brCity))
-            return;
-        $brCity = $brCity->toArray();
         $defaultPassword = Hash::make('12345');
         $allTags = Tag::all()->toArray();
         $allProfeciencies = Proficiency::where('category', Proficiency::CATEGORY_LEVEL)->get()->toArray();
