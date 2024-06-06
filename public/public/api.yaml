@@ -743,16 +743,16 @@ paths:
           example: 1
           schema:
             type: string
-        - name: dpcity_id
+        - name: dpcity
           in: query
-          description: City id  - must belong to sent state id
-          example: 1
+          description: City name 
+          example: Curitiba
           schema:
             type: string
-        - name: dpstate_id
+        - name: dpstate
           in: query
-          description: State id - must belong to sent country id
-          example: 1
+          description: State name
+          example: Paraná
           schema:
             type: string
         - name: dppostal_code
@@ -1168,8 +1168,8 @@ paths:
                   example: 1
         - name: job_city
           in: query
-          description: Array of job city id
-          example: 1
+          description: Array of city name
+          example: curitiba
           schema:
             type: array
             items:
@@ -1178,8 +1178,8 @@ paths:
               type: object
               properties:
                 job_city:
-                  type: integer
-                  example: 1
+                  type: string
+                  example: Curitiba
         - name: job_country
           in: query
           description: Array of job country id
@@ -1248,6 +1248,12 @@ paths:
           in: query
           description: The page for list (max 100 record per page)
           example: 1
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Records per page
+          example: 100
           schema:
             type: integer
       responses:
@@ -4580,8 +4586,8 @@ components:
           type: integer
           example: 1
         job_city:
-          type: integer
-          example: 1
+          type: string
+          example: curitiba
         job_seniority:
           type: integer
           example: 1
