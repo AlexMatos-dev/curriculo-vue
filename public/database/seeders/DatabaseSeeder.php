@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Notifications\NotificationSender;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,8 +24,6 @@ class DatabaseSeeder extends Seeder
         (new GenderSeeder())->run();
         (new LanguageSeeder())->run();
         (new CountrySeeder())->run();
-        (new BrStateSeeder)->run();
-        (new BrCitySeeder)->run();
         (new CommonCurrencySeeder())->run();
         (new CompanyTypeSeeder())->run();
         (new NotifierSeeder())->run();

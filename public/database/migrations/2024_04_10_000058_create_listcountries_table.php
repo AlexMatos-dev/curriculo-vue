@@ -11,6 +11,8 @@ class CreateListcountriesTable extends Migration {
 			$table->increments('lcountry_id', true);
 			$table->string('lcountry_name', 150);
 			$table->string('lcountry_acronyn')->nullable();
+			$table->string('ddi', 50);
+			$table->mediumText('flag')->charset('binary')->nullable();
 			$table->timestamps();
 		});
 	}

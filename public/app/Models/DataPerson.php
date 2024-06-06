@@ -22,8 +22,8 @@ class DataPerson extends Model
         'dpprofes_id',
         'dpdate_of_birth',
         'dpgender',
-        'dpcity_id',
-        'dpstate_id',
+        'dpcity',
+        'dpstate',
         'dppostal_code',
         'dpcountry_id'
     ];
@@ -36,16 +36,6 @@ class DataPerson extends Model
     public function professional()
     {
         return $this->belongsTo(Professional::class, 'dpprofes_id')->first();
-    }
-
-    public function listCity()
-    {
-        return $this->belongsTo(ListCity::class, 'dpcity_id')->first();
-    }
-
-    public function listState()
-    {
-        return $this->belongsTo(ListState::class, 'dpstate_id')->first();
     }
 
     public function listCounty()

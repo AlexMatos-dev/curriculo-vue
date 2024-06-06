@@ -22,6 +22,7 @@ class JobList extends Model
         'company_id',
         'job_modality_id',
         'job_city',
+        'job_state',
         'job_country',
         'job_seniority',
         'job_salary',
@@ -34,11 +35,6 @@ class JobList extends Model
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    public function city()
-    {
-        return $this->belongsTo(ListCity::class, 'city_id');
     }
 
     public function country()
@@ -69,7 +65,7 @@ class JobList extends Model
     /**
      * Lists jobs, filtering rsults accordingly to sent parameters
      * @param Illuminate\Http\Request $request - schema: [ 'job_modality_id' => int, 'job_modality_id' => int, 'job_country' => int
-     *      'job_city' => int, 'job_seniority' => int, 'job_salary_start' => float, 'job_salary_end' => float,
+     *      'job_city' => string, 'job_seniority' => int, 'job_salary_start' => float, 'job_salary_end' => float, 'job_state' => Array
      *      'experience_in_months_start' => integer, 'experience_in_months_end' => integer, 'job_skills' => IntArray,
      * ]
      * @param Bool paying
@@ -97,8 +93,16 @@ class JobList extends Model
             $query->whereIn("jobslist.job_modality_id", $request->job_modality_id);
         if ($request->has("job_country"))
             $query->whereIn("jobslist.job_country", $request->job_country);
-        if ($request->has("job_city"))
-            $query->whereIn("jobslist.job_city", $request->job_city);
+        if ($request->has("job_city")){
+            foreach($request->job_city as $cityName){
+                $query->orWhere("jobslist.job_city", 'like', '%'.$cityName.'%');
+            }
+        }
+        if ($request->has("job_state")){
+            foreach($request->job_state as $stateName){
+                $query->orWhere("jobslist.job_state", 'like', '%'.$stateName.'%');
+            }
+        }
         if ($request->has("job_seniority"))
             $query->whereIn("jobslist.job_seniority", $request->job_seniority);
         if ($request->has("job_salary_start"))
@@ -191,8 +195,7 @@ class JobList extends Model
         $proficiencies = ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level');
         $visaTypes = ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name');
         $listLanguages = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name');
-        $listCountries = ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name');
-        
+        $listCountries = (new ListCountry())->getAll(true);
         // Preparing data to be consumed
         foreach($jobLanguagesArray as $jobLanguage){
             if(!in_array($jobLanguage->joblist_id, $usedAttr[$jobLanguage->joblist_id]['languagesIds'])){

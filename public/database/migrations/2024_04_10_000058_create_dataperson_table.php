@@ -12,8 +12,8 @@ class CreateDatapersonTable extends Migration {
 			$table->bigInteger('dpprofes_id')->unsigned();
 			$table->datetime('dpdate_of_birth')->nullable();
 			$table->integer('dpgender')->unsigned()->nullable();
-			$table->bigInteger('dpcity_id')->unsigned()->nullable();
-			$table->integer('dpstate_id')->unsigned()->nullable();
+			$table->string('dpcity', 300)->nullable();
+			$table->string('dpstate', 300)->nullable();
 			$table->string('dppostal_code', 20)->nullable();
 			$table->integer('dpcountry_id')->unsigned()->nullable();
 			$table->timestamps();
