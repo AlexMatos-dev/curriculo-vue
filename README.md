@@ -12,7 +12,7 @@ As configurações de ambiente estão presentes dentro do arquivo ``docker-compo
 ### Laravel
 Para definir as configurações de ambiente do Laravel, faça um cópia do arquivo ``.env.axample`` e renomeie para ``.env``
 
-Dentro das configurações do arquivo .env, definir as configurações a seguir:
+Dentro das configurações do arquivo `.env`, definir as configurações a seguir:
 
 #### MySql
 ``DB_CONNECTION=mysql``<br>
