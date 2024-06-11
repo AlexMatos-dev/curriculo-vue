@@ -10,6 +10,7 @@ use App\Models\Professional;
 use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class MyJob extends Controller
@@ -25,7 +26,7 @@ class MyJob extends Controller
         if(!$jobList)
             Validator::throwResponse('job not found', 403);
         if(!$this->isException()){
-            $person = auth('api')->user();
+            $person = Auth::user();
             $company = $person->getProfile(Profile::COMPANY);
             if(!$company)
                 Validator::throwResponse('company not found', 403);

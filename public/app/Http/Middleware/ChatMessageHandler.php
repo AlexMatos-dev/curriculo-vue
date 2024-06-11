@@ -10,6 +10,7 @@ use App\Models\Profile;
 use App\Models\Recruiter;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class ChatMessageHandler extends Controller
@@ -20,7 +21,7 @@ class ChatMessageHandler extends Controller
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         if(!in_array(request('prefix'), ['professional', 'company', 'recruiter']))
             Validator::throwResponse('invalid prefix', 500);
         $profile = $person->getProfile($this->getProfileType(request('prefix')));

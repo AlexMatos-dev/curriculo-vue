@@ -2,6 +2,8 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Auth;
+
 class AsyncMethodHandler{
     const MAIN_METHOD_URL = 'async/asyncactions' ;
     const NOTIFY_JOB_APPLIED_STATUS_CHANGE = 1;
@@ -14,9 +16,9 @@ class AsyncMethodHandler{
      */
     public static function sendEmailNotification($notificationType, $data = [])
     {
-        if(!$notificationType || !in_array($notificationType, self::getNotificationTypes()) || !auth('api')->user())
+        if(!$notificationType || !in_array($notificationType, self::getNotificationTypes()) || !Auth::user())
             return false;
-        $personId = auth('api')->user()->person_id;
+        $personId = Auth::user()->person_id;
         $method = null;
         switch($notificationType){
             case self::NOTIFY_JOB_APPLIED_STATUS_CHANGE:
