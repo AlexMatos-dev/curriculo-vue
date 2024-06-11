@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
@@ -11,8 +10,8 @@ use App\Helpers\Validator;
 use App\Models\ListCountry;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AuthController extends Controller
 {
@@ -45,6 +44,7 @@ class AuthController extends Controller
         $token = $person->createToken('auth_token')->plainTextToken;
         $person->last_login = Carbon::now();
         $person->save();
+        Auth::login($person);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -107,7 +107,7 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        $personObj = auth('api')->user();
+        $personObj = Auth::user();
         $professional = $personObj->getProfile(Profile::PROFESSIONAL);
         if($professional)
             $professional = $professional->gatherInformation();
@@ -123,7 +123,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
+        Auth::user()->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -190,7 +190,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::user()->factory()->getTTL() * 60
         ]);
     }
 }

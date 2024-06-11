@@ -18,8 +18,8 @@ return [
     //     'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     // ],
     'defaults' => [
-        'guard' => 'api',
-        'passwords' => 'persons',
+        'guard' => 'web',
+        'passwords' =>'persons',
     ],
 
     /*
@@ -39,13 +39,15 @@ return [
     |
     */
 
+    // 'guards' => [
+    //     'web' => [
+    //         'driver' => 'session',
+    //         'provider' => 'users',
+    //     ],
+    // ],
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
-        ],
-        'api' => [
-            'driver' => 'sanctum',
             'provider' => 'persons',
         ],
     ],
@@ -68,14 +70,14 @@ return [
     */
 
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
+        // 'users' => [
+        //     'driver' => 'eloquent',
+        //     'model' => env('AUTH_MODEL', App\Models\User::class),
+        // ],
         'persons' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Person::class,
-        ]
+            'model' => env('AUTH_MODEL', App\Models\Person::class),
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
@@ -103,12 +105,6 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
-            'throttle' => 60,
-        ],
         'persons' => [
             'provider' => 'persons',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),

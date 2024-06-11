@@ -18,6 +18,7 @@ use App\Models\TypeVisas;
 use App\Models\Visa;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JobListController extends Controller
 {
@@ -134,7 +135,7 @@ class JobListController extends Controller
      */
     public function store(Request $request)
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $company = $person->getProfile(Profile::COMPANY);
         if(!$company)
             Validator::throwResponse('company profile not found');
@@ -200,7 +201,7 @@ class JobListController extends Controller
         $company = Company::find($jobList->company_id);
         if(!$company)
             Validator::throwResponse('company not found found');
-        $person = auth('api')->user();
+        $person = Auth::user();
         if(!$company->isAdmin($person->person_id))
             Validator::throwResponse('you do not have the rights, not your company');
         try{

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Validator;
 use App\Models\Person;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PersonController extends Controller
 {
@@ -26,7 +27,7 @@ class PersonController extends Controller
             'person_phone' => 'max:20',
             'person_langue' => 'required|Integer'
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         if(request('person_email') != $person->person_email && Person::where('person_email', request('person_email')->first()))
             return response()->json(['message' => 'invalid email'], 400);
         $result = $person->update([

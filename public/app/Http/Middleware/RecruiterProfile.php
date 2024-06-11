@@ -7,6 +7,7 @@ use App\Models\Profile;
 use App\Models\Recruiter;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class RecruiterProfile
@@ -18,7 +19,7 @@ class RecruiterProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $recruiter = $person->getProfile(Profile::RECRUITER);
         if(!$recruiter)
             Validator::throwResponse('recruiter profile not found', 403);
