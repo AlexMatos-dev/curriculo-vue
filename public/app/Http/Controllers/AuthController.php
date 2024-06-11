@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Person;
 use App\Helpers\Validator;
+use App\Models\ListCountry;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AuthController extends Controller
 {
@@ -44,6 +44,7 @@ class AuthController extends Controller
         $token = $person->createToken('auth_token')->plainTextToken;
         $person->last_login = Carbon::now();
         $person->save();
+        Auth::login($person);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -73,14 +74,25 @@ class AuthController extends Controller
             'person_phone' => 'max:20',
             'person_langue' => 'required|Integer'
         ]);
+        if(!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[\w$@]{8,}$/', request('person_password')))
+            return response()->json('the password must have a letter, a lowercase number and be between 8 and 20 characters long', 400);
         if(!ListLangue::find(request('person_langue')))
             return response()->json(['message' => 'invalid person language'], 400);
+        if(request('person_phone') && !request('person_ddi'))
+            return response()->json(['message' => 'ddi is required'], 400);
+        if(!request('person_phone') && request('person_ddi'))
+            return response()->json(['message' => 'phone number is required'], 400);
+        if(request('ddi') && !ListCountry::where('ddi', request('ddi'))->first())
+            return response()->json(['message' => 'invalid ddi'], 400);
+        $person_phone = request('person_phone');
+        if(request('person_phone'))
+            $person_phone = preg_replace('/[^0-9]/', '', $person_phone);
         $person = Person::create([
             'person_username' => request('person_username'),
             'person_email' => request('person_email'),
             'person_password' => Hash::make(request('person_password')),
-            'person_ddi' => request('person_ddi') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
-            'person_phone' => request('person_phone') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
+            'person_ddi' => request('person_ddi'),
+            'person_phone' => $person_phone,
             'person_langue' => request('person_langue')
         ]);
         if(!$person)
@@ -95,7 +107,7 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        $personObj = auth('api')->user();
+        $personObj = Auth::user();
         $professional = $personObj->getProfile(Profile::PROFESSIONAL);
         if($professional)
             $professional = $professional->gatherInformation();
@@ -111,7 +123,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
+        Auth::user()->logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -178,7 +190,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::user()->factory()->getTTL() * 60
         ]);
     }
 }

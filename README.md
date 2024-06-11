@@ -46,3 +46,15 @@ O sistema conta com alguns Seeders que geram dados falsos e aleatórios. Abaixo 
 * Dados de vagas: ``php artisan db:seed --class=CreateFakeJobData``
 * Dados de profissionais: ``php artisan db:seed --class=CreateFakeProfessionals``
 * Aplicações de vagas para o profissional: ``php artisan db:seed --class=CreateJobApplications``
+
+
+#### Utilização API rest (front-end)
+
+Devido a implementação da segurança utilizando o `SANCTUM` e o `crsf-cookie`, a API dos servidores de homologação ou produção não são acessíveis a não ser apartir de endereços de seu domínio ou sub-domínio, exemplo `jobifull.eu` (Front: `https://frontend.jobifull.eu` e Back: `https://api.jobifull.eu/`).
+O projeto neste repositório está configurado para aceitar a partir do CORS o acesso do front-end através do endereço: `http://localhost:8080` para isso, deve-se seguir o padrão do arquivo `.env` como o do arquivo `.env.example` e assim, a configuração estará finalizada. Execute na pasta do projeto do front-end o comando: `yarn serve --port 8080` para levantear o servidor front-end, o servidor back-end será levantado pelo `docker` (necessário) atrávez da porta `80` (`http://localhost:80`) logo, esse endereço deve ser utilizado pelo front-end para ter acesso a API do seu projeto back-end localmente.
+
+#### Utilização API rest (Mobile)
+
+Ao realizar login, é retornado um `token`de acesso e o mesmo deve ser enviado em todas as requisições que necessitam de autenticação no seu header com nome de `Authorization` seguindo o exemplo abaixo:
+* `Bearer 1|fR7aNEy6paogApH8kwD2Lwl3p2gYGzW1ZziaETaZ91c7667f`
+

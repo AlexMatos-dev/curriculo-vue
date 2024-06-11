@@ -6,13 +6,12 @@ use App\Helpers\Validator;
 use App\Models\DataPerson;
 use App\Models\Gender;
 use App\Models\JobModality;
-use App\Models\ListCity;
 use App\Models\ListCountry;
-use App\Models\ListState;
 use App\Models\Professional;
 use App\Models\ProfessionalProfession;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ProfessionalController extends Controller
 {
@@ -36,7 +35,7 @@ class ProfessionalController extends Controller
             'professional_phone' => 'max:20',
             'professional_title' => 'max:255',
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $dataToSet = [
             'professional_slug' => $person->makeSlug(request('professional_firstname'), request('professional_lastname')),
             'professional_firstname' => request('professional_firstname'),
@@ -88,8 +87,8 @@ class ProfessionalController extends Controller
      * Updates logged person DataPerson account.
      * @param String dpdate_of_birth
      * @param String dpgender
-     * @param String dpcity_id
-     * @param String dpstate_id
+     * @param String dpcity
+     * @param String dpstate
      * @param String dppostal_code
      * @param String dpcountry_id
      * @return \Illuminate\Http\JsonResponse
@@ -99,26 +98,20 @@ class ProfessionalController extends Controller
         Validator::validateParameters($this->request, [
             'dpdate_of_birth' => 'date_format:Y-m-d',
             'dpgender' => 'integer',
-            'dpcity_id' => 'integer',
-            'dpstate_id' => 'integer',
+            'dpcity' => 'max:300',
+            'dpstate' => 'max:300',
             'dppostal_code' => 'max:20',
             'dpcountry_id' => 'integer'
         ]);
-        if(request('dpcity_id') && !request('dpstate_id'))
+        if(request('dpcity') && !request('dpstate'))
             response()->json(['message' => "state is required"], 400)->send();
-        if(request('dpstate_id') && !request('dpcountry_id'))
+        if(request('dpstate') && !request('dpcountry_id'))
             response()->json(['message' => "country is required"], 400)->send();
         $objects = Validator::checkExistanceOnTable([
             'dpgender' => ['data' => request('dpgender'), 'object' => Gender::class],
-            'dpcity_id' => ['data' => request('dpcity_id'), 'object' => ListCity::class],
-            'dpstates_id' => ['data' => request('dpstate_id'), 'object' => ListState::class],
             'dpcountry_id' => ['data' => request('dpcountry_id'), 'object' => ListCountry::class]
         ]);
-        if(array_key_exists('dpstates_id', $objects) && $objects['dpstates_id']->lstacountry_id != request('dpcountry_id'))
-            response()->json(['message' => "state is not from country"], 400)->send();
-        if(array_key_exists('dpcity_id', $objects) && $objects['dpcity_id']->lcitstates_id != request('dpstate_id'))
-            response()->json(['message' => "city is not from state"], 400)->send();
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => 'no professional found', 400]);
@@ -146,7 +139,7 @@ class ProfessionalController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => 'professional not found'], 400);
@@ -188,7 +181,7 @@ class ProfessionalController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => 'professional not found'], 400);

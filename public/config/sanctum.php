@@ -19,7 +19,10 @@ return [
         '%s%s',
         'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
         Sanctum::currentApplicationUrlWithPort(),
-        'localhost,localhost:80,frontend.jobifull.eu,api.jobifull.eu/'
+        'localhost,localhost:80,frontend.jobifull.eu,api.jobifull.eu/',
+        env('APP_URL') ? ',' . parse_url(env('APP_URL'), PHP_URL_HOST) : '',
+        env('FRONTEND_URL') ? ',' . parse_url(env('FRONTEND_URL'), PHP_URL_HOST) : '',
+        'localhost,localhost:8080'
     ))),
 
     /*

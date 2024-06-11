@@ -64,11 +64,6 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
-			$table->foreign('job_city')->references('lcity_id')->on('listcities')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
-		Schema::table('jobslist', function(Blueprint $table) {
 			$table->foreign('job_country')->references('lcountry_id')->on('listcountries')
 						->onDelete('restrict')
 						->onUpdate('restrict');
@@ -314,16 +309,6 @@ class CreateForeignKeys extends Migration {
 						->onUpdate('restrict');
 		});
 		Schema::table('dataperson', function(Blueprint $table) {
-			$table->foreign('dpcity_id')->references('lcity_id')->on('listcities')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
-		Schema::table('dataperson', function(Blueprint $table) {
-			$table->foreign('dpstate_id')->references('lstates_id')->on('liststates')
-						->onDelete('restrict')
-						->onUpdate('restrict');
-		});
-		Schema::table('dataperson', function(Blueprint $table) {
 			$table->foreign('dpcountry_id')->references('lcountry_id')->on('listcountries')
 						->onDelete('restrict')
 						->onUpdate('restrict');
@@ -439,9 +424,6 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
 			$table->dropForeign('jobslist_company_id_foreign');
-		});
-		Schema::table('jobslist', function(Blueprint $table) {
-			$table->dropForeign('jobslist_job_city_foreign');
 		});
 		Schema::table('jobslist', function(Blueprint $table) {
 			$table->dropForeign('jobslist_job_country_foreign');
@@ -589,12 +571,6 @@ class CreateForeignKeys extends Migration {
 		});
 		Schema::table('dataperson', function(Blueprint $table) {
 			$table->dropForeign('dataperson_dpgender_foreign');
-		});
-		Schema::table('dataperson', function(Blueprint $table) {
-			$table->dropForeign('dataperson_dpcity_id_foreign');
-		});
-		Schema::table('dataperson', function(Blueprint $table) {
-			$table->dropForeign('dataperson_dpstate_id_foreign');
 		});
 		Schema::table('dataperson', function(Blueprint $table) {
 			$table->dropForeign('dataperson_dpcountry_id_foreign');
