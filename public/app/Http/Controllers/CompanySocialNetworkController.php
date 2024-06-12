@@ -23,7 +23,7 @@ class CompanySocialNetworkController extends Controller
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
+            return response()->json(["message" => translate('social network not found'), "error" => $e], 400);
         }
     }
 
@@ -45,7 +45,7 @@ class CompanySocialNetworkController extends Controller
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => "An error occurred while creating the social network, please try again later.", "Error" => $e->getMessage()], 400);
+            return response()->json(["message" => translate('an error occurred while creating the social network, please try again later'), "error" => $e->getMessage()], 400);
         }
     }
 
@@ -60,11 +60,11 @@ class CompanySocialNetworkController extends Controller
             $network = CompanySocialNetwork::findOrFail($socialNetworkId);
             $network->update($request->all());
 
-            return response()->json(["message" => "Social network updated successfully.", "data" => $network], 200);
+            return response()->json(["message" => translate('social network updated successfully'), "data" => $network], 200);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
+            return response()->json(["message" => translate('social network not found'), "Error" => $e], 400);
         }
     }
 
@@ -75,11 +75,11 @@ class CompanySocialNetworkController extends Controller
             $socialNetwork = CompanySocialNetwork::findOrFail($socialNetworkId);
             $socialNetwork->delete();
 
-            return response()->json(["message" => "Social network deleted sucessfully."], 200);
+            return response()->json(["message" => translate('social network deleted sucessfully')], 200);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => "Social network not found.", "Error" => $e], 400);
+            return response()->json(["message" => translate('social network not found'), "Error" => $e], 400);
         }
     }
 }

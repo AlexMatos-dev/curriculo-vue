@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ModelUtils;
 use Illuminate\Database\Eloquent\Model;
 
 class Translation extends Model
@@ -133,5 +134,53 @@ class Translation extends Model
             $results[$translation->en] = $text;
         }
         return $results;
+    }
+
+    /**
+     * Gets all translations indexed with key as EN property
+     * @param String category
+     * @param Bool addAllLanguagesIso - to set all languages iso on response
+     * @return Array - Schema: [$enTranslation => [$languageISO => $translation]]
+     */
+    public function getAllTranslationsAsEnForIndex($category = null, $addAllLanguagesIso = false)
+    {
+        $unofficialLanguaguesIso = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
+        $translations = $category ? Translation::where('category', $category)->get() : Translation::all();
+        $translationsArray = [];
+        foreach($translations as $translation){
+            $thisTranslations = [];
+            foreach(Translation::OFFICIAL_LANGUAGES as $officialLangIso){
+                $thisTranslations[$officialLangIso] = $translation->$officialLangIso;
+            }
+            if($addAllLanguagesIso){
+                $unofficalArray = $translation->unofficial_translations ? json_decode($translation->unofficial_translations, true) : [];
+                foreach($unofficialLanguaguesIso as $unofficalIso){
+                    $iso = $unofficalIso->llangue_acronyn;
+                    $thisTranslations[$iso] = array_key_exists($iso, $unofficalArray) ? $unofficalArray[$iso] : null;
+                }
+            }
+            $translationsArray[$translation->en] = $thisTranslations;
+        }
+        return $translationsArray;
+    }
+
+    /**
+     * Saves a new translation based on sent EN text
+     * @param String en - required
+     * @param String category - required
+     * @return Bool
+     */
+    public function fabricateTranslation($en, $category)
+    {
+        if(!in_array($category, ModelUtils::getClassConstants($this)))
+            $category = $this::CATEGORY_SYSTEM_TRANSLATIONS;
+        $transObj = new Translation();
+        $transObj->category = $category;
+        $transObj->en = $en;
+        foreach($this::OFFICIAL_LANGUAGES as $langIso){
+            $googleTranslatorObj = new \Stichoza\GoogleTranslate\GoogleTranslate($langIso, 'en');
+            $transObj->{$langIso} = $googleTranslatorObj->translate($en);
+        }
+        return $transObj->save();
     }
 }

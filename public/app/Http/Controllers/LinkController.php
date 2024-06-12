@@ -42,10 +42,10 @@ class LinkController extends Controller
             'curriculum_id' => 'numeric|required'
         ]);
         if(!in_array(request('link_type'), Link::LINK_TYPES))
-            Validator::throwResponse('link type not valid', 400);
+            Validator::throwResponse(translate('link type not valid'), 400);
         $link = Link::create($this->request->all());
         if(!$link)
-            Validator::throwResponse('link not created', 500);
+            Validator::throwResponse(translate('link not created'), 500);
         return response()->json($link);
     }
 
@@ -60,7 +60,7 @@ class LinkController extends Controller
     {
         $link = (new Link())->isFromProfessionalCurriculum(request('link'), $this->getProfessionalBySession()->professional_id);
         if(!$link)
-            Validator::throwResponse('link not found', 400);
+            Validator::throwResponse(translate('link not found'), 400);
         Validator::validateParameters($this->request, [
             'link_id' => 'numeric|required',
             'link_type' => 'required|max:100',
@@ -68,7 +68,7 @@ class LinkController extends Controller
         ]);
         $link->update($this->request->all());
         if(!$link)
-            Validator::throwResponse('link not updated', 500);
+            Validator::throwResponse(translate('link not updated'), 500);
         return response()->json($link);
     }
 
@@ -80,7 +80,7 @@ class LinkController extends Controller
     {
         $link = (new Link())->isFromProfessionalCurriculum(request('link'), $this->getProfessionalBySession()->professional_id);
         if(!$link)
-            Validator::throwResponse('link not found', 400);
+            Validator::throwResponse(translate('link not found'), 400);
         return response()->json($link);
     }
 
@@ -93,9 +93,9 @@ class LinkController extends Controller
     {
         $link = (new Link())->isFromProfessionalCurriculum(request('link'), $this->getProfessionalBySession()->professional_id);
         if(!$link)
-            Validator::throwResponse('link not found', 400);
+            Validator::throwResponse(translate('link not found'), 400);
         if(!$link->delete())
-            Validator::throwResponse('link not removed', 500);
-        return response()->json(['message' => 'link removed']);
+            Validator::throwResponse(translate('link not removed'), 500);
+        return response()->json(['message' => translate('link removed')]);
     }
 }

@@ -46,12 +46,12 @@ class CurriculumController extends Controller
         ]);
         $professional = $this->getProfessionalBySession();
         if(!$professional)
-            Validator::throwResponse('no professional found', 400);
+            Validator::throwResponse(translate('no professional found'), 400);
         $curriculum = new Curriculum();
         if(request('curriculum_id')){
             $foundResult = Curriculum::find(request('curriculum_id'));
             if(!$foundResult || $foundResult->cprofes_id != $professional->professional_id)
-                Validator::throwResponse('curriculum not found', 400);
+                Validator::throwResponse(translate('curriculum not found'), 400);
             $curriculum = $foundResult;
         }else{
             $curriculum->cprofes_id = $professional->professional_id;
@@ -65,7 +65,7 @@ class CurriculumController extends Controller
                 $imageHandler->destroyFile();
             break;
         }
-        $errorMessage = request('curriculum_id') ? 'curriculum not updated' : 'curriculum not created';
+        $errorMessage = request('curriculum_id') ? translate('curriculum not updated') : translate('curriculum not created');
         if(!$curriculum->save())
             Validator::throwResponse($errorMessage, 500);
         return response()->json($curriculum);
@@ -79,7 +79,7 @@ class CurriculumController extends Controller
     {
         $curriculum = (new Curriculum())->isFromProfessionalCurriculum(request('curriculum'), $this->getProfessionalBySession()->professional_id);
         if(!$curriculum)
-            Validator::throwResponse('curriculum not found', 400);
+            Validator::throwResponse(translate('curriculum not found'), 400);
         return response()->json($curriculum);
     }
 
@@ -92,7 +92,7 @@ class CurriculumController extends Controller
     {
         $curriculum = Curriculum::where('curriculum_id', request('curriculum'))->where('cprofes_id', $this->getProfessionalBySession()->professional_id)->first();
         if(!$curriculum)
-            Validator::throwResponse('curriculum not found', 400);
+            Validator::throwResponse(translate('curriculum not found'), 400);
         $error = false;
         try {
             \App\Models\Experience::where('excurriculum_id', $curriculum->curriculum_id)->delete();
@@ -109,7 +109,7 @@ class CurriculumController extends Controller
             $error = true;
         }
         if($error)
-            Validator::throwResponse('curriculum not removed', 500);
-        return response()->json(['message' => 'curriculum removed']);
+            Validator::throwResponse(translate('curriculum not removed'), 500);
+        return response()->json(['message' => translate('curriculum removed')]);
     }
 }

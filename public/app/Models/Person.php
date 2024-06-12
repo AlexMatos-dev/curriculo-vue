@@ -57,7 +57,8 @@ class Person extends Authenticatable
      */
     public function sendRequestChangePasswordCodeEmail()
     {
-        $languageISO = $this->language()->llangue_acronyn;
+        $languageISO = Session()->get('user_lang') ? Session()->get('user_lang') : $this->getLanguageIso($this->person_id);
+        $languageISO = !$languageISO ? 'en' : $languageISO;
         $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
         $code = strtoupper($this->generatePasswordCode());
         $renderedEmail = view('email_templates/password_reset_code', [

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Http\Controllers\Controller;
 use App\Models\ListLangue;
 use Illuminate\Support\Facades\Cache;
@@ -11,8 +10,9 @@ use App\Helpers\Validator;
 use App\Models\ListCountry;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Illuminate\Contracts\Session\Session;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class AuthController extends Controller
 {
@@ -72,18 +72,18 @@ class AuthController extends Controller
             'person_password' => Validator::getPersonPasswordRule(),
             'person_ddi' => 'max:10',
             'person_phone' => 'max:20',
-            'person_langue' => 'required|Integer'
+            'person_langue' => 'integer'
         ]);
         if(!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[\w$@]{8,}$/', request('person_password')))
-            return response()->json('the password must have a letter, a lowercase number and be between 8 and 20 characters long', 400);
-        if(!ListLangue::find(request('person_langue')))
-            return response()->json(['message' => 'invalid person language'], 400);
+            return response()->json(translate('the password must have a letter, a lowercase number and be between 8 and 20 characters long'), 400);
+        if(request('person_langue') && !ListLangue::find(request('person_langue')))
+            return response()->json(['message' => translate('invalid person language')], 400);
         if(request('person_phone') && !request('person_ddi'))
-            return response()->json(['message' => 'ddi is required'], 400);
+            return response()->json(['message' => translate('ddi is required')], 400);
         if(!request('person_phone') && request('person_ddi'))
-            return response()->json(['message' => 'phone number is required'], 400);
+            return response()->json(['message' => translate('phone number is required')], 400);
         if(request('ddi') && !ListCountry::where('ddi', request('ddi'))->first())
-            return response()->json(['message' => 'invalid ddi'], 400);
+            return response()->json(['message' => translate('invalid ddi')], 400);
         $person_phone = request('person_phone');
         if(request('person_phone'))
             $person_phone = preg_replace('/[^0-9]/', '', $person_phone);
@@ -96,7 +96,7 @@ class AuthController extends Controller
             'person_langue' => request('person_langue')
         ]);
         if(!$person)
-            return response()->json(['message' => 'person not created'], 500);
+            return response()->json(['message' => translate('person not created')], 500);
         return response()->json($person);
     }
 
@@ -123,8 +123,13 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        if(Auth::user()){
+            Auth::logout();
+        }else{
+            auth('api')->logout();
+        }
+        Session::flush();
+        return response()->json(['message' => translate('successfully logged out')]);
     }
 
     /**
@@ -139,13 +144,13 @@ class AuthController extends Controller
         ]);
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
-            return response()->json(['message' => 'invalid email'], 400);
+            return response()->json(['message' => translate('invalid email')], 400);
         if(Cache::has("awaiting-email-receival-{$person->person_id}"))
-            return response()->json(['message' => 'code already sent, wait 1 minute'], 500);
+            return response()->json(['message' => translate('code already sent, wait 1 minute')], 500);
         if(!$person->sendRequestChangePasswordCodeEmail())
-            return response()->json(['message' => 'email not sent'], 500);
+            return response()->json(['message' => translate('email not sent')], 500);
         Cache::put("awaiting-email-receival-{$person->person_id}", 'email sent', 60);
-        return response()->json(['message' => 'email sent'], 200);
+        return response()->json(['message' => translate('email sent')], 200);
     }
 
     /**
@@ -167,15 +172,15 @@ class AuthController extends Controller
         if(!$person)
             return response()->json(['message' => 'invalid email'], 400);
         if(Hash::check(request('newPassword'), $person->person_password))
-            return response()->json(['message' => 'invalid password'], 400);
+            return response()->json(['message' => translate('invalid password')], 400);
         $cache = Cache::get('resetPasswordCode--'.$person->person_id);
         if($cache != request('code'))
-            return response()->json(['message' => 'invalid code'], 400);
+            return response()->json(['message' => translate('invalid code')], 400);
         $person->person_password = Hash::make(request('newPassword'));
         if(!$person->save())
-            return response()->json(['message' => 'password not saved'], 500);
+            return response()->json(['message' => translate('password not saved')], 500);
         Cache::forget('resetPasswordCode--'.$person->person_id);
-        return response()->json(['message' => 'password updated'], 200);
+        return response()->json(['message' => translate('password updated')], 200);
     }
 
     /**

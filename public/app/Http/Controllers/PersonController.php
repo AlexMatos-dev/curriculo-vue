@@ -37,7 +37,7 @@ class PersonController extends Controller
             'person_langue' => request('person_langue')
         ]);
         if(!$result)
-            return response()->json(['message' => 'person not updated'], 500);
+            return response()->json(['message' => translate('person not updated')], 500);
         return response()->json($person);
     }
 }

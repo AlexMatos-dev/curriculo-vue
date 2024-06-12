@@ -22,14 +22,14 @@ class CompanyOrRecruiter
         $currentObject = null;
         if($company){
             if(!$company)
-                return response()->json(['message' => 'company or recruiter profile not found'], 403);
+                return response()->json(['message' => translate('company or recruiter profile not found')], 403);
             $objectType = 'company';
             $currentObject = $company;
         }else{
             $person = auth('api')->user();
             $recruiter = $person->getProfile(Profile::RECRUITER);
             if(!$recruiter)
-                return response()->json(['message' => 'company or recruiter profile not found'], 403);
+                return response()->json(['message' => translate('company or recruiter profile not found')], 403);
             $objectType = 'recruiter';
             $currentObject = $recruiter;
         }

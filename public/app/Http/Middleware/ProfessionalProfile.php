@@ -20,7 +20,7 @@ class ProfessionalProfile
         $person = auth('api')->user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
-            Validator::throwResponse('professional profile not found', 403);
+            Validator::throwResponse(translate('professional profile not found'), 403);
         Session()->put('person', $person);
         Session()->put('professional', $professional);
         return $next($request);

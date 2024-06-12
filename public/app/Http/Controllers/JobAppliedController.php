@@ -60,12 +60,12 @@ class JobAppliedController extends Controller
         ]);
         $jobAppliedObj = $jobApplied->getJobAppliedByCompanyId($this->getObjectFromSession()->company_id, request('job_applied_id'));
         if (!$jobAppliedObj)
-            Validator::throwResponse('job applied not found', 400);
+            Validator::throwResponse(translate('job applied not found'), 400);
         if ($jobAppliedObj->status == request('status'))
-            Validator::throwResponse('invalid status', 400);
+            Validator::throwResponse(translate('invalid status'), 400);
         $jobAppliedObj->status = request('status');
         if (!$jobAppliedObj->save())
-            Validator::throwResponse('status not changed', 500);
+            Validator::throwResponse(translate('status not changed'), 500);
         $planObj = new Plan();
         if ($this->getObjectFromSession()->paying && $planObj->canSendEmails($this->getObjectFromSession(), $this->getObjectType()))
         {
@@ -106,7 +106,7 @@ class JobAppliedController extends Controller
         {
             return response()->json([
                 'success' => false,
-                'message' => 'Validator fields error',
+                'message' => translate('validator fields error'),
                 'errors' => $validator->errors()
             ], 400);
         }
@@ -114,7 +114,7 @@ class JobAppliedController extends Controller
             'job_id' => ['object' => JobList::class, 'data' => request('job_id')]
         ]);
         if(JobApplied::where('professional_id', $this->getProfessionalBySession()->professional_id)->where('job_id', request('job_id'))->first())
-            Validator::throwResponse('professional already applied for this job', 400);
+            Validator::throwResponse(translate('professional already applied for this job'), 400);
         try
         {
             $jobApplied = JobApplied::create([
@@ -137,7 +137,7 @@ class JobAppliedController extends Controller
         {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create job application',
+                'message' => translate('failed to create job application'),
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -156,9 +156,9 @@ class JobAppliedController extends Controller
         $jobApplied = new JobApplied();
         $jobAppliedObj = $jobApplied->getJobAppliedByJobId(request('job_id'));
         if(!$jobAppliedObj || !$jobAppliedObj->isFromPorfessional($this->getProfessionalBySession()->professional_id))
-            Validator::throwResponse('no job applied found', 400);
+            Validator::throwResponse(translate('no job applied found'), 400);
         if(!$jobApplied->delete())
-            Validator::throwResponse('an error occured, job applied not removed', 500);
-        Validator::throwResponse('job applied removed', 200);
+            Validator::throwResponse(translate('an error occured, job applied not removed'), 500);
+        Validator::throwResponse(translate('job applied removed'), 200);
     }
 }

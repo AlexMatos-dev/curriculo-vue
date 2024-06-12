@@ -27,5 +27,6 @@ class DatabaseSeeder extends Seeder
         (new CommonCurrencySeeder())->run();
         (new CompanyTypeSeeder())->run();
         (new NotifierSeeder())->run();
+        // (new SystemTranslationsSyncSeeder())->run();
     }
 }

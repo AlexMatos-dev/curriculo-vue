@@ -17,7 +17,7 @@ class Validator
         try {
             $request->validate($rules);
         } catch (\Throwable $th) {
-            self::throwResponse($th->getMessage(), 400);
+            self::throwResponse(translate($th->getMessage()), 400);
         }
         return true;
     }
@@ -43,15 +43,15 @@ class Validator
                 switch($action[0]){
                     case 'lower':
                         if($gathered[$requestParam] > $targetDate)
-                            self::throwResponse("{$action[1]} is lower than $requestParam", 400);
+                            self::throwResponse("{$action[1]} " . translate('is lower than') . " $requestParam", 400);
                     break;
                     case 'equal':
                         if($gathered[$requestParam] != $targetDate)
-                            self::throwResponse("{$action[1]} is not equal to $requestParam", 400);
+                            self::throwResponse("{$action[1]} " . translate('is not equal to') . " $requestParam", 400);
                     break;
                     case 'bigger':
                         if($gathered[$requestParam] < $targetDate)
-                            self::throwResponse("{$action[1]} is bigger than $requestParam", 400);
+                            self::throwResponse("{$action[1]} " . translate('is bigger than') . " $requestParam", 400);
                     break;
                 }
             } catch (\Throwable $th) {
@@ -70,14 +70,14 @@ class Validator
     public static function validateImage($image = null, $returnError = false)
     {
         if(!$image){
-            self::throwResponse("invalid image", 400);
+            self::throwResponse(translate("invalid image"), 400);
         }
         $fileHandler = new FileHandler($image);
         if(!$fileHandler->isExtensionValid()){
-            self::throwResponse("invalid image format", 400);
+            self::throwResponse(translate("invalid image format"), 400);
         }
         if(!$fileHandler->isFileSizeValid()){
-            self::throwResponse("image too big, max of 2 mb allowed", 400);
+            self::throwResponse(translate("image too big, max of 2 mb allowed"), 400);
         }
         return $fileHandler;
     }
@@ -106,7 +106,7 @@ class Validator
         $value = $sum % 11;
         $result = $cnpj[13] == ($value < 2 ? 0 : 11 - $value);
         if(!$result)
-            self::throwResponse('cnpj is invalid', 400);
+            self::throwResponse(translate('cnpj is invalid'), 400);
         return true;
     }
 
@@ -127,7 +127,7 @@ class Validator
                 continue;
             $required = array_key_exists('required', $data) && is_bool($data['required']) ? $data['required'] : false;
             if(!array_key_exists('object', $data) || !array_key_exists('data', $data))
-                self::throwResponse('invalid parameters for validation', 500);
+                self::throwResponse(translate('invalid parameters for validation'), 500);
             try {
                 $key = array_key_exists('id', $data) ? $data['id'] : $key;
                 $objInstance = new $data['object']();
@@ -138,14 +138,14 @@ class Validator
                     $foundObject = $objInstance->find($data['data']);
                 }
             } catch (\Throwable $th) {
-                self::throwResponse("$key is not valid", 400);
+                self::throwResponse("$key " . translate('is not valid'), 400);
             }
             if(!$foundObject && $required)
-                self::throwResponse('invalid parameters for validation', 500);
+                self::throwResponse(translate('invalid parameters for validation'), 500);
             $attrToCheck = array_key_exists('attrToCheck', $data) ? $data['attrToCheck'] : false;
             $expectedValue = array_key_exists('expectedValue', $data) ? $data['expectedValue'] : false;
             if($attrToCheck && $expectedValue && $foundObject->{$attrToCheck} != $expectedValue)
-                self::throwResponse("invalid type of $attrToCheck", 400);
+                self::throwResponse(translate("invalid type of") . ' ' . $attrToCheck, 400);
             $objects[$key] = $foundObject;
         }
         return $objects;

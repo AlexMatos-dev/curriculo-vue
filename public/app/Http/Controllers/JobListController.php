@@ -112,9 +112,9 @@ class JobListController extends Controller
         try{
             $jobList = JobList::with('company')->findOrFail($joblistId);
             $jobListObj = $jobList->splitjoinDataFromListedJobs([$jobList]);
-            return response()->json(["message" => "job found successfully", "data" => $jobListObj]);
+            return response()->json(["message" => translate('job found successfully'), "data" => $jobListObj]);
         }catch(ModelNotFoundException $e){
-            return response()->json(["message" => "job not found", "Error" => $e], 400);
+            return response()->json(["message" => translate('job not found'), "error" => $e], 400);
         }
     }
 
@@ -158,11 +158,11 @@ class JobListController extends Controller
                 'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
             if($request->job_state && !$request->job_country)
-                Validator::throwResponse('a country is required');
+                Validator::throwResponse(translate('a country is required'));
             if($request->job_city && !$request->job_state)
-                Validator::throwResponse('a state is required');
+                Validator::throwResponse(translate('a state is required'));
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
-                Validator::throwResponse('invalid proficiency, must be seniority type');
+                Validator::throwResponse(translate('invalid proficiency, must be seniority type'));
             $data = $request->all();
             unset($data['job_skills']);
             $data['job_city'] = mb_strtolower($data['job_city']);
@@ -170,10 +170,10 @@ class JobListController extends Controller
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $jobList = JobList::create($data);
-            return response()->json(["message" => "job created successfully", 'data' => $jobList]);
+            return response()->json(["message" => translate('job created successfully'), 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => "an error occurred while creating the job, please try again later.", "Error" => $e], 500);
+            return response()->json(["message" => translate('an error occurred while creating the job, please try again later'), "error" => $e], 500);
         }
     }
 
@@ -196,13 +196,13 @@ class JobListController extends Controller
     {
         $jobList = JobList::find($jobListId);
         if(!$jobList)
-            Validator::throwResponse('job not found');
+            Validator::throwResponse(translate('job not found'));
         $company = Company::find($jobList->company_id);
         if(!$company)
-            Validator::throwResponse('company not found found');
+            Validator::throwResponse(translate('company not found found'));
         $person = auth('api')->user();
         if(!$company->isAdmin($person->person_id))
-            Validator::throwResponse('you do not have the rights, not your company');
+            Validator::throwResponse(translate('you do not have the rights, not your company'));
         try{
             Validator::validateParameters($request, [
                 'job_modality_id'   => 'required|integer',
@@ -222,11 +222,11 @@ class JobListController extends Controller
                 'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
             ]);
             if($request->job_state && !$request->job_country)
-                Validator::throwResponse('a country is required');
+                Validator::throwResponse(translate('a country is required'));
             if($request->job_city && !$request->job_state)
-                Validator::throwResponse('a state is required');
+                Validator::throwResponse(translate('a state is required'));
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
-                Validator::throwResponse('invalid proficiency, must be seniority type');
+                Validator::throwResponse(translate('invalid proficiency, must be seniority type'));
             $data = $request->all();
             unset($data['job_skills']);
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
@@ -235,11 +235,11 @@ class JobListController extends Controller
             $data['job_state'] = mb_strtolower($data['job_state']);
             $result = $jobList->update($data);
             if(!$result)
-                Validator::throwResponse('job not updated', 500);
-            return response()->json(["message" => "job updated successfully", 'data' => $jobList]);
+                Validator::throwResponse(translate('job not updated'), 500);
+            return response()->json(["message" => translate('job updated successfully'), 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => "an error occurred while updating the job, please try again later.", "Error" => $e], 500);
+            return response()->json(["message" => translate('an error occurred while updating the job, please try again later'), "Error" => $e], 500);
         }
     }
 
@@ -259,11 +259,11 @@ class JobListController extends Controller
             JobModality::where('joblist_id', $jobList->job_id);
             JobLanguage::where('joblist_id', $jobList->job_id);
             $jobList->delete();
-            return response()->json(["message" => "job $jobList->job_model deleted sucessfully."]);
+            return response()->json(["message" => translate('job deleted sucessfully')]);
         }
         catch (ModelNotFoundException $e)
         {
-            return response()->json(["message" => "job not found.", "Error" => $e], 404);
+            return response()->json(["message" => translate('job not found'), "error" => $e], 404);
         }
     }
 
@@ -292,9 +292,9 @@ class JobListController extends Controller
                     'proficiency' => ['object' => Proficiency::class, 'data' => request('proficiency_id')],
                 ]);
                 if(request('language_id') && !request('proficiency_id'))
-                    Validator::throwResponse('no proficiency sent');
+                    Validator::throwResponse(translate('no proficiency sent'));
                 if($objects['proficiency']->category != Proficiency::CATEGORY_LANGUAGE)
-                    Validator::throwResponse('invalid proficiency, category not accepted');
+                    Validator::throwResponse(translate('invalid proficiency, category not accepted'));
                 if(JobLanguage::create([
                     'joblist_id' => $this->getJobBySession()->job_id,
                     'language_id' => request('language_id'),
@@ -320,8 +320,8 @@ class JobListController extends Controller
             break;
         }
         if(!$result)
-            Validator::throwResponse('action not performed', 500);
-        return response()->json(['message' => "action performed", 'data' => $data]);
+            Validator::throwResponse(translate('action not performed'), 500);
+        return response()->json(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -358,7 +358,7 @@ class JobListController extends Controller
                     ]))
                         $result = true; 
                 }else{
-                    Validator::throwResponse(['message' => "visa already added to job", 'data' => $data]);
+                    Validator::throwResponse(['message' => translate('visa already added to job'), 'data' => $data]);
                 }
             break;
             case 'remove':
@@ -379,8 +379,8 @@ class JobListController extends Controller
             break;
         }
         if(!$result)
-            Validator::throwResponse('action not performed', 500);
-        return response()->json(['message' => "action performed", 'data' => $data]);
+            Validator::throwResponse(translate('action not performed'), 500);
+        return response()->json(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -412,7 +412,7 @@ class JobListController extends Controller
                     ]))
                         $result = true;
                 }else{
-                    Validator::throwResponse(['message' => "skill already added to job", 'data' => $data]);
+                    Validator::throwResponse(['message' => translate('skill already added to job'), 'data' => $data]);
                 } 
             break;
             case 'remove':
@@ -431,7 +431,7 @@ class JobListController extends Controller
             break;
         }
         if(!$result)
-            Validator::throwResponse('action not performed', 500);
-        return response()->json(['message' => "action performed", 'data' => $data]);
+            Validator::throwResponse(translate('action not performed'), 500);
+        return response()->json(['message' => translate('action performed'), 'data' => $data]);
     }
 }

@@ -25,19 +25,19 @@ class ChatMessageHandler extends Controller
             Validator::throwResponse('invalid prefix', 500);
         $profile = $person->getProfile($this->getProfileType(request('prefix')));
         if(!$profile)
-            Validator::throwResponse(request('prefix') . ' profile not found', 500);
+            Validator::throwResponse(request('prefix') . ' ' . translate('profile not found'), 500);
         Session()->put('chatSender', $profile);
         Session()->put('chatSenderType', request('prefix'));
         if($this->isReceiverException())
             return $next($request);
         $receiverTypeProfile = $this->getProfileType(request('receiverType'));
         if(!request('receiverId') || !request('receiverType') || !$receiverTypeProfile)
-            Validator::throwResponse('receiver ' . request('receiverType') . ' profile not found', 500);
+            Validator::throwResponse('receiver ' . request('receiverType') . ' ' . translate('profile not found'), 500);
         $receiverProfile = $this->getProfileObject($receiverTypeProfile, request('receiverId'));
         if(!$receiverProfile)
-            Validator::throwResponse('receiver profile not found', 500);
+            Validator::throwResponse(translate('receiver profile not found'), 500);
         if($profile->person_id == $receiverProfile->person_id)
-            Validator::throwResponse('you can not send a message to yourself', 500);
+            Validator::throwResponse(translate('you can not send a message to yourself'), 500);
         Session()->put('chatReceiver', $receiverProfile);
         Session()->put('chatReceiverType', $receiverTypeProfile);
         return $next($request);

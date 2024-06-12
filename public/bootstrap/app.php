@@ -16,8 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'async/asyncactions'
         ]);
         $middleware->group('api', [
-            \Illuminate\Http\Middleware\HandleCors::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class
+            \App\Http\Middleware\UserLanguage::class
+        ]);
+        $middleware->group('web', [
+            \App\Http\Middleware\UserLanguage::class
         ]);
         $middleware->group('authenticate', [
             \App\Http\Middleware\Authentication::class,
