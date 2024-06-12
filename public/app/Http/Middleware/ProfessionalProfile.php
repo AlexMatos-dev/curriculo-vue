@@ -6,6 +6,7 @@ use App\Helpers\Validator;
 use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProfessionalProfile
@@ -17,7 +18,7 @@ class ProfessionalProfile
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             Validator::throwResponse(translate('professional profile not found'), 403);

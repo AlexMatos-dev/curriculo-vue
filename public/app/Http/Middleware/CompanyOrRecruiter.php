@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CompanyOrRecruiter
@@ -16,7 +17,7 @@ class CompanyOrRecruiter
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $company = $person->getProfile(Profile::COMPANY);
         $objectType = null;
         $currentObject = null;
@@ -26,7 +27,7 @@ class CompanyOrRecruiter
             $objectType = 'company';
             $currentObject = $company;
         }else{
-            $person = auth('api')->user();
+            $person = Auth::user();
             $recruiter = $person->getProfile(Profile::RECRUITER);
             if(!$recruiter)
                 return response()->json(['message' => translate('company or recruiter profile not found')], 403);

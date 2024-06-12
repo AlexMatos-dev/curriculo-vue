@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class Authentication
@@ -22,7 +23,7 @@ class Authentication
             return $next($request);
         if(!$request->header('Authorization'))
             return response()->json(['message' => translate('token not provided')], 401);
-        if(!auth('api')->check())
+        if(!Auth::user())
             return response()->json(['message' => translate('invalid token'), 'generateToken' => true], 401);
         return $next($request);
     }

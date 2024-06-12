@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CompanyAdmin
@@ -16,7 +17,7 @@ class CompanyAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $company = $person->getProfile(Profile::COMPANY);
         if(!$company)
             return response()->json(['message' => translate('company not found')], 403);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
 
 class RecruiterController extends Controller
 {
@@ -17,7 +18,7 @@ class RecruiterController extends Controller
         Validator::validateParameters($this->request, [
             'recruiter_photo' => 'required'
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $recruiter = $person->getProfile(Profile::RECRUITER);
         if(!$recruiter)
             return response()->json(['message' => translate('no recruiter found')], 400);

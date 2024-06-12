@@ -17,6 +17,8 @@ class CreatePersonsTable extends Migration {
 			$table->unsignedInteger('person_langue')->nullable();
 			$table->dateTime('last_login')->nullable();
 			$table->timestamps();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->rememberToken();
 			$table->softDeletes();
 		});
 	}

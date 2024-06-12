@@ -9,6 +9,7 @@ use App\Models\Professional;
 use App\Models\Profile;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class MyCurriculum extends Controller
@@ -24,7 +25,7 @@ class MyCurriculum extends Controller
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             Validator::throwResponse(translate('professional not found'), 403);

@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\CompanyType;
 use App\Models\Person;
 use App\Models\Profile;
+use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
 {
@@ -41,7 +42,7 @@ class CompanyController extends Controller
         Validator::checkExistanceOnTable([
             'company_type' => ['object' => CompanyType::class, 'data' => request('company_type')]
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $dataToSet = [
             'company_register_number' => request('company_register_number'),
             'company_slug' => $person->makeSlug(request('company_name'), null),
@@ -109,7 +110,7 @@ class CompanyController extends Controller
         $actions = ['add', 'remove', 'grant', 'revoke', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => translate('invalid action')], 400);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
@@ -150,7 +151,7 @@ class CompanyController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => translate('invalid action')], 400);
-        $person = auth('api')->user();
+        $person = Auth::user()
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))

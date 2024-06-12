@@ -45,6 +45,7 @@ class AuthController extends Controller
         $token = $person->createToken('auth_token')->plainTextToken;
         $person->last_login = Carbon::now();
         $person->save();
+        Auth::login($person);
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
@@ -107,7 +108,7 @@ class AuthController extends Controller
      */
     public function profile()
     {
-        $personObj = auth('api')->user();
+        $personObj = Auth::user();
         $professional = $personObj->getProfile(Profile::PROFESSIONAL);
         if($professional)
             $professional = $professional->gatherInformation();
@@ -195,7 +196,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::user()->factory()->getTTL() * 60
         ]);
     }
 }

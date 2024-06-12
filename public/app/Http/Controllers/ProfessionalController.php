@@ -11,6 +11,7 @@ use App\Models\Professional;
 use App\Models\ProfessionalProfession;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ProfessionalController extends Controller
 {
@@ -34,7 +35,7 @@ class ProfessionalController extends Controller
             'professional_phone' => 'max:20',
             'professional_title' => 'max:255',
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $dataToSet = [
             'professional_slug' => $person->makeSlug(request('professional_firstname'), request('professional_lastname')),
             'professional_firstname' => request('professional_firstname'),
@@ -110,7 +111,7 @@ class ProfessionalController extends Controller
             'dpgender' => ['data' => request('dpgender'), 'object' => Gender::class],
             'dpcountry_id' => ['data' => request('dpcountry_id'), 'object' => ListCountry::class]
         ]);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => translate('no professional found'), 400]);
@@ -138,7 +139,7 @@ class ProfessionalController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => translate('invalid action')], 400);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => translate('professional not found')], 400);
@@ -180,7 +181,7 @@ class ProfessionalController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => 'invalid action'], 400);
-        $person = auth('api')->user();
+        $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
             return response()->json(['message' => translate('professional not found')], 400);
