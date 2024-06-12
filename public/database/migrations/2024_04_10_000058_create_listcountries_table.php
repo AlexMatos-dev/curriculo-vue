@@ -13,6 +13,7 @@ class CreateListcountriesTable extends Migration {
 			$table->string('lcountry_acronyn')->nullable();
 			$table->string('ddi', 50);
 			$table->mediumText('flag')->charset('binary')->nullable();
+			$table->string('spokenLanguages', 300)->default('[]');
 			$table->timestamps();
 		});
 	}

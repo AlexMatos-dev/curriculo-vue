@@ -44,10 +44,10 @@ class SkillController extends Controller
             'skproficiency_level' => ['data' => request('skproficiency_level'), 'object' => Proficiency::class]
         ]);
         if($objects['skproficiency_level']->category != Proficiency::CATEGORY_LEVEL)
-            Validator::throwResponse('invalid proficiency type');
+            Validator::throwResponse(translate('invalid proficiency type'));
         $skill = Skill::create($this->request->all());
         if(!$skill)
-            Validator::throwResponse('skill not created', 500);
+            Validator::throwResponse(translate('skill not created'), 500);
         return response()->json($skill);
     }
 
@@ -88,10 +88,10 @@ class SkillController extends Controller
     {
         $skillObj = Skill::find(request('skill'));
         if(!$skillObj)
-            Validator::throwResponse('skill not found', 400);
+            Validator::throwResponse(translate('skill not found'), 400);
         $skill = $skillObj->isFromProfessionalCurriculum($this->getProfessionalBySession()->professional_id);
         if(!$skill)
-            Validator::throwResponse('skill not found', 400);
+            Validator::throwResponse(translate('skill not found'), 400);
         return response()->json($skill);
     }
 
@@ -104,12 +104,12 @@ class SkillController extends Controller
     {
         $skillObj = Skill::find(request('skill'));
         if(!$skillObj)
-            Validator::throwResponse('skill not found', 400);
+            Validator::throwResponse(translate('skill not found'), 400);
         $skill = $skillObj->isFromProfessionalCurriculum($this->getProfessionalBySession()->professional_id);
         if(!$skill)
-            Validator::throwResponse('skill not found', 400);
+            Validator::throwResponse(translate('skill not found'), 400);
         if(!$skill->delete())
-            Validator::throwResponse('skill not removed', 500);
-        return response()->json(['message' => 'skill removed']);
+            Validator::throwResponse(translate('skill not removed'), 500);
+        return response()->json(['message' => translate('skill removed')]);
     }
 }

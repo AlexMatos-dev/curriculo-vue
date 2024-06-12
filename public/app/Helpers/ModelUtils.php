@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Translation;
+use ReflectionClass;
 
 class ModelUtils
 {
@@ -144,5 +145,20 @@ class ModelUtils
     {
         $className = self::BASE_MODELS_PATH . trim('\ ') . class_basename($object);
         return new $className();
+    }
+
+    /**
+     * Return all constants of sent Object
+     * @param Object object
+     * @return Array of constants
+     */
+    public static function getClassConstants(Object $object)
+    {
+        try {
+            $oClass = new ReflectionClass($object);
+            return $oClass->getConstants();
+        } catch (\Throwable $th) {
+            return [];
+        }
     }
 }

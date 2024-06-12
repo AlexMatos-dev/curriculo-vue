@@ -72,7 +72,7 @@ class ReferenceController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'references.refcurriculum_id');
         })->first();
         if(!$reference)
-            Validator::throwResponse('reference not found', 400);
+            Validator::throwResponse(translate('reference not found'), 400);
         $request->validate([
             'reference_name'    =>'required',
             'reference_email'   =>'required',
@@ -93,7 +93,7 @@ class ReferenceController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'references.refcurriculum_id');
         })->first();
         if(!$reference)
-            Validator::throwResponse('reference not found', 400);
+            Validator::throwResponse(translate('reference not found'), 400);
         $reference->delete();
         return response()->json($reference);
     }

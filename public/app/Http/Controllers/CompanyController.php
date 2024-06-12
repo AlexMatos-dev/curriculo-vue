@@ -42,7 +42,7 @@ class CompanyController extends Controller
         Validator::checkExistanceOnTable([
             'company_type' => ['object' => CompanyType::class, 'data' => request('company_type')]
         ]);
-        $person = Auth::user()->user();
+        $person = Auth::user();
         $dataToSet = [
             'company_register_number' => request('company_register_number'),
             'company_slug' => $person->makeSlug(request('company_name'), null),
@@ -74,14 +74,14 @@ class CompanyController extends Controller
         if(!$company){
             $response = (new Company())->saveCompany($dataToSet);
             if(!$response)
-                return response()->json(['message' => 'professional not found'], 500);
+                return response()->json(['message' => translate('professional not found')], 500);
             $company = $response;
             $newCompany = true;
         }else{
             if(!$company->isAdmin($person->person_id))
-                return response()->json(['message' => 'not an admin of company'], 401);
+                return response()->json(['message' => translate('not an admin of company')], 401);
             if(!$company->saveCompany($dataToSet))
-                return response()->json(['message' => 'company not updated'], 500);
+                return response()->json(['message' => translate('company not updated')], 500);
         }
         if($newCompany){
             $result = Profile::create([
@@ -91,7 +91,7 @@ class CompanyController extends Controller
             ]);
             if(!$result){
                 $company->delete();
-                return response()->json(['message' => 'company not updated'], 500);
+                return response()->json(['message' => translate('company not updated')], 500);
             }
             $company->syncAdmins($person->person_id, true);
         }
@@ -109,12 +109,12 @@ class CompanyController extends Controller
     {
         $actions = ['add', 'remove', 'grant', 'revoke', 'list'];
         if(!in_array(request('action'), $actions))
-            return response()->json(['message' => 'invalid action'], 400);
-        $person = Auth::user()->user();
+            return response()->json(['message' => translate('invalid action')], 400);
+        $person = Auth::user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
-            return response()->json(['message' => 'person is invalid'], 400);
+            return response()->json(['message' => translate('person is invalid')], 400);
         $data = [];
         switch(request('action')){
             case 'add':
@@ -135,8 +135,8 @@ class CompanyController extends Controller
             break;
         }
         if(!$result)
-            return response()->json(['message' => 'action not completed with success'], 500);
-        return response()->json(['message' => 'action performed', 'data' => $data]);
+            return response()->json(['message' => translate('action not completed with success')], 500);
+        return response()->json(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -150,12 +150,12 @@ class CompanyController extends Controller
     {
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
-            return response()->json(['message' => 'invalid action'], 400);
-        $person = Auth::user()->user();
+            return response()->json(['message' => translate('invalid action')], 400);
+        $person = Auth::user()
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))
-            return response()->json(['message' => 'person is invalid'], 400);
+            return response()->json(['message' => translate('person is invalid')], 400);
         switch(request('action')){
             case 'add':
                 $result = $company->addRecruiter($targetPerson->person_id);
@@ -168,7 +168,7 @@ class CompanyController extends Controller
             break;
         }
         if(!$result)
-            return response()->json(['message' => 'action not completed with success'], 500);
-        return response()->json(['message' => 'action performed', 'data' => $company->getRecruiters()]);
+            return response()->json(['message' => translate('action not completed with success')], 500);
+        return response()->json(['message' => translate('action performed'), 'data' => $company->getRecruiters()]);
     }
 }

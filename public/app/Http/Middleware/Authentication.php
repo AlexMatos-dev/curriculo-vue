@@ -22,9 +22,9 @@ class Authentication
         if($this->isException())
             return $next($request);
         if(!$request->header('Authorization'))
-            return response()->json(['message' => 'token not provided'], 401);
+            return response()->json(['message' => translate('token not provided')], 401);
         if(!Auth::user())
-            return response()->json(['message' => 'invalid token', 'generateToken' => true], 401);
+            return response()->json(['message' => translate('invalid token'), 'generateToken' => true], 401);
         return $next($request);
     }
 

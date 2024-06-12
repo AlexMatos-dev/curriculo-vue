@@ -97,7 +97,7 @@ class CertificationController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'certifications.cercurriculum_id');
         })->first();
         if(!$certification)
-            Validator::throwResponse('certification not found', 400);
+            Validator::throwResponse(translate('certification not found'), 400);
         $certification->delete();
 
         return response()->json($certification);

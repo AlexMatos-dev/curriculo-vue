@@ -26,7 +26,7 @@ class ChatMessageController extends Controller
         ]);
         $chatMessageObjects = $this->getChatMessageObjects();
         if($chatMessageObjects['receiverType'] == 'company' && !$chatMessageObjects['receiverObject']->checkPrivacy(ChatMessage::CATEGORY_MESSAGE))
-            Validator::throwResponse('message can not be sent to company', 500);
+            Validator::throwResponse(translate('message can not be sent to company'), 500);
         $chatAttachment = null;
         if(request('attachment')){
             $imageHandler = Validator::validateImage(request('attachment'));
@@ -35,7 +35,7 @@ class ChatMessageController extends Controller
         }
         $chatMessage = (new ChatMessage())->makeMessage($chatMessageObjects['receiver'], $chatMessageObjects['sender'], request('message'), $chatAttachment, request('job_id'));
         if(!$chatAttachment)
-            Validator::throwResponse('message not sent', 500);
+            Validator::throwResponse(translate('message not sent'), 500);
         return response()->json($chatMessage);
     }
 
@@ -53,10 +53,10 @@ class ChatMessageController extends Controller
         ]);
         $senderObj = Session()->get('chatSender');
         if($object['chat_message']->sender_message_id != $senderObj->{$senderObj->getKeyName()})
-            Validator::throwResponse('not owner of message', 400);
+            Validator::throwResponse(translate('not owner of message'), 400);
         if(!$object['chat_message']->delete())
-            Validator::throwResponse('chat message not removed', 500);
-        return response()->json(['message' => 'chat message removed']);
+            Validator::throwResponse(translate('chat message not removed'), 500);
+        return response()->json(['message' => translate('chat message removed')]);
     }
 
     /**
