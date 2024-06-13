@@ -38,8 +38,13 @@ function translate($text, $enforcedLangIso = null)
     if(!array_key_exists($text, $translations))
         return $text;
     $translatedText = $translations[$text]['en'];
-    if(array_key_exists($langIso, $translations[$text]))
-        $translatedText = $translations[$text][$langIso];
+    if(array_key_exists($langIso, $translations[$text])){
+        if($translations[$text][$langIso]){
+            $translatedText = $translations[$text][$langIso];
+        }else{
+            $translatedText = $translations[$text]['object']->getTranslationByIsoCode($langIso);
+        }
+    }
     return $translatedText;
 }
 

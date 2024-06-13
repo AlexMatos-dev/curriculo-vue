@@ -66,7 +66,7 @@ class Person extends Authenticatable
     }
 
     /**
-     * Send email to $this Person with generated code
+     * Send change password code to the email of $this Person with generated code for password change
      * @return Bool
      */
     public function sendRequestChangePasswordCodeEmail()
@@ -74,7 +74,7 @@ class Person extends Authenticatable
         $languageISO = Session()->get('user_lang') ? Session()->get('user_lang') : $this->getLanguageIso($this->person_id);
         $languageISO = !$languageISO ? 'en' : $languageISO;
         $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
-        $code = strtoupper($this->generatePasswordCode());
+        $code = strtoupper($this->generateCode());
         $renderedEmail = view('email_templates/password_reset_code', [
             'code' => $code,
             'translations'=> $translatedText,
@@ -82,9 +82,38 @@ class Person extends Authenticatable
         ]);
         $emailObj = new \App\Helpers\Mail();
         $resultOfEmailSend = $emailObj->sendMail($this->person_email, $translatedText['Your password change code!'], $renderedEmail);
-        if(!$resultOfEmailSend['success'])
+        if(!$resultOfEmailSend['success']){
+            Cache::forget("resetPasswordCode--{$this->person_id}");
+            Cache::forget("awaiting_changepass-email-receival-{$this->person_id}");
             return false;
+        }
         Cache::put("resetPasswordCode--{$this->person_id}", "$code", 1800);
+        return true;
+    }
+
+    /**
+     * Send verify email code to the email of $this Person with generated code for email verification
+     * @return Bool
+     */
+    public function sendEmailVerificationCodeEmail()
+    {
+        $languageISO = Session()->get('user_lang') ? Session()->get('user_lang') : $this->getLanguageIso($this->person_id);
+        $languageISO = !$languageISO ? 'en' : $languageISO;
+        $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
+        $code = strtoupper($this->generateCode());
+        $renderedEmail = view('email_templates/email_verification_code', [
+            'code' => $code,
+            'translations'=> $translatedText,
+            'languageIso' => $languageISO
+        ]);
+        $emailObj = new \App\Helpers\Mail();
+        $resultOfEmailSend = $emailObj->sendMail($this->person_email, $translatedText['your email verification code'] . '!', $renderedEmail);
+        if(!$resultOfEmailSend['success']){
+            Cache::forget("verifyEmailCode--{$this->person_id}");
+            Cache::forget("awaiting-emailverification-email-receival-{$this->person_id}");
+            return false;
+        }
+        Cache::put("verifyEmailCode--{$this->person_id}", "$code", 1800);
         return true;
     }
 
@@ -92,7 +121,7 @@ class Person extends Authenticatable
      * Generates a random 6 characters (number and letter) password code
      * @return String
      */
-    public function generatePasswordCode()
+    public function generateCode()
     {
         return Str::random(6);
     }

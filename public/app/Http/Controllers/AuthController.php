@@ -33,7 +33,9 @@ class AuthController extends Controller
         $credentials = request(['email', 'password']);
         $person = Person::where('person_email', $credentials['email']) ->first();
         if(!$person || !Hash::check($credentials['password'], $person->person_password))
-            return response()->json(['message' => 'invalid credentials'], 401);
+            return response()->json(['message' => translate('invalid credentials')], 401);
+        if(!$person->email_verified_at)
+            return response()->json(['message' => translate('email not verified')], 401);
         $key = "lastLoginOf--{$person->person_id}";
         $personType = '';
         if(Cache::has($key)){
@@ -146,11 +148,11 @@ class AuthController extends Controller
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
             return response()->json(['message' => translate('invalid email')], 400);
-        if(Cache::has("awaiting-email-receival-{$person->person_id}"))
+        if(Cache::has("awaiting_changepass-email-receival-{$person->person_id}"))
             return response()->json(['message' => translate('code already sent, wait 1 minute')], 500);
         if(!$person->sendRequestChangePasswordCodeEmail())
             return response()->json(['message' => translate('email not sent')], 500);
-        Cache::put("awaiting-email-receival-{$person->person_id}", 'email sent', 60);
+        Cache::put("awaiting_changepass-email-receival-{$person->person_id}", 'email sent', 60);
         return response()->json(['message' => translate('email sent')], 200);
     }
 
@@ -180,7 +182,8 @@ class AuthController extends Controller
         $person->person_password = Hash::make(request('newPassword'));
         if(!$person->save())
             return response()->json(['message' => translate('password not saved')], 500);
-        Cache::forget('resetPasswordCode--'.$person->person_id);
+        Cache::forget("resetPasswordCode--{$person->person_id}");
+        Cache::forget("awaiting_changepass-email-receival-{$person->person_id}");
         return response()->json(['message' => translate('password updated')], 200);
     }
 
@@ -198,5 +201,58 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => Auth::user()->factory()->getTTL() * 60
         ]);
+    }
+
+    /**
+     * Request an email verification code which will be sent to informed Person email
+     * @param String email - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function requestEmailConfirmationCode()
+    {
+        Validator::validateParameters($this->request, [
+            'email' => 'email|required'
+        ]);
+        $person = Person::where('person_email', request('email'))->first();
+        if(!$person)
+            return response()->json(['message' => translate('invalid email')], 400);
+        if($person->email_verified_at)
+            return response()->json(['message' => translate('email already verified')], 200);
+        if(Cache::has("awaiting-emailverification-email-receival-{$person->person_id}"))
+            return response()->json(['message' => translate('code already sent, wait 1 minute')], 500);
+        if(!$person->sendEmailVerificationCodeEmail())
+            return response()->json(['message' => translate('email not sent')], 500);
+        $person->email_verified_at = null;
+        $person->save();
+        Cache::put("awaiting-emailverification-email-receival-{$person->person_id}", 'email sent', 60);
+        return response()->json(['message' => translate('email sent')], 200);
+    }
+
+    /**
+     * Verifies sent email 
+     * Note: Code will only be usable once
+     * @param String code - required
+     * @param String email - required
+     * @param String newEmail - required (must not be in use at persons)
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verifyEmail()
+    {
+        Validator::validateParameters($this->request, [
+            'code' => 'required',
+            'email' => 'required'
+        ]);
+        $person = Person::where('person_email', request('email'))->first();
+        if(!$person)
+            return response()->json(['message' => 'invalid email'], 400);
+        $cache = Cache::get('verifyEmailCode--'.$person->person_id);
+        if($cache != request('code'))
+            return response()->json(['message' => translate('invalid code')], 400);
+        $person->email_verified_at = Carbon::now();
+        if(!$person->save())
+            return response()->json(['message' => translate('email not verified')], 500);
+        Cache::forget("verifyEmailCode--{$person->person_id}");
+        Cache::forget("awaiting-emailverification-email-receival-{$person->person_id}");
+        return response()->json(['message' => translate('email verified')], 200);
     }
 }
