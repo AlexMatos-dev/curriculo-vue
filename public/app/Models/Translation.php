@@ -159,6 +159,7 @@ class Translation extends Model
                     $thisTranslations[$iso] = array_key_exists($iso, $unofficalArray) ? $unofficalArray[$iso] : null;
                 }
             }
+            $thisTranslations['object'] = $translation;
             $translationsArray[$translation->en] = $thisTranslations;
         }
         return $translationsArray;

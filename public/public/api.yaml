@@ -242,6 +242,71 @@ paths:
                   value:
                     message: invalid token
                   summary: Token is not valid
+  /api/requestemailconfirmationcode:
+    post:
+      tags:
+        - auth
+      summary: Request an email verification ode which will be used to validate email
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailToReceiveEmail@email.com
+          required: true
+      responses:
+        '200':
+          description: Email containing the email verification code
+          content:
+            application/json:
+              example: {"message": "email sent"}
+        '500':
+          description: Email sent error
+          content:
+            application/json:
+              example: {"message": "email not sent"}
+  /api/verifyemail:
+    post:
+      tags:
+        - auth
+      summary: Verifies user email. If email is already verified, method responds with a 200 code and does not send email. Note - The code has 30 minutes of validaty and, an email can only be send again after 1 minute of last sent email
+      parameters:
+        - in: query
+          name: email
+          schema:
+            type: string
+            example: emailOfPerson@email.com
+          required: true
+        - name: code
+          in: query
+          description: The received code at email
+          required: true
+          example: 123456
+          schema:
+            type: string
+      # requestBody:
+      #   description: Change password
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/ChangePassword'
+      #   required: true
+      responses:
+        '200':
+          description: Person email verified
+          content:
+            application/json:
+              example: {"message": "email verified"}
+        '400':
+          description: Invalid email
+          content:
+            application/json:
+              example: {"message": "invalid email | invalid code"}
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "email not verified"}
 
   /api/requestchangepassword:
     post:
