@@ -11,6 +11,7 @@ use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\CompanyTypeController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\ListLangueController;
@@ -164,4 +165,9 @@ Route::prefix('company_types')->group(function ()
 Route::prefix('language')->group(function ()
 {
     Route::get('getlanguage', [ListLangueController::class, 'getLangue']);
+});
+
+Route::prefix('countries')->group(function ()
+{
+    Route::get('getCountries', [CountryController::class, 'getCountries']);
 });
