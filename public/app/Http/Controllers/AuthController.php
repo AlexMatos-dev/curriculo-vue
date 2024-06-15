@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     /**
-     * Get a JWT via given credentials.
+     * Login route, which return a token.
      * @param Stirng email    - required
      * @param String password - required
      * @param String personType (professional, recruiter or company)
@@ -35,7 +35,7 @@ class AuthController extends Controller
         if(!$person || !Hash::check($credentials['password'], $person->person_password))
             return response()->json(['message' => translate('invalid credentials')], 401);
         if(!$person->email_verified_at)
-            return response()->json(['message' => translate('email not verified')], 401);
+            return response()->json(['message' => translate('email not verified')], 406);
         $key = "lastLoginOf--{$person->person_id}";
         $personType = '';
         if(Cache::has($key)){
