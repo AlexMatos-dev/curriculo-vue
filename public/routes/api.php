@@ -11,6 +11,7 @@ use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\CompanyTypeController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\ListLangueController;
@@ -27,6 +28,8 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 Route::post('requestchangepassword', [AuthController::class, 'requestChangePasswordCode']);
 Route::post('changepassword', [AuthController::class, 'changePassword']);
+Route::post('requestemailconfirmationcode', [AuthController::class, 'requestEmailConfirmationCode']);
+Route::post('verifyemail', [AuthController::class, 'verifyEmail']);
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -164,4 +167,9 @@ Route::prefix('company_types')->group(function ()
 Route::prefix('language')->group(function ()
 {
     Route::get('getlanguage', [ListLangueController::class, 'getLangue']);
+});
+
+Route::prefix('countries')->group(function ()
+{
+    Route::get('getCountries', [CountryController::class, 'getCountries']);
 });

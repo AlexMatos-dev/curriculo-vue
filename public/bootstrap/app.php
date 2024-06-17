@@ -16,6 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'async/asyncactions'
         ]);
+        $middleware->group('api', [
+            \App\Http\Middleware\UserLanguage::class
+        ]);
+        $middleware->group('web', [
+            \App\Http\Middleware\UserLanguage::class
+        ]);
         $middleware->group('authenticate', [
             \App\Http\Middleware\Authentication::class,
         ]);

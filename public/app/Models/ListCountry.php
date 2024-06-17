@@ -20,7 +20,8 @@ class ListCountry extends Model
         'lcountry_name',
         'lcountry_acronyn',
         'ddi',
-        'flag'
+        'flag',
+        'spokenLanguages'
     ];
 
     /**

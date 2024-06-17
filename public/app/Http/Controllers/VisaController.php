@@ -49,12 +49,12 @@ class VisaController extends Controller
             'country_name' => request('vicountry_id')
         ]);
         if(!$country)
-            Validator::throwResponse('country not found', 500);
+            Validator::throwResponse(translate('country not found'), 500);
         $values = $this->request->all();
         $values['vicountry_id'] = $country->country_id;
         $visa = Visa::create($values);
         if(!$visa)
-            Validator::throwResponse('visa not created', 500);
+            Validator::throwResponse(translate('visa not created'), 500);
         return response()->json($visa);
     }
 
@@ -92,7 +92,7 @@ class VisaController extends Controller
         $values['vicountry_id'] = $country->country_id;
         $visa->update($values);
         if(!$visa)
-            Validator::throwResponse('visa not updated', 500);
+            Validator::throwResponse(translate('visa not updated'), 500);
         if($isDifferent)
             $country->tryToRemove($isDifferent['countryId'], $isDifferent['curriculumId']);
         return response()->json($visa);
@@ -106,7 +106,7 @@ class VisaController extends Controller
     {
         $visa = (new Visa())->isFromProfessionalCurriculum(request('visa'), $this->getProfessionalBySession()->professional_id);
         if(!$visa)
-            Validator::throwResponse('visa not found', 400);
+            Validator::throwResponse(translate('visa not found'), 400);
         return response()->json($visa);
     }
 
@@ -119,12 +119,12 @@ class VisaController extends Controller
     {
         $visa = (new Visa())->isFromProfessionalCurriculum(request('visa'), $this->getProfessionalBySession()->professional_id);
         if(!$visa)
-            Validator::throwResponse('visa not found', 400);
+            Validator::throwResponse(translate('visa not found'), 400);
         $countryId = $visa->vicountry_id;
         $curriculumId = $visa->vicurriculum_id;
         if(!$visa->delete())
-            Validator::throwResponse('visa not removed', 500);
+            Validator::throwResponse(translate('visa not removed'), 500);
         (new Country())->tryToRemove($countryId, $curriculumId);
-        return response()->json(['message' => 'visa removed']);
+        return response()->json(['message' => translate('visa removed')]);
     }
 }

@@ -92,7 +92,7 @@ class ExperienceController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'experiences.excurriculum_id');
         })->first();
         if(!$experience)
-            Validator::throwResponse('experience not found', 400);
+            Validator::throwResponse(translate('experience not found'), 400);
         $request->validate([
             'exjob_title'       =>'required',
             'excompany_name'    =>'required',
@@ -121,7 +121,7 @@ class ExperienceController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'experiences.excurriculum_id');
         })->first();
         if(!$experience)
-            Validator::throwResponse('experience not found', 400);
+            Validator::throwResponse(translate('experience not found'), 400);
         $experience->delete();
 
         return response()->json($experience);

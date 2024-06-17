@@ -126,7 +126,7 @@ class JobApplied extends Model
 
     /**
      * Sends an email to informed professional
-     * @param Array data - schema: ['professioanl_id' => Int, 'applied_id' => Int, 'status' = > String] | All required
+     * @param Array data - schema: ['professional_id' => Int, 'applied_id' => Int, 'status' = > String] | All required
      * @return Bool
      */
     public function sendStatusEmail(Array $data)
@@ -141,7 +141,7 @@ class JobApplied extends Model
         $jobApplied = $this->getJobAppliedByApplianedId($data['applied_id'], ['company']);
         if(!$professional || !$jobApplied)
             return false;
-        $languageISO = (new Person())->getLanguageIso($professional->person_id);
+        $languageISO = Session()->get('user_lang') ? Session()->get('user_lang') : (new Person())->getLanguageIso($this->person_id);
         $languageISO = !$languageISO ? 'en' : $languageISO;
         $translatedText = (new Translation())->getTranslationsByCategory(Translation::CATEGORY_SYSTEM_TRANSLATIONS, $languageISO);
         $renderedView = view('email_templates.job_application_changed_status', [

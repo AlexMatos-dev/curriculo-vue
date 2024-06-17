@@ -19,11 +19,11 @@ class AsyncActionController extends Controller
     {
         AsyncMethodHandler::logMessage("the person of id {$this->request->personId} requested an async action using the following parameters: {$this->request->method}");
         if(!$this->request->method){
-            Validator::throwResponse('no method sent', 400);
+            Validator::throwResponse(translate('no method sent'), 400);
         }
         $person = Person::find($this->request->personId);
         if(!$person){
-            Validator::throwResponse('no person id sent', 400);
+            Validator::throwResponse(translate('no person id sent'), 400);
         }
         $avaliableClasses = [
             'jobApplied' => JobApplied::class 
@@ -33,10 +33,10 @@ class AsyncActionController extends Controller
             Session()->put('asyncLoggedPerson', $person);
             $result = (new ($avaliableClasses[$information[0]])())->{$information[1]}($this->request->data);
             if(!$result)
-                Validator::throwResponse('an error occured', 500);
-            Validator::throwResponse('executed with success', 200);
+                Validator::throwResponse(translate('an error occured'), 500);
+            Validator::throwResponse(translate('executed with success'), 200);
         } catch (\Throwable $th) {
-            Validator::throwResponse('internal error: '.$th->getMessage(), 500);
+            Validator::throwResponse(translate('internal error') . ': '.$th->getMessage(), 500);
         }
     }
 }

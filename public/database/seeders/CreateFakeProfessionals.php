@@ -228,13 +228,12 @@ class CreateFakeProfessionals extends Seeder
                     'lareading_level' => $reading
                 ]);
             }
-            $city = $brCity[array_rand($brCity)];
             $dataPerson = DataPerson::create([
                 'dpprofes_id' => $professional->professional_id,
                 'dpdate_of_birth' => $faker->date('Y-m-d'),
                 'dpgender' => $i > $half ? 2 : 1,
-                'dpcity_id' => $city['lcity_id'],
-                'dpstate_id' => $city['lcitstates_id'],
+                'dpcity' => $faker->city(),
+                'dpstate' => 'paraná',
                 'dppostal_code' => $faker->postcode(),
                 'dpcountry_id' => $brCountry->lcountry_id
             ]);

@@ -103,7 +103,7 @@ class EducationController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'educations.edcurriculum_id');
         })->first();
         if(!$education)
-            Validator::throwResponse('education not found', 400);
+            Validator::throwResponse(translate('education not found'), 400);
         $request->validate([
             'eddegree'          => 'required',
             'edfield_of_study'  => 'required|numeric',
@@ -138,7 +138,7 @@ class EducationController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'educations.edcurriculum_id');
         })->first();
         if(!$education)
-            Validator::throwResponse('education not found', 400);
+            Validator::throwResponse(translate('education not found'), 400);
         $education->delete();
         return response()->json($education);
     }

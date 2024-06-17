@@ -22,7 +22,7 @@ class RecruiterProfile
         $person = Auth::user();
         $recruiter = $person->getProfile(Profile::RECRUITER);
         if(!$recruiter)
-            Validator::throwResponse('recruiter profile not found', 403);
+            Validator::throwResponse(translate('recruiter profile not found'), 403);
         Session()->put('person', $person);
         Session()->put('recruiter', $recruiter);
         return $next($request);

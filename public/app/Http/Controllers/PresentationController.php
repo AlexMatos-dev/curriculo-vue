@@ -68,7 +68,7 @@ class PresentationController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'presentations.precurriculum_id');
         })->first();
         if(!$presentation)
-            Validator::throwResponse('presentation not found', 400);
+            Validator::throwResponse(translate('presentation not found'), 400);
         $request->validate([
             'presentation_text'  =>  'required'
         ]);
@@ -88,7 +88,7 @@ class PresentationController extends Controller
             $join->on('curriculums.curriculum_id', '=', 'presentations.precurriculum_id');
         })->first();
         if(!$presentation)
-            Validator::throwResponse('presentation not found', 400);
+            Validator::throwResponse(translate('presentation not found'), 400);
         $presentation->delete();
 
         return response()->json($presentation);

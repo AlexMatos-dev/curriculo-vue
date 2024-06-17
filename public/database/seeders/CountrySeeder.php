@@ -18,18 +18,20 @@ class CountrySeeder extends Seeder
             return;
         $countryArray = json_decode(file_get_contents($path), true);
         $countryObj = new ListCountry();
-        $flagPath = storage_path('app/flags');
+        $flagPath = storage_path('app/dbSourceFiles/flags');
         foreach($countryArray as $isoCode => $data){
             if($countryObj::where('lcountry_name', $data['en'])->first())
                 continue;
             $flagSource = null;
-            if(file_exists($flagPath . "/$isoCode.png"))
-                $flagSource = file_get_contents($flagPath . "/$isoCode.png");
+            if(file_exists($flagPath . "/$isoCode.svg"))
+                $flagSource = file_get_contents($flagPath . "/$isoCode.svg");
+            $spokenLanguages = array_key_exists('spokenLanguages', $data) ? $data['spokenLanguages'] : [];
             $result = ListCountry::create([
                 'lcountry_name' => $data['en'],
                 'lcountry_acronyn' => $isoCode,
                 'ddi' => $data['ddi'],
-                'flag' => $flagSource
+                'flag' => $flagSource,
+                'spokenLanguages' => json_encode($spokenLanguages)
             ]);
             if(!$result || Translation::where('en', $data['en'])->first())
                 continue;
