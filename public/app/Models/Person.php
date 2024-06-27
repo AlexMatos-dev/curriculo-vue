@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Helpers\LaravelMail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
@@ -60,6 +62,31 @@ class Person extends Authenticatable
         ];
     }
 
+    public function getAuthPassword()
+    {
+        return $this->person_password;
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->person_email;
+    }
+
+    public function getPersonId()
+    {
+        return $this->person_id;
+    }
+
+    public function getPersonName()
+    {
+        return $this->person_username;
+    }
+
     public function language()
     {
         return $this->belongsTo(ListLangue::class, 'person_langue')->first();
@@ -80,8 +107,8 @@ class Person extends Authenticatable
             'translations'=> $translatedText,
             'languageIso' => $languageISO
         ]);
-        $emailObj = new \App\Helpers\Mail();
-        $resultOfEmailSend = $emailObj->sendMail($this->person_email, $translatedText['Your password change code!'], $renderedEmail);
+        $mailer = new \App\Helpers\LaravelMail($this->person_email, $translatedText['Your password change code!'], $renderedEmail);
+        $resultOfEmailSend = $mailer->sendMail();
         if(!$resultOfEmailSend['success']){
             Cache::forget("resetPasswordCode--{$this->person_id}");
             Cache::forget("awaiting_changepass-email-receival-{$this->person_id}");
@@ -106,8 +133,8 @@ class Person extends Authenticatable
             'translations'=> $translatedText,
             'languageIso' => $languageISO
         ]);
-        $emailObj = new \App\Helpers\Mail();
-        $resultOfEmailSend = $emailObj->sendMail($this->person_email, $translatedText['your email verification code'] . '!', $renderedEmail);
+        $mailer = new LaravelMail($this->person_email, translate('your email verification code!'), $renderedEmail);
+        $resultOfEmailSend = $mailer->sendMail();
         if(!$resultOfEmailSend['success']){
             Cache::forget("verifyEmailCode--{$this->person_id}");
             Cache::forget("awaiting-emailverification-email-receival-{$this->person_id}");

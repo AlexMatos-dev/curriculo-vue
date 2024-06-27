@@ -151,7 +151,7 @@ class CompanyController extends Controller
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             return response()->json(['message' => translate('invalid action')], 400);
-        $person = Auth::user()
+        $person = Auth::user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $targetPerson = Person::find(request('person_id'));
         if(request('action') != 'list' && (!$targetPerson || $person->person_id == $targetPerson->person_id))

@@ -4,8 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ ucfirst($translations['verification code to change your password']) }}</title>
-  <!--[if mso]><style type="text/css">body, table, td, a { font-family: Arial, Helvetica, sans-serif !important; }</style><![endif]-->
+  <title>{{ ucfirst(translate('reset password')) }}</title>
 </head>
 
 <body style="font-family: Helvetica, Arial, sans-serif; margin: 0px; padding: 0px; background-color: #ffffff;">
@@ -21,18 +20,45 @@
                   <div style="text-align: left;">
                     <div style="padding-bottom: 20px;"><img src="data:image/webp;base64,{{ base64_encode(file_get_contents(public_path('images/logo.webp'))) }}" alt="System logo" style="width: 56px;"></div>
                   </div>
-                  <div style="padding: 20px; background-color: rgb(255, 255, 255);">
-                    <div style="color: rgb(0, 0, 0); text-align: left;">
-                      <h1 style="margin: 1rem 0">{{ ucfirst($translations['your change password code']) }}:</h1>
-                      <p style="padding-bottom: 16px"><span style="text-align: center;display: block;"><strong
-                            style="font-size: 130%">{{ $code }}</strong></span></p>
-                      <p style="padding-bottom: 16px"><em>{{ ucfirst($translations['the code will expire in 30 minutes and can be used only once']) }}.</em></p>
-                      <p style="padding-bottom: 16px">{{ ucfirst($translations['in case you did not request this email, please ignore']) }}.</p>
-                      <p style="padding-bottom: 16px">{{ ucfirst($translations['thanks']) }}.</p>
-                    </div>
-                  </div>
-                  <div style="padding-top: 20px; color: rgb(153, 153, 153); text-align: center;">
-                    <p style="padding-bottom: 16px; font-weight:600;">{{ $translations['team'] }} <span style="color:#0b0b55;">Job<span style="color:#2adffd;">i</span>Full</span></p>
+                  <div style="padding: 20px; background-color: rgb(255, 255, 255);text-align:center;">
+                    <div style="color: rgb(0, 0, 0); text-align:center;">
+                      <h1 style="margin:1rem 0;padding-bottom:5px;border-bottom:1px solid rgb(153, 153, 153);">{{ ucfirst(translate('reset password')) }}</h1>
+                      <p style="padding-top: 10px">
+                        {{ ucfirst(translate('hi')) }} {{ $personName }},
+                      </p>
+                      <p>
+                        {{ ucfirst(translate('forgot your password?')) }}
+                      </p>
+                      <p>
+                        {{ ucfirst(translate('we received a request to reset the password for your account')) }}.
+                      </p>
+                      <p>
+                        {{ ucfirst(translate('to reset your password, click the button below')) }}:
+                      </p>
+                      <p>
+                        <a 
+                          style="display:inline-block;font-weight:400;color:rgb(255 255 255/1);text-align:center;border:1px solid transparent;
+                          font-size: 1rem;line-height:1.5;border-radius: .25rem;background:rgb(83 195 196/1);text-decoration:none;padding:10px;" 
+                          href="{{ $url }}">
+                            {{ ucfirst(translate('reset password')) }}                    
+                        </a>
+                      </p>
+                      <p style="padding-top: 15px;">
+                        {{ ucfirst(translate('or copy and paste the URL into your browser')) }}:
+                      </p>
+                      <p style="text-decoration: underline; color: blue;">
+                        {{ $url }}
+                      </p>
+
+                      <p style="padding-top: 20px">
+                        {{ ucfirst(translate('in case you did not request this email, please ignore')) }}.
+                      </p>
+                      <p">
+                        {{ ucfirst(translate('thanks')) }}.
+                      </p>
+                      <div style="padding-top: 5px; color: rgb(153, 153, 153); text-align: center;">
+                        <p style="padding-bottom: 16px; font-weight:600;">{{ ucfirst(translate('team')) }} <span style="color:#0b0b55;">Job<span style="color:#2adffd;">i</span>Full</span></p>
+                      </div>
                   </div>
                 </td>
               </tr>
