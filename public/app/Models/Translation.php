@@ -98,13 +98,17 @@ class Translation extends Model
      */
     public function translateUnofficialTranslation($languageIso = 'en')
     {
-        if(in_array($languageIso, $this::OFFICIAL_LANGUAGES))
+        try {
+            if(in_array($languageIso, $this::OFFICIAL_LANGUAGES))
+                return false;
+            $googleTranslator = new \Stichoza\GoogleTranslate\GoogleTranslate($languageIso, 'en');
+            $translatedText = $googleTranslator->translate($this->en);
+            if(!$translatedText)
+                return false;
+            return $this->addTranslationsToUnofficialTranslations($translatedText, $languageIso);
+        } catch (\Throwable $th) {
             return false;
-        $googleTranslator = new \Stichoza\GoogleTranslate\GoogleTranslate($languageIso, 'en');
-        $translatedText = $googleTranslator->translate($this->en);
-        if(!$translatedText)
-            return false;
-        return $this->addTranslationsToUnofficialTranslations($translatedText, $languageIso);
+        }
     }
 
     public function getTranslations(Array $textToTranslate, String $languageISO = 'en')
