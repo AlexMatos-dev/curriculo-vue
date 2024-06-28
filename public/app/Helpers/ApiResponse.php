@@ -19,7 +19,7 @@ function returnResponse($data = '', $code = 200, $headers = [], $options = 0)
     ];
     if(!empty($headers))
         $defaultHeaders = array_merge($defaultHeaders, $headers);
-    response()->json($data, $code)->header('Access-Control-Allow-Origin', 'http://localhost:8080')
+    response()->json($data, $code)->header('Access-Control-Allow-Origin', env('FRONTEND_URL'))
     ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     ->header('Access-Control-Allow-Credentials', 'true')->send();
