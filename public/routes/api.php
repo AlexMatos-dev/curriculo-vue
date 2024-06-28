@@ -166,12 +166,12 @@ Route::prefix('company_types')->group(function ()
     Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });
 
-Route::prefix('language')->group(function ()
+Route::prefix('languages')->group(function ()
 {
-    Route::get('getlanguage', [ListLangueController::class, 'getLangue']);
+    Route::get('index', [ListLangueController::class, 'getLangue']);
 });
 
 Route::prefix('countries')->group(function ()
 {
-    Route::get('getCountries', [CountryController::class, 'getCountries']);
+    Route::get('index', [CountryController::class, 'getCountries']);
 });

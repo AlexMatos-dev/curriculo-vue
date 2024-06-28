@@ -24,7 +24,7 @@ class CurriculumController extends Controller
             'curriculum_type' => request('curriculum_type')
         ];
         $curriculums = (new Curriculum())->getAllMyCurriculums($parameters, $this->getProfessionalBySession()->professional_id);
-        return response()->json($curriculums);
+        returnResponse($curriculums);
     }
 
     /**
@@ -68,7 +68,7 @@ class CurriculumController extends Controller
         $errorMessage = request('curriculum_id') ? translate('curriculum not updated') : translate('curriculum not created');
         if(!$curriculum->save())
             Validator::throwResponse($errorMessage, 500);
-        return response()->json($curriculum);
+        returnResponse($curriculum);
     }
 
     /**
@@ -80,7 +80,7 @@ class CurriculumController extends Controller
         $curriculum = (new Curriculum())->isFromProfessionalCurriculum(request('curriculum'), $this->getProfessionalBySession()->professional_id);
         if(!$curriculum)
             Validator::throwResponse(translate('curriculum not found'), 400);
-        return response()->json($curriculum);
+        returnResponse($curriculum);
     }
 
     /**
@@ -110,6 +110,6 @@ class CurriculumController extends Controller
         }
         if($error)
             Validator::throwResponse(translate('curriculum not removed'), 500);
-        return response()->json(['message' => translate('curriculum removed')]);
+        returnResponse(['message' => translate('curriculum removed')]);
     }
 }

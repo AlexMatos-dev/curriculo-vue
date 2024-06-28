@@ -95,7 +95,7 @@ class JobListController extends Controller
                 'nonPaying' => $nonPaying
             ], $perPage, $this->request);
         }
-        return response()->json([
+        returnResponse([
             'data' => $results['results'],
             'curent_page' => $page,
             'per_page' => $perPage,
@@ -113,9 +113,9 @@ class JobListController extends Controller
         try{
             $jobList = JobList::with('company')->findOrFail($joblistId);
             $jobListObj = $jobList->splitjoinDataFromListedJobs([$jobList]);
-            return response()->json(["message" => translate('job found successfully'), "data" => $jobListObj]);
+            returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
         }catch(ModelNotFoundException $e){
-            return response()->json(["message" => translate('job not found'), "error" => $e], 400);
+            returnResponse(["message" => translate('job not found'), "error" => $e], 400);
         }
     }
 
@@ -171,10 +171,10 @@ class JobListController extends Controller
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $jobList = JobList::create($data);
-            return response()->json(["message" => translate('job created successfully'), 'data' => $jobList]);
+            returnResponse(["message" => translate('job created successfully'), 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => translate('an error occurred while creating the job, please try again later'), "error" => $e], 500);
+            returnResponse(["message" => translate('an error occurred while creating the job, please try again later'), "error" => $e], 500);
         }
     }
 
@@ -237,10 +237,10 @@ class JobListController extends Controller
             $result = $jobList->update($data);
             if(!$result)
                 Validator::throwResponse(translate('job not updated'), 500);
-            return response()->json(["message" => translate('job updated successfully'), 'data' => $jobList]);
+            returnResponse(["message" => translate('job updated successfully'), 'data' => $jobList]);
         }
         catch (ModelNotFoundException $e){
-            return response()->json(["message" => translate('an error occurred while updating the job, please try again later'), "Error" => $e], 500);
+            returnResponse(["message" => translate('an error occurred while updating the job, please try again later'), "Error" => $e], 500);
         }
     }
 
@@ -260,11 +260,11 @@ class JobListController extends Controller
             JobModality::where('joblist_id', $jobList->job_id);
             JobLanguage::where('joblist_id', $jobList->job_id);
             $jobList->delete();
-            return response()->json(["message" => translate('job deleted sucessfully')]);
+            returnResponse(["message" => translate('job deleted sucessfully')]);
         }
         catch (ModelNotFoundException $e)
         {
-            return response()->json(["message" => translate('job not found'), "error" => $e], 404);
+            returnResponse(["message" => translate('job not found'), "error" => $e], 404);
         }
     }
 
@@ -322,7 +322,7 @@ class JobListController extends Controller
         }
         if(!$result)
             Validator::throwResponse(translate('action not performed'), 500);
-        return response()->json(['message' => translate('action performed'), 'data' => $data]);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -381,7 +381,7 @@ class JobListController extends Controller
         }
         if(!$result)
             Validator::throwResponse(translate('action not performed'), 500);
-        return response()->json(['message' => translate('action performed'), 'data' => $data]);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -433,6 +433,6 @@ class JobListController extends Controller
         }
         if(!$result)
             Validator::throwResponse(translate('action not performed'), 500);
-        return response()->json(['message' => translate('action performed'), 'data' => $data]);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 }

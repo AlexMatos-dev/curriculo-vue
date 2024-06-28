@@ -25,6 +25,6 @@ class ProficiencyController extends Controller
         if($category = Proficiency::getCategory($categoryName)){
             $proficiencies->where('category', $category);
         }
-        return response()->json($proficiencies->get(), 200);
+        returnResponse($proficiencies->get(), 200);
     }
 }

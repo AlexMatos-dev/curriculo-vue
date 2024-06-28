@@ -16,7 +16,7 @@ class CertificationController extends Controller
     public function index(Request $request)
     {
         $certifications = Certification::where('cercurriculum_id', $request->cercurriculum_id)->paginate(request('per_page', 10));
-        return response()->json($certifications);
+        returnResponse($certifications);
     }
 
     /**
@@ -43,7 +43,7 @@ class CertificationController extends Controller
         ]);
         $certification = Certification::create($request->all());
 
-        return response()->json($certification);
+        returnResponse($certification);
     }
 
     /**
@@ -52,7 +52,7 @@ class CertificationController extends Controller
     public function show(Certification $certification)
     {
 
-       return response()->json($certification);
+       returnResponse($certification);
     }
 
     /**
@@ -84,7 +84,7 @@ class CertificationController extends Controller
         ]);
         $certification->update($request->all());
 
-        return response()->json($certification);
+        returnResponse($certification);
     }
 
     /**
@@ -100,6 +100,6 @@ class CertificationController extends Controller
             Validator::throwResponse(translate('certification not found'), 400);
         $certification->delete();
 
-        return response()->json($certification);
+        returnResponse($certification);
     }
 }

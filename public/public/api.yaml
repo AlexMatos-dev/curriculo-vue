@@ -4352,7 +4352,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/company_types'
-  /api/languages/getlanguages:
+  /api/languages/index:
     get:
       tags:
         - Langue
@@ -4364,6 +4364,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListLanguage'
+  /api/countries/index:
+    get:
+      tags:
+        - Country
+      description: get all countiries
+      responses:
+        '200':
+          description: A list of countries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCountry'
 components:
   schemas:
     Login:
@@ -5987,6 +5999,46 @@ components:
         es:
           type: string
           example: portugués 
+        unofficial_translations:
+          type: string
+          example: Json or Null
+    ListCountry:
+      type: object
+      properties:
+        lcountry_id:
+          type: string
+          example: 1
+        lcountry_name:
+          type: string
+          example: brasil
+        lcountry_acronyn:
+          type: string
+          example: br
+        ddi:
+          type: string
+          example: +55
+        flag:
+          type: string
+          example: br.svg
+        spokenLanguages:
+          type: array
+          items:
+              required:
+                - test
+              type: object
+              properties:
+                0:
+                  type: string
+                  example: pt
+        en:
+          type: string
+          example: brazil
+        pt:
+          type: string
+          example: brasil
+        es:
+          type: string
+          example: brasil 
         unofficial_translations:
           type: string
           example: Json or Null

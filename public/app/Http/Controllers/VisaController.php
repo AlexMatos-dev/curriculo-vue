@@ -23,7 +23,7 @@ class VisaController extends Controller
             'vicurriculum_id' => 'numeric'
         ]);
         $visas = (new Visa())->getAllMyVisas(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
-        return response()->json($visas);
+        returnResponse($visas);
     }
 
     /**
@@ -55,7 +55,7 @@ class VisaController extends Controller
         $visa = Visa::create($values);
         if(!$visa)
             Validator::throwResponse(translate('visa not created'), 500);
-        return response()->json($visa);
+        returnResponse($visa);
     }
 
     /**
@@ -95,7 +95,7 @@ class VisaController extends Controller
             Validator::throwResponse(translate('visa not updated'), 500);
         if($isDifferent)
             $country->tryToRemove($isDifferent['countryId'], $isDifferent['curriculumId']);
-        return response()->json($visa);
+        returnResponse($visa);
     }
 
     /**
@@ -107,7 +107,7 @@ class VisaController extends Controller
         $visa = (new Visa())->isFromProfessionalCurriculum(request('visa'), $this->getProfessionalBySession()->professional_id);
         if(!$visa)
             Validator::throwResponse(translate('visa not found'), 400);
-        return response()->json($visa);
+        returnResponse($visa);
     }
 
     /**
@@ -125,6 +125,6 @@ class VisaController extends Controller
         if(!$visa->delete())
             Validator::throwResponse(translate('visa not removed'), 500);
         (new Country())->tryToRemove($countryId, $curriculumId);
-        return response()->json(['message' => translate('visa removed')]);
+        returnResponse(['message' => translate('visa removed')]);
     }
 }

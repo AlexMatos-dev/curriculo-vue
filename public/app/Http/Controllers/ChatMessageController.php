@@ -36,7 +36,7 @@ class ChatMessageController extends Controller
         $chatMessage = (new ChatMessage())->makeMessage($chatMessageObjects['receiver'], $chatMessageObjects['sender'], request('message'), $chatAttachment, request('job_id'));
         if(!$chatAttachment)
             Validator::throwResponse(translate('message not sent'), 500);
-        return response()->json($chatMessage);
+        returnResponse($chatMessage);
     }
 
     /**
@@ -56,7 +56,7 @@ class ChatMessageController extends Controller
             Validator::throwResponse(translate('not owner of message'), 400);
         if(!$object['chat_message']->delete())
             Validator::throwResponse(translate('chat message not removed'), 500);
-        return response()->json(['message' => translate('chat message removed')]);
+        returnResponse(['message' => translate('chat message removed')]);
     }
 
     /**
@@ -86,6 +86,6 @@ class ChatMessageController extends Controller
         }else{
             $results = $chatMessage->listChatMessages($chatMessageObjects, request('job_id'));
         }
-        return response()->json($results);
+        returnResponse($results);
     }
 }

@@ -16,7 +16,7 @@ class PresentationController extends Controller
     {
         $presentation = Presentation::where('precurriculum_id', $request->precurriculum_id);
         $presentation = $presentation->paginate(request('per_page', 10));
-        return response()->json($presentation);
+        returnResponse($presentation);
     }
 
     /**
@@ -39,7 +39,7 @@ class PresentationController extends Controller
         ]);
         $presentation = Presentation::create($request->all());
 
-        return response()->json($presentation);
+        returnResponse($presentation);
     }
 
     /**
@@ -47,7 +47,7 @@ class PresentationController extends Controller
      */
     public function show(Presentation $presentation)
     {
-        return response()->json($presentation);
+        returnResponse($presentation);
     }
 
     /**
@@ -75,7 +75,7 @@ class PresentationController extends Controller
         
         $presentation->update($request->all());
 
-        return response()->json($presentation);
+        returnResponse($presentation);
     }
 
     /**
@@ -91,6 +91,6 @@ class PresentationController extends Controller
             Validator::throwResponse(translate('presentation not found'), 400);
         $presentation->delete();
 
-        return response()->json($presentation);
+        returnResponse($presentation);
     }
 }

@@ -24,15 +24,15 @@ class ResetPasswordController extends Controller
         ]);
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
-            return response()->json(['message' => translate('invalid email')], 400);
+            returnResponse(['message' => translate('invalid email')], 400);
         $response = Password::broker('persons')->sendResetLink(
             ['person_email' => $person->person_email]
         );
         if($response == Password::RESET_THROTTLED)
-            return response()->json(['message' => translate('wait before resending password reset email')], 500);
+            returnResponse(['message' => translate('wait before resending password reset email')], 500);
         if($response != Password::RESET_LINK_SENT)
-            return response()->json(['message' => translate('email not sent')], 500);
-        return response()->json(['message' => translate('email sent')], 200);
+            returnResponse(['message' => translate('email not sent')], 500);
+        returnResponse(['message' => translate('email sent')], 200);
     }
 
     /**
@@ -52,19 +52,19 @@ class ResetPasswordController extends Controller
             'password_confirmation' => Validator::getPersonPasswordRule(),
         ]);
         if(request('password') != request('password_confirmation'))
-            return response()->json(['message' => translate('passwords do not match')], 400);
+            returnResponse(['message' => translate('passwords do not match')], 400);
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
-            return response()->json(['message' => translate('invalid email')], 400);
+            returnResponse(['message' => translate('invalid email')], 400);
         $passswordResetToken = PasswordResetToken::find(request('email'));
         if(!$passswordResetToken)
-            return response()->json(['message' => translate('no reset password found, request a new reset password email')], 400);
+            returnResponse(['message' => translate('no reset password found, request a new reset password email')], 400);
         if(!$passswordResetToken->isTokenValid(request('token')))
-            return response()->json(['message' => translate('token is invalid')], 400);
+            returnResponse(['message' => translate('token is invalid')], 400);
         $person->person_password = Hash::make(request('password'));
         if(!$person->save())
-            return response()->json(['message' => translate('password not reset with success')], 500);
+            returnResponse(['message' => translate('password not reset with success')], 500);
         $passswordResetToken->delete();
-        return response()->json(['message' => translate('password reset with success')]);
+        returnResponse(['message' => translate('password reset with success')]);
     }
 }

@@ -19,11 +19,11 @@ class CompanySocialNetworkController extends Controller
 
             $results = $socialNetwork->paginate(10);
 
-            return response()->json($results);
+            returnResponse($results);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => translate('social network not found'), "error" => $e], 400);
+            returnResponse(["message" => translate('social network not found'), "error" => $e], 400);
         }
     }
 
@@ -41,11 +41,11 @@ class CompanySocialNetworkController extends Controller
             $data = $request->all();
             $data['company_id'] = $this->getCompanyBySession()->company_id;
             $socialNetwork = CompanySocialNetwork::create($data);
-            return response()->json($socialNetwork, 200);
+            returnResponse($socialNetwork, 200);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => translate('an error occurred while creating the social network, please try again later'), "error" => $e->getMessage()], 400);
+            returnResponse(["message" => translate('an error occurred while creating the social network, please try again later'), "error" => $e->getMessage()], 400);
         }
     }
 
@@ -60,11 +60,11 @@ class CompanySocialNetworkController extends Controller
             $network = CompanySocialNetwork::findOrFail($socialNetworkId);
             $network->update($request->all());
 
-            return response()->json(["message" => translate('social network updated successfully'), "data" => $network], 200);
+            returnResponse(["message" => translate('social network updated successfully'), "data" => $network], 200);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => translate('social network not found'), "Error" => $e], 400);
+            returnResponse(["message" => translate('social network not found'), "Error" => $e], 400);
         }
     }
 
@@ -75,11 +75,11 @@ class CompanySocialNetworkController extends Controller
             $socialNetwork = CompanySocialNetwork::findOrFail($socialNetworkId);
             $socialNetwork->delete();
 
-            return response()->json(["message" => translate('social network deleted sucessfully')], 200);
+            returnResponse(["message" => translate('social network deleted sucessfully')], 200);
         }
         catch (\Exception $e)
         {
-            return response()->json(["message" => translate('social network not found'), "Error" => $e], 400);
+            returnResponse(["message" => translate('social network not found'), "Error" => $e], 400);
         }
     }
 }

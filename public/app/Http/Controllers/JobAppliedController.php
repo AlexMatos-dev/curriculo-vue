@@ -27,7 +27,7 @@ class JobAppliedController extends Controller
         $parameters = $this->request->all();
         $parameters['professional_id'] = $this->getProfessionalBySession()->professional_id;
         $data = $jobApplied->listJobApplied($parameters);
-        return response()->json($data);
+        returnResponse($data);
     }
 
     /**
@@ -42,7 +42,7 @@ class JobAppliedController extends Controller
         $parameters = $this->request->all();
         $parameters['company_id'] = $this->getObjectFromSession()->company_id;
         $data = $jobApplied->listJobApplied();
-        return response()->json($data);
+        returnResponse($data);
     }
 
     /**
@@ -78,7 +78,7 @@ class JobAppliedController extends Controller
         $professional = Professional::find($jobAppliedObj->professional_id);
         if($professional)
             (new ChatMessage())->makeNotification($professional, ChatMessage::TYPE_JOB_STATUS_CHANGED, request('status'), null, $jobAppliedObj->job_id);
-        return response()->json(['data' => $jobAppliedObj], 200);
+        returnResponse(['data' => $jobAppliedObj], 200);
     }
 
     /**
@@ -88,7 +88,7 @@ class JobAppliedController extends Controller
     public function listStatus()
     {
         $jobApplied = new JobApplied();
-        return response()->json($jobApplied->getStatus());
+        returnResponse($jobApplied->getStatus());
     }
 
     /**
@@ -104,7 +104,7 @@ class JobAppliedController extends Controller
 
         if ($validator->fails())
         {
-            return response()->json([
+            returnResponse([
                 'success' => false,
                 'message' => translate('validator fields error'),
                 'errors' => $validator->errors()
@@ -129,13 +129,13 @@ class JobAppliedController extends Controller
             if($company && $company->checkPrivacy(ChatMessage::CATEGORY_NOTIFICATION))
                 (new ChatMessage())->makeNotification($company, ChatMessage::TYPE_JOB_APPLIED, '', null, $request->job_id);
 
-            return response()->json([
+            returnResponse([
                 'data' => $jobApplied,
             ]);
         }
         catch (\Exception $e)
         {
-            return response()->json([
+            returnResponse([
                 'success' => false,
                 'message' => translate('failed to create job application'),
                 'error' => $e->getMessage()
