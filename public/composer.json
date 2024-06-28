@@ -10,7 +10,6 @@
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "phpmailer/phpmailer": "^6.9",
         "stichoza/google-translate-php": "^5.1"
     },
     "require-dev": {
@@ -29,7 +28,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/SystemTranslator.php"
+            "app/Helpers/SystemTranslator.php",
+            "app/Helpers/ApiResponse.php"
         ]
     },
     "autoload-dev": {

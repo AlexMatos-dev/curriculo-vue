@@ -22,7 +22,7 @@ class SkillController extends Controller
             'curriculum_id' => 'numeric'
         ]);
         $skills = (new Skill())->getAllMySkills(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession()->curriculum_id);
-        return response()->json($skills);
+        returnResponse($skills);
     }
 
     /**
@@ -48,7 +48,7 @@ class SkillController extends Controller
         $skill = Skill::create($this->request->all());
         if(!$skill)
             Validator::throwResponse(translate('skill not created'), 500);
-        return response()->json($skill);
+        returnResponse($skill);
     }
 
     /**
@@ -77,7 +77,7 @@ class SkillController extends Controller
         if($objects['skproficiency_level']->category != Proficiency::CATEGORY_LEVEL)
             Validator::throwResponse('invalid proficiency, must be level type');
         $skill->update($this->request->all());
-        return response()->json($skill);
+        returnResponse($skill);
     }
 
     /**
@@ -92,7 +92,7 @@ class SkillController extends Controller
         $skill = $skillObj->isFromProfessionalCurriculum($this->getProfessionalBySession()->professional_id);
         if(!$skill)
             Validator::throwResponse(translate('skill not found'), 400);
-        return response()->json($skill);
+        returnResponse($skill);
     }
 
     /**
@@ -110,6 +110,6 @@ class SkillController extends Controller
             Validator::throwResponse(translate('skill not found'), 400);
         if(!$skill->delete())
             Validator::throwResponse(translate('skill not removed'), 500);
-        return response()->json(['message' => translate('skill removed')]);
+        returnResponse(['message' => translate('skill removed')]);
     }
 }

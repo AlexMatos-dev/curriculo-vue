@@ -62,12 +62,12 @@ class ProfessionalController extends Controller
         if(!$professional){
             $response = (new Professional())->saveProfessional($dataToSet);
             if(!$response)
-                return response()->json(['message' => translate('professional not found')], 500);
+                returnResponse(['message' => translate('professional not found')], 500);
             $professional = $response;
             $newProfessional = true;
         }else{
             if(!$professional->saveProfessional($dataToSet))
-                return response()->json(['message' => translate('professional not updated')], 500);
+                returnResponse(['message' => translate('professional not updated')], 500);
         }
         if($newProfessional){
             $result = Profile::create([
@@ -77,10 +77,10 @@ class ProfessionalController extends Controller
             ]);
             if(!$result){
                 $professional->delete();
-                return response()->json(['message' => translate('professional not updated')], 500);
+                returnResponse(['message' => translate('professional not updated')], 500);
             }
         }
-        return response()->json($professional);
+        returnResponse($professional);
     }
 
     /**
@@ -114,7 +114,7 @@ class ProfessionalController extends Controller
         $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
-            return response()->json(['message' => translate('no professional found'), 400]);
+            returnResponse(['message' => translate('no professional found'), 400]);
         $data = $this->request->all();
         $dataPerson = $professional->getDataPerson();
         $newDataPerson = false;
@@ -124,8 +124,8 @@ class ProfessionalController extends Controller
             $newDataPerson = true;
         }
         if(!$dataPerson->saveDataPerson($data))
-            return response()->json(['message' => translate('data person not updated'), 400]);
-        return response()->json($dataPerson);
+            returnResponse(['message' => translate('data person not updated'), 400]);
+        returnResponse($dataPerson);
     }
 
     /**
@@ -138,11 +138,11 @@ class ProfessionalController extends Controller
     {
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
-            return response()->json(['message' => translate('invalid action')], 400);
+            returnResponse(['message' => translate('invalid action')], 400);
         $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
-            return response()->json(['message' => translate('professional not found')], 400);
+            returnResponse(['message' => translate('professional not found')], 400);
         $data = null;
         switch(request('action')){
             case 'add':
@@ -164,8 +164,8 @@ class ProfessionalController extends Controller
             break;
         }
         if(!$result)
-            return response()->json(['message' => translate('action not completed with success')], 500);
-        return response()->json(['message' => translate('action performed'), 'data' => $data]);
+            returnResponse(['message' => translate('action not completed with success')], 500);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -180,11 +180,11 @@ class ProfessionalController extends Controller
     {
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
-            return response()->json(['message' => 'invalid action'], 400);
+            returnResponse(['message' => 'invalid action'], 400);
         $person = Auth::user();
         $professional = $person->getProfile(Profile::PROFESSIONAL);
         if(!$professional)
-            return response()->json(['message' => translate('professional not found')], 400);
+            returnResponse(['message' => translate('professional not found')], 400);
         $data = null;
         switch(request('action')){
             case 'add':
@@ -209,8 +209,8 @@ class ProfessionalController extends Controller
             break;
         }
         if(!$result)
-            return response()->json(['message' => translate('action not completed with success')], 500);
-        return response()->json(['message' => translate('action performed'), 'data' => $data]);
+            returnResponse(['message' => translate('action not completed with success')], 500);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 
     /**
@@ -290,7 +290,7 @@ class ProfessionalController extends Controller
                 'nonPaying' => $nonPaying
             ], $perPage);
         }
-        return response()->json([
+        returnResponse([
             'data' => $results['results'],
             'curent_page' => $page,
             'per_page' => $perPage,
@@ -308,6 +308,6 @@ class ProfessionalController extends Controller
         $professional = Professional::where('professional_slug', $professional_slug)->first();
         if(!$professional)
             Validator::throwResponse(translate('invalid professional slug'));
-        return response()->json($professional->gatherInformation());
+        returnResponse($professional->gatherInformation());
     }
 }

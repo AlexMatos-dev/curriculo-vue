@@ -19,7 +19,7 @@ class EducationController extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json(
+        returnResponse(
             (new Education())->list($request->edcurriculum_id, request('per_page', 10))
         );
     }
@@ -66,7 +66,7 @@ class EducationController extends Controller
         }
         $education = Education::create($request->all());
 
-        return response()->json($education);
+        returnResponse($education);
     }
 
     /**
@@ -75,7 +75,7 @@ class EducationController extends Controller
      */
     public function show(Education $education)
     {
-        return response()->json($education);
+        returnResponse($education);
     }
 
     /**
@@ -124,7 +124,7 @@ class EducationController extends Controller
             ]);
         }
         $education->update($request->all());
-        return response()->json($education);
+        returnResponse($education);
     }
 
     /**
@@ -140,6 +140,6 @@ class EducationController extends Controller
         if(!$education)
             Validator::throwResponse(translate('education not found'), 400);
         $education->delete();
-        return response()->json($education);
+        returnResponse($education);
     }
 }

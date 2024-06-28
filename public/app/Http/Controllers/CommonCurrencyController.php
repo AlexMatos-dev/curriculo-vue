@@ -18,6 +18,6 @@ class CommonCurrencyController extends Controller
         })->select('common_currencies.*', 'translations.en', 'translations.pt', 'translations.es', 'translations.unofficial_translations');
         if(request('currency'))
             $commonCurrency->where('common_currencies.currency', mb_strtoupper(request('currency')));
-        return response()->json($commonCurrency->get(), 200);
+        returnResponse($commonCurrency->get(), 200);
     }
 }

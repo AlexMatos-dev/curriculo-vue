@@ -18,7 +18,7 @@ class ReferenceController extends Controller
     public function index(Request $request)
     {
         $reference = Reference::where('refcurriculum_id', $request->refcurriculum_id)->paginate(request('per_page', 10));
-        return response()->json($reference);
+        returnResponse($reference);
     }
 
     /**
@@ -42,7 +42,7 @@ class ReferenceController extends Controller
         ]);
         $reference = Reference::create($request->all());
 
-        return response()->json($reference);
+        returnResponse($reference);
     }
 
     /**
@@ -51,7 +51,7 @@ class ReferenceController extends Controller
     public function show(Reference $reference)
     {
 
-        return response()->json($reference);
+        returnResponse($reference);
     }
 
     /**
@@ -80,7 +80,7 @@ class ReferenceController extends Controller
         ]);
         $reference->update($request->all());
 
-        return response()->json($reference);
+        returnResponse($reference);
     }
 
     /**
@@ -95,6 +95,6 @@ class ReferenceController extends Controller
         if(!$reference)
             Validator::throwResponse(translate('reference not found'), 400);
         $reference->delete();
-        return response()->json($reference);
+        returnResponse($reference);
     }
 }

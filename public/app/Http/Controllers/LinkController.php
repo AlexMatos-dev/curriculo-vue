@@ -22,7 +22,7 @@ class LinkController extends Controller
             'curriculum_id' => 'numeric'
         ]);
         $links = (new Link())->getAllMyLinks(request('per_page', 100), $this->getProfessionalBySession()->professional_id, $this->getCurriculumBySession());
-        return response()->json($links);
+        returnResponse($links);
     }
 
     /**
@@ -46,7 +46,7 @@ class LinkController extends Controller
         $link = Link::create($this->request->all());
         if(!$link)
             Validator::throwResponse(translate('link not created'), 500);
-        return response()->json($link);
+        returnResponse($link);
     }
 
     /**
@@ -69,7 +69,7 @@ class LinkController extends Controller
         $link->update($this->request->all());
         if(!$link)
             Validator::throwResponse(translate('link not updated'), 500);
-        return response()->json($link);
+        returnResponse($link);
     }
 
     /**
@@ -81,7 +81,7 @@ class LinkController extends Controller
         $link = (new Link())->isFromProfessionalCurriculum(request('link'), $this->getProfessionalBySession()->professional_id);
         if(!$link)
             Validator::throwResponse(translate('link not found'), 400);
-        return response()->json($link);
+        returnResponse($link);
     }
 
     /**
@@ -96,6 +96,6 @@ class LinkController extends Controller
             Validator::throwResponse(translate('link not found'), 400);
         if(!$link->delete())
             Validator::throwResponse(translate('link not removed'), 500);
-        return response()->json(['message' => translate('link removed')]);
+        returnResponse(['message' => translate('link removed')]);
     }
 }

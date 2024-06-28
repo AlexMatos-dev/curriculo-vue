@@ -34,6 +34,6 @@ class CompanyTypeController extends Controller
                 $languageISO = Translation::OFFICIAL_LANGUAGES[0];
             $companyTypes->where($languageISO, 'like', '%'.request('name').'%');
         }
-        return response()->json($companyTypes->get(), 200);
+        returnResponse($companyTypes->get(), 200);
     }
 }

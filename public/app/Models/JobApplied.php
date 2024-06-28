@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\LaravelMail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -152,8 +153,8 @@ class JobApplied extends Model
             'statusTranslation' => $translatedText[$data['status']],
             'translations' => $translatedText
         ]);
-        $emailObj = new \App\Helpers\Mail();
-        $resultOfEmailSend = $emailObj->sendMail($professional->professional_email, ucfirst($translatedText['update on your job application']), $renderedView);
+        $mail = new LaravelMail($professional->professional_email, ucfirst($translatedText['update on your job application']), $renderedView);
+        $resultOfEmailSend = $mail->sendMail();
         if(!$resultOfEmailSend['success'])
             return false;
         return true;

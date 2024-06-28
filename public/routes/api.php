@@ -19,6 +19,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
@@ -26,10 +27,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
-Route::post('requestchangepassword', [AuthController::class, 'requestChangePasswordCode']);
-Route::post('changepassword', [AuthController::class, 'changePassword']);
 Route::post('requestemailconfirmationcode', [AuthController::class, 'requestEmailConfirmationCode']);
 Route::post('verifyemail', [AuthController::class, 'verifyEmail']);
+Route::post('password/email', [ResetPasswordController::class, 'sendResetLinkEmail']);
+Route::post('password/reset', [ResetPasswordController::class, 'reset']);
+
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::post('logout', [AuthController::class, 'logout']);
@@ -56,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::post('joblist', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
     Route::delete('joblist/{joblist}', [JobListController::class, 'destroy']);
-    Route::prefix('joblist')->middleware('job')->group(function ()
+    Route::prefix('joblist')->middleware(['job', 'verify_email'])->group(function ()
     {
         Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
         Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
@@ -76,7 +78,7 @@ Route::prefix('professional')->group(function ()
     Route::middleware('auth:sanctum')->group(function ()
     {
         Route::post('update', [ProfessionalController::class, 'update']);
-        Route::middleware('professional')->group(function ()
+        Route::middleware(['professional', 'verify_email'])->group(function ()
         {
             Route::post('updateprofessionalperson', [ProfessionalController::class, 'updateDataPerson']);
             Route::post('updateprofessionaljobmodality', [ProfessionalController::class, 'manageProfessionalJobModality']);
@@ -89,7 +91,7 @@ Route::prefix('professional')->group(function ()
 Route::prefix('company')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [CompanyController::class, 'update']);
-    Route::middleware('companyadmin')->group(function ()
+    Route::middleware(['companyadmin',  'verify_email'])->group(function ()
     {
         Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
         Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
@@ -104,7 +106,7 @@ Route::prefix('recruiter')->middleware('auth:sanctum', 'recruiter')->group(funct
 Route::prefix('social_network')->group(function ()
 {
     Route::get('showByCompanyId/{company_id}', [CompanySocialNetworkController::class, 'showByCompanyId']);
-    Route::middleware('auth:sanctum', 'companyadmin')->group(function ()
+    Route::middleware(['auth:sanctum', 'companyadmin', 'verify_email'])->group(function ()
     {
         Route::post('store', [CompanySocialNetworkController::class, 'store']);
         Route::patch('update/{social_network_id}', [CompanySocialNetworkController::class, 'update']);
@@ -132,7 +134,7 @@ Route::prefix('common_currency')->group(function ()
     Route::get('index', [CommonCurrencyController::class, 'index']);
 });
 
-Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
+Route::prefix('job_applied')->middleware(['auth:sanctum', 'verify_email'])->group(function ()
 {
     Route::get('status', [JobAppliedController::class, 'listStatus']);
 
@@ -149,7 +151,7 @@ Route::prefix('job_applied')->middleware('auth:sanctum')->group(function ()
     });
 });
 
-Route::prefix('chat_message')->middleware(['auth:sanctum'])->group(function ()
+Route::prefix('chat_message')->middleware(['auth:sanctum', 'verify_email'])->group(function ()
 {
     Route::middleware('chat')->prefix('{prefix}')->group(function ()
     {
@@ -164,12 +166,12 @@ Route::prefix('company_types')->group(function ()
     Route::get('getcompanytypes', [CompanyTypeController::class, 'getCompanyTypes']);
 });
 
-Route::prefix('language')->group(function ()
+Route::prefix('languages')->group(function ()
 {
-    Route::get('getlanguage', [ListLangueController::class, 'getLangue']);
+    Route::get('index', [ListLangueController::class, 'getLangue']);
 });
 
 Route::prefix('countries')->group(function ()
 {
-    Route::get('getCountries', [CountryController::class, 'getCountries']);
+    Route::get('index', [CountryController::class, 'getCountries']);
 });

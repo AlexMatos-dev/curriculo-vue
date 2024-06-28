@@ -29,7 +29,7 @@ class PersonController extends Controller
         ]);
         $person = Auth::user();
         if(request('person_email') != $person->person_email && Person::where('person_email', request('person_email')->first()))
-            return response()->json(['message' => 'invalid email'], 400);
+            returnResponse(['message' => 'invalid email'], 400);
         $result = $person->update([
             'person_username' => request('person_username'),
             'person_email' => request('person_email'),
@@ -38,7 +38,7 @@ class PersonController extends Controller
             'person_langue' => request('person_langue')
         ]);
         if(!$result)
-            return response()->json(['message' => translate('person not updated')], 500);
-        return response()->json($person);
+            returnResponse(['message' => translate('person not updated')], 500);
+        returnResponse($person);
     }
 }

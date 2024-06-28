@@ -19,7 +19,7 @@ class ExperienceController extends Controller
         $experience = Experience::where('excurriculum_id', $request->excurriculum_id);
         $experience =  $experience->paginate($request->per_page);
 
-        return response()->json($experience);
+        returnResponse($experience);
     }
 
     /**
@@ -55,7 +55,7 @@ class ExperienceController extends Controller
         $data['excurriculum_id'] = $this->getCurriculumBySession()->curriculum_id;
         $experience = Experience::create($data);
 
-        return response()->json($experience);
+        returnResponse($experience);
 
     }
 
@@ -65,7 +65,7 @@ class ExperienceController extends Controller
      */
     public function show(Experience $experience)
     {
-        return response()->json($experience);
+        returnResponse($experience);
     }
 
     /**
@@ -124,6 +124,6 @@ class ExperienceController extends Controller
             Validator::throwResponse(translate('experience not found'), 400);
         $experience->delete();
 
-        return response()->json($experience);
+        returnResponse($experience);
     }
 }

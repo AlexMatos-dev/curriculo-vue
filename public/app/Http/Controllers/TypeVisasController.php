@@ -14,6 +14,6 @@ class TypeVisasController extends Controller
             $join->on('type_visas.type_name', '=', 't.en');
         });
 
-        return response()->json($typeVisas->get(), 200);
+        returnResponse($typeVisas->get(), 200);
     }
 }

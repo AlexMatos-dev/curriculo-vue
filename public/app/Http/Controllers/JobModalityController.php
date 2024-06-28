@@ -26,6 +26,6 @@ class JobModalityController extends Controller
             'job_modalities.updated_at'
         );
 
-        return response()->json($jobsModalities->get(), 200);
+        returnResponse($jobsModalities->get(), 200);
     }
 }

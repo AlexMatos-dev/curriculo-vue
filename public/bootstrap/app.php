@@ -17,9 +17,20 @@ return Application::configure(basePath: dirname(__DIR__))
             'async/asyncactions'
         ]);
         $middleware->group('api', [
-            \App\Http\Middleware\UserLanguage::class
+            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'throttle:6,1',
+            \App\Http\Middleware\UserLanguage::class,
+            \App\Http\Middleware\ApiGuard::class
         ]);
         $middleware->group('web', [
+            Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\UserLanguage::class
         ]);
         $middleware->group('authenticate', [
@@ -48,6 +59,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->group('chat', [
             \App\Http\Middleware\ChatMessageHandler::class
+        ]);
+        $middleware->group('verify_email', [
+            \App\Http\Middleware\VerifyEmail::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

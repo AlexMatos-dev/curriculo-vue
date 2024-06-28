@@ -11,7 +11,6 @@ class ListLangueController extends Controller
     public function getLangue()
     {
         $langues = ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name', true, true);
-
-        return response()->json($langues, 200);
+        returnResponse($langues, 200);
     }
 }
