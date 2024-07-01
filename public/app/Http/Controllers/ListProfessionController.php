@@ -13,8 +13,12 @@ class ListProfessionController extends Controller
         $professional = ListProfession::leftJoin('translations AS t', function ($join)
         {
             $join->on('listprofessions.profession_name', '=', 't.en');
+        })->leftJoin('jobslist AS jl', function ($join)
+        {
+            $join->on('listprofessions.lprofession_id', '=', 'jl.profession_for_job');
         })
-            ->where('listprofessions.valid_profession', '=', '1');
+            ->where('listprofessions.valid_profession', '=', '1')
+            ->groupBy('listprofessions.lprofession_id', 't.en', 't.pt', 't.es', 'listprofessions.parent_profession_id', 'listprofessions.valid_profession', 'listprofessions.person_id', 'listprofessions.profession_category_id');
 
         if ($request->has('profession_name'))
         {
@@ -28,9 +32,21 @@ class ListProfessionController extends Controller
             $professional->where('t.' . $languageISO, 'like', '%' . $request->input('profession_name') . '%');
         }
 
-        $professional = $professional->select('listprofessions.*')
-            ->groupBy('listprofessions.lprofession_id', 'listprofessions.profession_name', 'listprofessions.valid_profession', 't.en', 't.pt', 't.es');
+        $professional = $professional
+            ->selectRaw('
+            listprofessions.lprofession_id,
+            t.en,
+            t.pt,
+            t.es,
+            listprofessions.parent_profession_id,
+            listprofessions.valid_profession,
+            listprofessions.person_id,
+            listprofessions.profession_category_id,
+            COUNT(jl.job_id) AS job_count
+        ')
+            ->orderBy('job_count', 'DESC')
+            ->paginate(request('per_page', 20));
 
-        return response()->json($professional->get(), 200);
+        return response()->json($professional);
     }
 }
