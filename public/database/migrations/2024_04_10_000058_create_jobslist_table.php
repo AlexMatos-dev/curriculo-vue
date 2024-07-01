@@ -3,11 +3,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateJobsListTable extends Migration {
+class CreateJobsListTable extends Migration
+{
 
 	public function up()
 	{
-		Schema::create('jobslist', function(Blueprint $table) {
+		Schema::create('jobslist', function (Blueprint $table)
+		{
 			$table->bigIncrements('job_id', true);
 			$table->bigInteger('company_id')->unsigned();
 			$table->unsignedBigInteger('job_modality_id');
@@ -15,12 +17,13 @@ class CreateJobsListTable extends Migration {
 			$table->string('job_state', 300)->nullable();
 			$table->string('job_city', 300)->nullable();
 			$table->unsignedInteger('job_seniority')->nullable();
-			$table->decimal('job_salary', 10,2)->default('0.0');
+			$table->decimal('job_salary', 10, 2)->default('0.0');
 			$table->string('job_description', 500);
 			$table->integer('experience_in_months')->nullable();
 			$table->string('job_experience_description', 100)->nullable();
 			$table->text('job_benefits')->nullable();
 			$table->unsignedInteger('wage_currency')->nullable();
+			$table->bigInteger('profession_for_job')->nullable();
 			$table->timestamps();
 		});
 	}
