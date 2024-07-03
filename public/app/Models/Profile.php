@@ -66,7 +66,10 @@ class Profile extends Model
             if($object){
                 $data = [];
                 foreach($object->getFillable() as $attr){
-                    $data[$attr] = $object->{$attr};
+                    $val = $object->{$attr};
+                    if(in_array($attr, ['company_cover_photo','company_logo','professional_photo','recruiter_photo']))
+                        $val = $val ? base64_encode($val) : null;
+                    $data[$attr] = $val;
                 }
                 $myProfiles[$profileType] = $data;
             }
