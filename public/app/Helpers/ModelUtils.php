@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
+use App\Models\ListLangue;
 use App\Models\Translation;
+use Carbon\Carbon;
 use ReflectionClass;
 
 class ModelUtils
@@ -18,6 +20,7 @@ class ModelUtils
      */
     public static function getFillableData(Object $object, $addId = false, $findAndMerge = [])
     {
+        $languages = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
         try {
             $attributesNames = $object->getFillable();
             if($addId)
@@ -37,10 +40,12 @@ class ModelUtils
                         $thisData['en'] = $thisObject->en;
                         $thisData['pt'] = $thisObject->pt;
                         $thisData['es'] = $thisObject->es;
-                        $unofficial = json_decode($thisObject->unofficial_translations, true);
-                        if(is_array($unofficial)){
-                            foreach($unofficial as $languageIso => $translatedText){
-                                $thisData[$languageIso] = $translatedText;
+                        $unofficial = $thisObject->unofficial_translations ? json_decode($thisObject->unofficial_translations, true) : [];
+                        foreach($languages as $language){
+                            $langIso = $language->llangue_acronyn;
+                            $thisData[$langIso] = null;
+                            if(array_key_exists($langIso, $unofficial)){
+                                $thisData[$langIso] = $unofficial[$langIso];
                             }
                         }
                     }
@@ -111,6 +116,7 @@ class ModelUtils
      */
     public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false)
     {
+        $listLanguages = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
         try {
             $foundObjectArray = $object::leftJoin('translations', function($join) use($object, $relationAttr){
                 $join->on('translations.en', $object->getTable() . '.' . $relationAttr);
@@ -121,6 +127,12 @@ class ModelUtils
                 $rawInstance = self::makeInstance($object);
                 foreach($attributes as $attributeName){
                     $rawInstance->{$attributeName} = $objectData->{$attributeName};
+                }
+                $unofficialTrans = $objectData->unofficial_translations ? json_decode($objectData->unofficial_translations, true) : [];
+                foreach($listLanguages as $langIso){
+                    $rawInstance->{$langIso->llangue_acronyn} = null;
+                    if(array_key_exists($langIso->llangue_acronyn, $unofficialTrans))
+                        $rawInstance->{$langIso->llangue_acronyn} = $unofficialTrans[$langIso->llangue_acronyn];
                 }
                 if($addId)
                     $rawInstance->{$objectData->getKeyName()} = $objectData->{$objectData->getKeyName()};
@@ -159,6 +171,37 @@ class ModelUtils
             return $oClass->getConstants();
         } catch (\Throwable $th) {
             return [];
+        }
+    }
+
+    /**
+     * Formats date accordingly to language
+     * @param Date $data
+     * @param Bool addHour - default = false
+     * @param String userLang - default = ListLangue default language
+     * @return String
+     */
+    public static function parseDateByLanguage($date, $addHour = false, $userLang = ListLangue::DEFAULT_LANGUAGE)
+    {
+        if(Session()->has('user_lang'))
+            $userLang = Session()->get('user_lang');
+        if(!in_array($userLang, Translation::OFFICIAL_LANGUAGES))
+            $userLang = ListLangue::DEFAULT_LANGUAGE;
+        if(is_string($date))
+            $date = Carbon::parse($date);
+        switch($userLang){
+            case 'en':
+                return $addHour ? $date->format('Y/m/d H:i:s') : $date->format('Y/m/d');
+            break;
+            case 'es':
+                return $addHour ? $date->format('d/m/Y H:i:s') : $date->format('d/m/Y');
+            break;
+            case 'pt':
+                return $addHour ? $date->format('d/m/Y H:i:s') : $date->format('d/m/Y');
+            break;
+            default:
+                return $addHour ? $date->format('Y/m/d H:i:s') : $date->format('Y/m/d');
+            break;
         }
     }
 }

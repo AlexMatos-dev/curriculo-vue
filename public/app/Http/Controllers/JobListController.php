@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
+use App\Models\CommonCurrency;
 use App\Models\Company;
+use App\Models\CompanyType;
 use App\Models\JobLanguage;
 use App\Models\JobList;
 use App\Models\JobModality;
@@ -40,6 +43,7 @@ class JobListController extends Controller
      * @param Int experience_in_months_end
      * @param Array job_visas
      * @param Array job_visas_countries
+     * @param String filter - avaliable: (mostrecent)
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
@@ -64,43 +68,62 @@ class JobListController extends Controller
             'job_experience_description' => 'max:100',
             'experience_in_months_start' => 'integer',
             'experience_in_months_end' => 'integer',
-            'per_page' => 'integer'
+            'job_visas' => 'array',
+            'job_visas_countries' => 'array',
+            'per_page' => 'integer',
+            'filter' => 'string'
         ]);
         $page = request('page', 1);
         $perPage = request('per_page', 100);
+
+        $bdData = [
+            'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
+            'proficiencies' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level'),
+            'visaTypes' => ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name'),
+            'listLanguages' => ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name'),
+            'jobModalities' => ModelUtils::getIdIndexedAndTranslated(new JobModality(), 'name'),
+            'commonCurrencies' => ModelUtils::getIdIndexedAndTranslated(new CommonCurrency(), 'currency_name'),
+            'companyTypes' => ModelUtils::getIdIndexedAndTranslated(new CompanyType(), 'name'),
+            'listCountries' => (new ListCountry())->getAll(true),
+            'countriesTranslated' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, true)
+        ];
+
         $jobListObj = new JobList();
-        $nonPaying = $jobListObj->listJobs($request, false);
-        $nonPaying = $jobListObj->splitjoinDataFromListedJobs($nonPaying);
-        $paying = $jobListObj->listJobs($request, true);
-        $paying = $jobListObj->splitjoinDataFromListedJobs($paying);
-        $total = count($paying) + count($nonPaying);
-        $results = $jobListObj->processListedJobs([
-            'paying'    => $paying,
-            'nonPaying' => $nonPaying
-        ], $perPage, $this->request);
-        $lastPage = ceil($total / $perPage);
-        if($page < 1)
-            $page = 1;
-        if($page >= $lastPage)
-            $page = $lastPage;
-        if($page > 1){
-            $nonPayingOffset = $results['status']['nonPaying'];
-            $nonPaying = $jobListObj->listJobs($request, false, $perPage, $nonPayingOffset);
-            $nonPaying = $jobListObj->splitjoinDataFromListedJobs($nonPaying);
-            $payingOffset = $results['status']['paying'];
-            $paying = $jobListObj->listJobs($request, true, $perPage, $payingOffset);
-            $paying = $jobListObj->splitjoinDataFromListedJobs($paying);
+        if(request('filter')){
+            $results = [];
+            switch(request('filter')){
+                case 'mostrecent':
+                    $data = $jobListObj->listJobs($request, true);
+                    if(count($data) < $perPage){
+                        $notPaying = $jobListObj->listJobs($request, true);
+                        $data = array_merge($data, $notPaying);
+                    }
+                    $results = $jobListObj->gatherJobJoinData($data, $bdData, $this->request);
+                break;
+            }
+            returnResponse([
+                'data' => $results,
+                'curent_page' => 1,
+                'per_page' => $perPage,
+                'last_page' => 1
+            ]);
+        }else{
+            $nonPaying = $jobListObj->listJobs($request, false);
+            $nonPaying = $jobListObj->gatherJobJoinData($nonPaying, $bdData, $this->request);
+            $paying = $jobListObj->listJobs($request, true);
+            $paying = $jobListObj->gatherJobJoinData($paying, $bdData, $this->request);
+            $orderedJobs = $jobListObj->orderByMatch($paying, $nonPaying);
             $results = $jobListObj->processListedJobs([
-                'paying'    => $paying,
-                'nonPaying' => $nonPaying
-            ], $perPage, $this->request);
+                'paying'    => $orderedJobs['paying'],
+                'nonPaying' => $orderedJobs['nonPaying']
+            ], $perPage, $page);
+            returnResponse([
+                'data' => $results['results'],
+                'curent_page' => (int)$results['curent_page'],
+                'per_page' => (int)$results['curent_page'],
+                'last_page' => (int)$results['last_page']
+            ]);
         }
-        returnResponse([
-            'data' => $results['results'],
-            'curent_page' => $page,
-            'per_page' => $perPage,
-            'last_page' => $lastPage
-        ]);
     }
 
     /**

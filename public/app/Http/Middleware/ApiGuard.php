@@ -41,8 +41,11 @@ class ApiGuard extends Controller
         ];
         foreach ($input as $key => $value) {
             foreach ($suspectPatterns as $pattern) {
-                if (preg_match($pattern, $value)) {
-                    Validator::throwResponse('detected SQL injection attempt');
+                if(!is_array($value))
+                    $value = [$value];
+                foreach($value as $value){
+                    if (preg_match($pattern, $value))
+                        Validator::throwResponse('detected SQL injection attempt');
                 }
             }
         }
