@@ -9,8 +9,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AsynActions
 {
-    private $allowedOrigin = ['api.jobifull.eu'];
-
     /**
      * Handle an incoming request.
      *
@@ -18,8 +16,19 @@ class AsynActions
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!in_array($_SERVER['HTTP_HOST'], $this->allowedOrigin))
+        if(!$this->isOriginAllowed($_SERVER['HTTP_HOST']))
             Validator::throwResponse('not allowed', 500);
         return $next($request);
+    }
+
+    /**
+     * Checks if origin can access this route
+     */
+    public function isOriginAllowed($origin = '')
+    {
+        $allowedOrigin = [
+            str_replace(['http://', '/'], '', env('APP_URL'))
+        ];
+        return in_array($origin, $allowedOrigin);
     }
 }

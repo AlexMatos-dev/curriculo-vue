@@ -27,7 +27,7 @@ class ListCountry extends Model
     /**
      * Gets all countries and its translations
      * @param Bool flagToBase64 - to encode flag as base 64
-     * @return ArrayOfCountry Schema: [$id => $countryObj] 
+     * @return Array Schema: [$id => $countryObj] 
      */
     public function getAll($flagToBase64 = false)
     {

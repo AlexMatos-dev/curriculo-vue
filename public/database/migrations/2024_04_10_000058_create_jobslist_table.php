@@ -21,7 +21,9 @@ class CreateJobsListTable extends Migration
 			$table->string('job_description', 500);
 			$table->integer('experience_in_months')->nullable();
 			$table->string('job_experience_description', 100)->nullable();
-			$table->text('job_benefits')->nullable();
+			$table->text('job_benefits', 3000)->nullable();
+			$table->text('job_offer', 3000)->nullable();
+			$table->text('job_requirements', 3000)->nullable();
 			$table->unsignedInteger('wage_currency')->nullable();
 			$table->bigInteger('profession_for_job')->nullable();
 			$table->timestamps();

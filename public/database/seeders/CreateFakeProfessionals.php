@@ -50,6 +50,7 @@ class CreateFakeProfessionals extends Seeder
         $brCountry = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$brCountry)
             return;
+        $sourceImage = file_exists(storage_path('app/placeholder.png')) ? file_get_contents(storage_path('app/placeholder.png')) : null;
         $defaultPassword = Hash::make('12345');
         $allTags = Tag::all()->toArray();
         $allProfeciencies = Proficiency::where('category', Proficiency::CATEGORY_LEVEL)->get()->toArray();
@@ -89,8 +90,8 @@ class CreateFakeProfessionals extends Seeder
                 'professional_lastname' => $lastName,
                 'professional_email' => $faker->unique()->email(),
                 'professional_phone' => $faker->unique()->phoneNumber(),
-                'professional_photo' => $faker->imageUrl(360, 360, 'professional logo', true, 'professional logo'),
-                'professional_cover' => $faker->imageUrl(360, 360, 'professional logo', true, 'professional logo'),
+                'professional_photo' => $sourceImage,
+                'professional_cover' => $sourceImage,
                 'professional_title' => $faker->jobTitle(),
                 'currently_working' => $faker->boolean(),
                 'avaliable_to_travel' => $faker->boolean(),

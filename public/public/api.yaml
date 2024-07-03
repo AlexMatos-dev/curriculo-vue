@@ -1257,6 +1257,13 @@ paths:
                 company_id:
                   type: integer
                   example: 1
+        - name: filter
+          in: query
+          description: Default filter type such as (mostrecent)
+          example: mostrecent
+          schema:
+            type: string
+            example: mostrecent
         - name: job_city
           in: query
           description: Array of city name
@@ -4689,26 +4696,37 @@ components:
         company_id:
           type: integer
           example: 1
-        job_modality_id:
-          type: integer
-          example: 1
+        job_modality:
+          type: string
+          example: presencial
           description: id from job_modalities
         job_country:
-          type: integer
-          example: 1
+          type: string
+          example: brasil
         job_city:
           type: string
           example: curitiba
+        job_state:
+          type: string
+          example: paraná
+        location:
+          type: string
+          example: $job_city / $job_state / $job_country (the variables)
         job_seniority:
-          type: integer
-          example: 1
-          description: Proficiency id of category = seniority
+          type: string
+          example: senior
         job_salary:
           type: number
           example: 2500.00
         job_description:
           type: string
           example: Job description
+        job_requirements:
+          type: string
+          example: Job requirements
+        job_offer:
+          type: string
+          example: Job offer
         job_english_level:
           type: integer
           example: 1
@@ -4722,21 +4740,36 @@ components:
           type: string
           example: gym pass and udemy course pass
         skills:
-          type: array
-          items:
-            $ref: '#/components/schemas/JobSkills'
+          type: string
+          example: [$skillName / $skillProficiency |Example -> php / basic]
+        skillsIds:
+          type: string
+          example: [1]
         languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/JobLanguages'
+          type: string
+          example: [$languageName / $languageProficiency |Example -> english / advanced]
+        languagesIds:
+          type: string
+          example: [1]
         visas:
-          type: array
-          items:
-            $ref: '#/components/schemas/JobVisas'
+          type: string
+          example: [$visaName / $visaCoutry |Example -> vitem ix / brazil]
+        visasIds:
+          type: string
+          example: [1]
         match:
           type: number
           example: 100.00
           description: The float/double number of the match accordingly to sent parameters | This exists only in /api/joblist/show/{joblistId}
+        wage_currency:
+          type: string
+          example: reais
+        job_created_at:
+          type: string
+          example: '01-01-20204'
+        job_updated_at:
+          type: string
+          example: '01-01-20204'
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
