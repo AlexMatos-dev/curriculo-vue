@@ -138,6 +138,7 @@ class CreateFakeJobData extends Seeder
             try {
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
                 $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
+                $profession = $professions[array_rand($professions)];
                 $job = JobList::create([
                     'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
@@ -145,13 +146,14 @@ class CreateFakeJobData extends Seeder
                     'job_country' => $countryObj->lcountry_id,
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),
-                    'job_description' => $professions[array_rand($professions)]['profession_name'],
+                    'job_description' => $profession['profession_name'],
                     'job_experience_description' => $faker->text(80),
                     'experience_in_months' => $jobData['exp'],
                     'job_benefits' => $faker->text(500),
                     'job_offer' => $faker->text(499),
                     'job_requirements' => $faker->text(499),
-                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id']
+                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id'],
+                    'profession_for_job' => $profession['lprofession_id']
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){

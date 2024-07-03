@@ -465,11 +465,9 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
-		Schema::table('joblist', function (Blueprint $table)
+		Schema::table('jobslist', function (Blueprint $table)
 		{
-			$table->foreign('profession_for_job')
-				->references('listprofessions')
-				->on('jobslist')
+			$table->foreign('profession_for_job')->references('lprofession_id')->on('listprofessions')
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
@@ -781,9 +779,9 @@ class CreateForeignKeys extends Migration
 		{
 			$table->dropForeign('chat_messages_job_id_foreign');
 		});
-		Schema::table('joblist', function (Blueprint $table)
+		Schema::table('jobslist', function (Blueprint $table)
 		{
-			$table->dropForeign('profession_for_job');
+			$table->dropForeign('jobslist_profession_for_job_foreign');
 		});
 	}
 }

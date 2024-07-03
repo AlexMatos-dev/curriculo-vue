@@ -6,6 +6,12 @@ use App\Models\ListProfession;
 use App\Models\Translation;
 use Illuminate\Http\Request;
 
+/**
+ * Gets all professions paginated
+ * @param String languageISO
+ * @param String profession_name
+ * @return LaravelPaginated
+ */
 class ListProfessionController extends Controller
 {
     public function getProfessions(Request $request)

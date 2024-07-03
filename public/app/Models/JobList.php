@@ -31,7 +31,8 @@ class JobList extends Model
         'experience_in_months',
         'job_benefits',
         'job_offer',
-        'job_requirements'
+        'job_requirements',
+        'profession_for_job'
     ];
 
     public function company()

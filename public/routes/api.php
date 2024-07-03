@@ -175,10 +175,9 @@ Route::prefix('languages')->group(function ()
 Route::prefix('countries')->group(function ()
 {
     Route::get('index', [CountryController::class, 'getCountries']);
-    Route::get('getCountries', [CountryController::class, 'getCountries']);
 });
 
-Route::prefix('profession')->group(function ()
+Route::prefix('professions')->group(function ()
 {
-    Route::get('getProfessions', [ListProfessionController::class, 'getProfessions']);
+    Route::get('index', [ListProfessionController::class, 'getProfessions']);
 });
