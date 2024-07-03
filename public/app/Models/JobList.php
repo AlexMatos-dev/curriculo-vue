@@ -75,9 +75,9 @@ class JobList extends Model
      * @param Int offset
      * @return Array
      */
-    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null, $distinct = true, $byIds = [])
+    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 200, $offset = null, $distinct = true, $byIds = [])
     {
-        $limit = !is_numeric($limit) || $limit > 500 ? 500 : $limit;
+        $limit = !is_numeric($limit) || $limit > 200 ? 200 : $limit;
         if($distinct){
             $query = JobList::select(
                 'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.*', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at'
