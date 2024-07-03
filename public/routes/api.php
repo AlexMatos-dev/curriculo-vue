@@ -15,6 +15,7 @@ use App\Http\Controllers\CountryController;
 use App\Http\Controllers\JobAppliedController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\ListLangueController;
+use App\Http\Controllers\ListProfessionController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
@@ -174,4 +175,9 @@ Route::prefix('languages')->group(function ()
 Route::prefix('countries')->group(function ()
 {
     Route::get('index', [CountryController::class, 'getCountries']);
+});
+
+Route::prefix('professions')->group(function ()
+{
+    Route::get('index', [ListProfessionController::class, 'getProfessions']);
 });

@@ -18,6 +18,7 @@ use App\Models\Tag;
 use App\Models\TypeVisas;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class CreateFakeJobData extends Seeder
@@ -35,6 +36,7 @@ class CreateFakeJobData extends Seeder
             $limit = 1;
         $faker = Faker::create('pt_BR');
         // -- Start of Essential Data --
+        $sourceImage = file_exists(storage_path('app/placeholder.png')) ? file_get_contents(storage_path('app/placeholder.png')) : null;
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$countryObj)
             return;
@@ -76,6 +78,17 @@ class CreateFakeJobData extends Seeder
             if($created > 5)
                 break;
             $person = Person::inRandomOrder()->first();
+            if(!$person){
+                $person = Person::create([
+                    'person_username' => $faker->firstName('masculine') . ' ' . $faker->lastName('masculine'),
+                    'person_email' => $faker->email,
+                    'person_password' => Hash::make(12345),
+                    'person_ddi' => substr($faker->phoneNumber(), 0, 2),
+                    'person_phone' => $faker->phoneNumber(),
+                    'person_langue' => ListLangue::inRandomOrder()->first()->llangue_id,
+                    'last_login' => $faker->dateTime()
+                ]);
+            }
             $companyName = $faker->company();
             $companyObj = Company::where('company_name', $companyName)->first();
             if($companyObj)
@@ -87,8 +100,8 @@ class CreateFakeJobData extends Seeder
                     'company_register_number' => $faker->uuid(),
                     'company_name' => $companyName,
                     'company_type' => $companyTypes[array_rand($companyTypes)]['company_type_id'],
-                    'company_logo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
-                    'company_cover_photo' => $faker->imageUrl(360, 360, 'company logo', true, 'company logo'),
+                    'company_logo' => $sourceImage,
+                    'company_cover_photo' => $sourceImage,
                     'company_video' => $faker->url('youtube'),
                     'company_email' => $faker->unique()->companyEmail(),
                     'company_phone' => $faker->unique()->phoneNumber(),
@@ -104,7 +117,7 @@ class CreateFakeJobData extends Seeder
                     'has_privilegies' => true
                 ]);
             } catch (\Throwable $th) {
-                
+
             }
             if($company)
                 $created++;
@@ -125,6 +138,7 @@ class CreateFakeJobData extends Seeder
             try {
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
                 $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
+                $profession = $professions[array_rand($professions)];
                 $job = JobList::create([
                     'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
@@ -132,11 +146,14 @@ class CreateFakeJobData extends Seeder
                     'job_country' => $countryObj->lcountry_id,
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),
-                    'job_description' => $professions[array_rand($professions)]['profession_name'],
+                    'job_description' => $profession['profession_name'],
                     'job_experience_description' => $faker->text(80),
                     'experience_in_months' => $jobData['exp'],
                     'job_benefits' => $faker->text(500),
-                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id']
+                    'job_offer' => $faker->text(499),
+                    'job_requirements' => $faker->text(499),
+                    'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id'],
+                    'profession_for_job' => $profession['lprofession_id']
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
