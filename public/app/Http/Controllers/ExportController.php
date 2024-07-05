@@ -23,7 +23,7 @@ class ExportController extends Controller
                 unset($translations['object']);
                 $filtered[$en] = $translations;
             }
-            $json = json_encode($filtered, JSON_PRETTY_PRINT);
+            $json = json_encode($filtered);
             file_put_contents($path, $json);
             returnResponse(['message' => 'done']);
         } catch (\Throwable $th) {
@@ -63,7 +63,7 @@ class ExportController extends Controller
             $result[$language->llangue_acronyn] = $data;
         }
         try {
-            file_put_contents($path, json_encode($result, JSON_PRETTY_PRINT));
+            file_put_contents($path, json_encode($result));
             returnResponse(['message' => 'done']);
         } catch (\Throwable $th) {
             Log::alert('Export languages failed: ' . $th->getMessage());

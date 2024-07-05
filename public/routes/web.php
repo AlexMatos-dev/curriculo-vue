@@ -18,3 +18,8 @@ Route::middleware('async')->prefix('async')->group(function(){
         Route::get('export_language', [ExportController::class, 'exportLanguages']);
     });
 });
+
+Route::prefix('exports')->group(function(){
+    Route::get('export_translation', [ExportController::class, 'exportTranslations']);
+    Route::get('export_language', [ExportController::class, 'exportLanguages']);
+});

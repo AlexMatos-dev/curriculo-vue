@@ -73,8 +73,10 @@ class JobListController extends Controller
             'per_page' => 'integer',
             'filter' => 'string'
         ]);
-        $page = request('page', 1);
-        $perPage = request('per_page', 100);
+        $page = (int)request('page', 1);
+        $perPage = (int)request('per_page', 100);
+        if(!$perPage)
+            $perPage = 10;
 
         $bdData = [
             'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
@@ -94,11 +96,25 @@ class JobListController extends Controller
             switch(request('filter')){
                 case 'mostrecent':
                     $data = $jobListObj->listJobs($request, true);
-                    if(count($data) < $perPage){
-                        $notPaying = $jobListObj->listJobs($request, true);
-                        $data = array_merge($data, $notPaying);
+                    $dataSize = count($data);
+                    if($dataSize > 0){
+                        if($dataSize < $perPage){
+                            $notPaying = $jobListObj->listJobs($request, true);
+                            $data = array_merge($data, $notPaying);
+                        }
+                        $results = $jobListObj->gatherJobJoinData($data, $bdData, $this->request);
+                        $resized = [];
+                        foreach($results as $result){
+                            if(count($resized) < $perPage){
+                                $resized[] = $result;
+                            }else{
+                                break;
+                            }
+                        }
+                        $results = $resized;
+                    }else{
+                        $results = [];
                     }
-                    $results = $jobListObj->gatherJobJoinData($data, $bdData, $this->request);
                 break;
             }
             returnResponse([
@@ -117,11 +133,19 @@ class JobListController extends Controller
                 'paying'    => $orderedJobs['paying'],
                 'nonPaying' => $orderedJobs['nonPaying']
             ], $perPage, $page);
+            if($page < 1){
+                $page = 1;
+            }else{
+                $page = $page > $results['last_page'] ? $results['last_page'] : $page;
+            }
+            $data = [];
+            if(!empty($results['results']) && !empty($results['results'][$page]))
+                $data = $results['results'][$page];
             returnResponse([
-                'data' => $results['results'],
-                'curent_page' => (int)$results['curent_page'],
-                'per_page' => (int)$results['curent_page'],
-                'last_page' => (int)$results['last_page']
+                'data' => $data,
+                'curent_page' => $page,
+                'per_page' => $results['curent_page'],
+                'last_page' => $results['last_page']
             ]);
         }
     }

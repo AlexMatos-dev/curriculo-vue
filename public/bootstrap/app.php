@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('api', [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            'throttle:6,1',
+            \App\Http\Middleware\ApiThrottle::class,
             \App\Http\Middleware\UserLanguage::class,
             \App\Http\Middleware\ApiGuard::class
         ]);
