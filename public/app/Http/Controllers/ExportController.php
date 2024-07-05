@@ -25,10 +25,10 @@ class ExportController extends Controller
             }
             $json = json_encode($filtered);
             file_put_contents($path, $json);
-            returnResponse(['message' => 'done']);
+            exit(json_encode(['message' => 'done']));
         } catch (\Throwable $th) {
             Log::alert('Export translations failed: ' . $th->getMessage());
-            returnResponse(['message' => $th->getMessage()], 500);
+            exit(json_encode(['message' => 'Erro: ' . $th->getMessage()]));
         }
     }
 
@@ -64,10 +64,10 @@ class ExportController extends Controller
         }
         try {
             file_put_contents($path, json_encode($result));
-            returnResponse(['message' => 'done']);
+            exit(json_encode(['message' => 'done']));
         } catch (\Throwable $th) {
             Log::alert('Export languages failed: ' . $th->getMessage());
-            returnResponse(['message' => $th->getMessage()], 500);
+            exit(json_encode(['message' => 'Erro: ' . $th->getMessage()]));
         }
     }
 }
