@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CacheHandler;
 use App\Models\Person;
 use App\Helpers\Validator;
 use App\Http\Controllers\Controller;
@@ -25,6 +26,10 @@ class ResetPasswordController extends Controller
         $person = Person::where('person_email', request('email'))->first();
         if(!$person)
             returnResponse(['message' => translate('invalid email')], 400);
+        $cacheHandler = new CacheHandler("awaiting-resetpassword-email-receival-{$person->person_id}");
+        if($cacheHandler->cacheExist()){
+            returnResponse(['message' => translate('reset password email already sent, wait for') . ' ' . $cacheHandler->getExpirationTime() . ' ' . translate('seconds')], 500);
+        }
         $response = Password::broker('persons')->sendResetLink(
             ['person_email' => $person->person_email]
         );
@@ -32,6 +37,7 @@ class ResetPasswordController extends Controller
             returnResponse(['message' => translate('wait before resending password reset email')], 500);
         if($response != Password::RESET_LINK_SENT)
             returnResponse(['message' => translate('email not sent')], 500);
+        $cacheHandler->setCache("awaiting-resetpassword-email-receival-{$person->person_id}", ['sent' => true], 60);
         returnResponse(['message' => translate('email sent')], 200);
     }
 

@@ -168,6 +168,35 @@ class Validator
     }
 
     /**
+     * Validates sent password an return detailed messages about the password
+     * @param String password
+     * @return Bool
+     */
+    public static function validatePassword($password = '')
+    {
+        if(!$password){
+            self::throwResponse(ucfirst(translate('a password is required')));
+        }
+        if(strlen($password) < 6){
+            self::throwResponse(ucfirst(translate('password is too shot, it must have more than 6 characters length')));
+        }
+        if(strlen($password) > 20){
+            self::throwResponse(ucfirst(translate('password is too long, it must have more than 20 characters length')));
+        }
+        $regexChecks = [
+            '/[a-z]/'      => ucfirst(translate('invalid password, enter a lowercase letter')),
+            '/[A-Z]/'      => ucfirst(translate('invalid password, enter an uppercase letter')),
+            '/[0-9]/'      => ucfirst(translate('invalid password, enter a number')),
+            '/[@$!%*#?&]/' => ucfirst(translate('invalid password, enter a special character'))
+        ];
+        foreach($regexChecks as $regex => $errorMessage){
+            if(!preg_match($regex, $password))
+                self::throwResponse($errorMessage);
+        }
+        return true;
+    }
+
+    /**
      * Terminate application and return a json response with sent message and code
      * @param String message
      * @param Int code

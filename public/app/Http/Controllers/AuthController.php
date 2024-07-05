@@ -76,11 +76,11 @@ class AuthController extends Controller
         Validator::validateParameters($this->request, [
             'person_username' => 'required|max:300',
             'person_email' => 'required|max:200|email|unique:persons',
-            'person_password' => Validator::getPersonPasswordRule(),
             'person_ddi' => 'max:10',
             'person_phone' => 'max:20',
             'person_langue' => 'integer'
         ]);
+        Validator::validatePassword(request('person_password'));
         if(request('person_langue') && !ListLangue::find(request('person_langue')))
             returnResponse(['message' => translate('invalid person language')], 400);
         if(request('person_phone') && !request('person_ddi'))
@@ -133,7 +133,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return response()->json(['message' => 'successfully logged out'], 200)
             ->withCookie(cookie()->forget('XSRF-TOKEN'))
-            ->withCookie(cookie()->forget(env('APP_NAME')) . '_session');
+            ->withCookie(cookie()->forget(env('APP_NAME') . '_session'));
     }
 
     /**
