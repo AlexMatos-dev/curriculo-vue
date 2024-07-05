@@ -10,7 +10,7 @@
  */
 function returnResponse($data = '', $code = 200, $headers = [], $options = 0)
 {
-    $incomingOrigin = !array_key_exists('HTTP_ORIGIN', $_SERVER) ? $_SERVER['HTTP_ORIGIN'] : '';
+    $incomingOrigin = array_key_exists('HTTP_ORIGIN', $_SERVER) ? $_SERVER['HTTP_ORIGIN'] : '';
     $allowedOrigins = explode(',' , env('ALLOWED_ORIGINS'));
     if(!in_array($incomingOrigin, $allowedOrigins)){
         response()->json(['message' => 'unknow'], 500)->header('Access-Control-Allow-Origin', '')
