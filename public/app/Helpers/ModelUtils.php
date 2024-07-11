@@ -110,11 +110,12 @@ class ModelUtils
      * @param String relationAttr 
      * @param Bool noKey - default = false
      * @param Bool addId - default = false
+     * @param Bool pureArray - default = false (parse data as array and not an object)
      * @return Array schema [
      *      $objectId => $object
      * ]
      */
-    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false)
+    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false, $pureArray = false)
     {
         $listLanguages = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
         try {
@@ -139,7 +140,7 @@ class ModelUtils
                 if($noKey){
                     $data[] = $rawInstance;
                 }else{
-                    $data[$objectData->{$object->getKeyName()}] = $rawInstance;
+                    $data[$objectData->{$object->getKeyName()}] = $pureArray ? $rawInstance->toArray() : $rawInstance;
                 }
             }
             return $data;

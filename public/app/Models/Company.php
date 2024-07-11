@@ -91,6 +91,18 @@ class Company extends Model
     }
 
     /**
+     * Verifies if person_id belongs to an admin of $this company or a recruiter
+     * @param Int person_id
+     * @return Bool
+     */
+    public function isAdminOrRecruiter($person_id)
+    {
+        if($this->isAdmin($person_id) || $this->isMyRecruiter($person_id))
+            return true;
+        return false;
+    }
+
+    /**
      * Verifies if person_id belongs to an admin of $this company
      * @param Int person_id
      * @return Bool

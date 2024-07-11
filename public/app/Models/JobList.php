@@ -21,6 +21,7 @@ class JobList extends Model
     protected $fillable = [
         'company_id',
         'job_modality_id',
+        'job_title',
         'job_city',
         'job_state',
         'job_country',
@@ -32,7 +33,12 @@ class JobList extends Model
         'job_benefits',
         'job_offer',
         'job_requirements',
-        'profession_for_job'
+        'profession_for_job',
+        'payment_type',
+        'job_contract',
+        'working_visa',
+        'job_period',
+        'wage_currency'
     ];
 
     public function company()
@@ -55,6 +61,26 @@ class JobList extends Model
         return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
     }
 
+    public function jobPeriod()
+    {
+        return $this->belongsTo(JobPeriod::class, 'job_period')->first();
+    }
+
+    public function paymentType()
+    {
+        return $this->belongsTo(JobPaymentType::class, 'job_payment_type')->first();
+    }
+
+    public function jobContract()
+    {
+        return $this->belongsTo(JobContract::class, 'job_contract')->first();
+    }
+
+    public function workingVisa()
+    {
+        return $this->belongsTo(workingVisa::class, 'working_visa')->first();
+    }
+
     public function jobEnglishLevel()
     {
         return $this->belongsTo(JobModality::class, 'job_modality_id')->first();
@@ -70,6 +96,8 @@ class JobList extends Model
      * @param Illuminate\Http\Request $request - schema: [ 'job_modality_id' => int, 'job_modality_id' => int, 'job_country' => int
      *      'job_city' => string, 'job_seniority' => int, 'job_salary_start' => float, 'job_salary_end' => float, 'job_state' => Array
      *      'experience_in_months_start' => integer, 'experience_in_months_end' => integer, 'job_skills' => IntArray,
+     *      'profession_for_job' => integer, 'payment_type' => integer, 'job_contract' => integer,
+     *      'working_visa' => integer, 'job_period' => integer, 'wage_currency' => integer
      * ]
      * @param Bool paying
      * @param Int limit
@@ -139,6 +167,18 @@ class JobList extends Model
             $query->where("jobslist.job_description", 'like', '%'.$request->job_description.'%');
         if ($request->has("job_experience_description"))
             $query->where("jobslist.job_experience_description", 'like', '%'.$request->job_experience_description.'%');
+        if ($request->has("profession_for_job"))
+            $query->where("jobslist.profession_for_job", $request->profession_for_job);
+        if ($request->has("payment_type"))
+            $query->where("jobslist.payment_type", $request->payment_type);
+        if ($request->has("job_contract"))
+            $query->where("jobslist.job_contract", $request->job_contract);
+        if ($request->has("working_visa"))
+            $query->where("jobslist.working_visa", $request->working_visa);
+        if ($request->has("job_period"))
+            $query->where("jobslist.job_period", $request->job_period);
+        if ($request->has("wage_currency"))
+            $query->where("jobslist.wage_currency", $request->wage_currency);
         if($limit)
             $query->limit($limit);
         if($offset)
@@ -214,12 +254,17 @@ class JobList extends Model
         $proficiencies = $bdData['proficiencies'];
         $visaTypes = $bdData['visaTypes'];
         $listLanguages = $bdData['listLanguages'];
-        $jobModalities = $bdData['jobModalities'];
         $commonCurrencies = $bdData['commonCurrencies'];
-        $companyTypes = $bdData['companyTypes'];
         $listCountries = $bdData['listCountries'];
         $countriesTranslated = $bdData['countriesTranslated'];
         $languageIso = Session()->has('user_lang') ? Session()->get('user_lang') : ListLangue::DEFAULT_LANGUAGE;
+        $defaultLanguage = ListLangue::DEFAULT_LANGUAGE;
+        $officialLanguages = Translation::OFFICIAL_LANGUAGES;
+        $simpleJoinData = [
+            'professions' => 'profession_for_job', 'JobPaymentTypes' => 'payment_type', 'jobContracts' => 'job_contract', 
+            'workingVisas' => 'working_visa', 'jobPeriods' => 'job_period', 'companyTypes' => 'company_type', 
+            'listCountries' => 'job_country', 'proficiencies' => 'job_seniority'
+        ];
         // Preparing data to be consumed
         foreach($jobLanguagesArray as $jobLanguage){
             if(!in_array($jobLanguage->joblist_id, $usedAttr[$jobLanguage->joblist_id]['languagesIds'])){
@@ -282,39 +327,6 @@ class JobList extends Model
             }
             $thisObj->location = $location;
             $thisObj->salary = '$' . str_replace('.', ',', $thisObj->job_salary);
-            if(array_key_exists($thisObj->job_country, $listCountries)){
-                $translation = new Translation([
-                    'en' => $listCountries[$thisObj->job_country]['en'],
-                    'pt' => $listCountries[$thisObj->job_country]['pt'],
-                    'es' => $listCountries[$thisObj->job_country]['es'],
-                    'unofficial_translations' => $listCountries[$thisObj->job_country]['unofficial_translations'],
-                ]);
-                $thisObj->job_country = $translation->getTranslationByIsoCode(Session()->get('user_lang'));
-            }else{
-                $thisObj->job_country = '';
-            }
-            if(array_key_exists($thisObj->job_modality_id, $jobModalities)){
-                $translation = new Translation([
-                    'en' => $jobModalities[$thisObj->job_modality_id]['en'],
-                    'pt' => $jobModalities[$thisObj->job_modality_id]['pt'],
-                    'es' => $jobModalities[$thisObj->job_modality_id]['es'],
-                    'unofficial_translations' => $jobModalities[$thisObj->job_modality_id]['unofficial_translations'],
-                ]);
-                $thisObj->job_modality = $translation->getTranslationByIsoCode(Session()->get('user_lang'));
-            }else{
-                $thisObj->job_modality = '';
-            }
-            if(array_key_exists($thisObj->job_seniority, $proficiencies)){
-                $translation = new Translation([
-                    'en' => $proficiencies[$thisObj->job_seniority]['en'],
-                    'pt' => $proficiencies[$thisObj->job_seniority]['pt'],
-                    'es' => $proficiencies[$thisObj->job_seniority]['es'],
-                    'unofficial_translations' => $proficiencies[$thisObj->job_seniority]['unofficial_translations'],
-                ]);
-                $thisObj->job_seniority = $translation->getTranslationByIsoCode(Session()->get('user_lang'));
-            }else{
-                $thisObj->job_seniority = '';
-            }
             if(array_key_exists($thisObj->wage_currency, $commonCurrencies)){
                 $wage_currency_name = $commonCurrencies[$thisObj->wage_currency][$languageIso] ? $commonCurrencies[$thisObj->wage_currency][$languageIso] : ListLangue::DEFAULT_LANGUAGE;
                 $thisObj->wage_currency = $commonCurrencies[$thisObj->wage_currency]->currency_symbol . ' / ' . $wage_currency_name;
@@ -322,16 +334,31 @@ class JobList extends Model
                 $thisObj->wage_currency = '';
                 $thisObj->wage_currency_name = '';
             }
-            if(array_key_exists($thisObj->company_type, $companyTypes)){
-                $translation = new Translation([
-                    'en' => $companyTypes[$thisObj->company_type]['en'],
-                    'pt' => $companyTypes[$thisObj->company_type]['pt'],
-                    'es' => $companyTypes[$thisObj->company_type]['es'],
-                    'unofficial_translations' => $companyTypes[$thisObj->company_type]['unofficial_translations'],
-                ]);
-                $thisObj->company_type = $translation->getTranslationByIsoCode(Session()->get('user_lang'));
-            }else{
-                $thisObj->company_type = '';
+            $jobModality = '';
+            if(array_key_exists($thisObj->job_modality_id, $bdData['jobModalities'])){
+                $thisBdData = $bdData['jobModalities'][$thisObj->job_modality_id];
+                if(!in_array($languageIso, $officialLanguages)){
+                    $arr = json_decode($thisBdData['unofficial_translations'], true);
+                    $jobModality = (array_key_exists($languageIso, $arr) && $arr[$languageIso]) ? $arr[$languageIso] : $arr[$defaultLanguage];
+                }else{
+                    $jobModality = $thisBdData[$languageIso];
+                }
+            }
+            $thisObj->job_modality = $jobModality;
+
+            foreach($simpleJoinData as $bdDataName => $key){
+                if(!empty($bdData[$bdDataName]) && !empty($bdData[$bdDataName][$thisObj->{$key}])){
+                    $thisBdData = $bdData[$bdDataName][$thisObj->{$key}];
+                    if(!in_array($languageIso, $officialLanguages)){
+                        $arr = json_decode($thisBdData['unofficial_translations'], true);
+                        $translation = (array_key_exists($languageIso, $arr) && $arr[$languageIso]) ? $arr[$languageIso] : $arr[$defaultLanguage];
+                    }else{
+                        $translation = $thisBdData[$languageIso];
+                    }
+                    $thisObj->{$key} = $translation;
+                }else{
+                    $thisObj->{$key} = '';
+                }
             }
             foreach($attrToUnset as $attrName){
                 unset($thisObj->{$attrName});
