@@ -1,0 +1,52 @@
+[
+    {
+        "pt": "sem especificar",
+        "es": "sin especificar",
+        "en": "not specified"
+    },
+    {
+        "pt": "não requer visto",
+        "es": "no requiere visa",
+        "en": "no visa required"
+    },
+    {
+        "pt": "não oferecemos visto",
+        "es": "no ofrecemos visa",
+        "en": "we do not offer visa"
+    },
+    {
+        "pt": "não oferecemos suporte para vistos",
+        "es": "no ofrecemos apoyo para visas",
+        "en": "we do not offer visa support"
+    },
+    {
+        "pt": "requer visto de trabalho",
+        "es": "requiere visa de trabajo",
+        "en": "work visa required"
+    },
+    {
+        "pt": "oferecemos suporte para visto de trabalho",
+        "es": "ofrecemos apoyo para visa de trabajo",
+        "en": "we offer work visa support"
+    },
+    {
+        "pt": "apenas candidatos com autorização de trabalho válida",
+        "es": "solo candidatos con autorización de trabajo válida",
+        "en": "only candidates with valid work authorization"
+    },
+    {
+        "pt": "contratação remota disponível para outros países",
+        "es": "contratación remota disponible para otros países",
+        "en": "remote hiring available for other countries"
+    },
+    {
+        "pt": "requer cidadania ou autorização de trabalho válida",
+        "es": "requiere ciudadanía o autorización de trabajo válida",
+        "en": "citizenship or valid work authorization required"
+    },
+    {
+        "pt": "vaga disponível apenas para residentes permanentes",
+        "es": "vacante disponible solo para residentes permanentes",
+        "en": "position available only for permanent residents"
+    }
+]

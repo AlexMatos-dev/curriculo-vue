@@ -1,0 +1,57 @@
+[
+    {
+        "pt": "sem especificar",
+        "es": "sin especificar",
+        "en": "not specified"
+    },
+    {
+        "pt": "tempo integral",
+        "es": "tiempo completo",
+        "en": "full time"
+    },
+    {
+        "pt": "meio período",
+        "es": "medio tiempo",
+        "en": "part time"
+    },
+    {
+        "pt": "manhã",
+        "es": "mañana",
+        "en": "morning"
+    },
+    {
+        "pt": "tarde",
+        "es": "tarde",
+        "en": "afternoon"
+    },
+    {
+        "pt": "noite",
+        "es": "noche",
+        "en": "night"
+    },
+    {
+        "pt": "madrugada",
+        "es": "madrugada",
+        "en": "early morning"
+    },
+    {
+        "pt": "turno",
+        "es": "turno",
+        "en": "shift"
+    },
+    {
+        "pt": "fim de semana",
+        "es": "fin de semana",
+        "en": "weekend"
+    },
+    {
+        "pt": "flexível",
+        "es": "flexible",
+        "en": "flexible"
+    },
+    {
+        "pt": "por hora",
+        "es": "por hora",
+        "en": "hourly"
+    }
+]

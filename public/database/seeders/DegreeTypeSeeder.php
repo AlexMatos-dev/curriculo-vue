@@ -13,12 +13,10 @@ class DegreeTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        $degreeTypeArray = [
-            ['en' => 'technical', 'pt' => 'técnico', 'es' => 'tecnico'],
-            ['en' => 'master', 'pt' => 'mestre', 'es' => 'maestría'],
-            ['en' => 'doctoral', 'pt' => 'doutorado', 'es' => 'doctorado'],
-            ['en' => 'bachelor', 'pt' => 'bacharel', 'es' => 'licenciatura']
-        ];
+        $path = storage_path('app/dbSourceFiles/degreeTypes.json');
+        if(!file_exists($path))
+            return;
+        $degreeTypeArray = json_decode(file_get_contents($path), true);
         $degreeTypeObj = new DegreeType();
         foreach($degreeTypeArray as $degreeType){
             if($degreeTypeObj::where('name', $degreeType['en'])->first())

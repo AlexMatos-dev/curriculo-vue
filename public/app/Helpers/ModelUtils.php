@@ -58,6 +58,37 @@ class ModelUtils
             return $object->toArray();
         }
     }
+
+    /**
+     * Returns an array with requested data and with all languages isos with or without translations filed
+     * @param Array arrayOfObject
+     * @param Array attrsToAdd - the custom attributes to set
+     * @param String keyOfArray - if not sent will be the array index
+     * @return Array of object attributes 
+     */
+    public static function parseAsArrayWithAllLanguagesIsosAndTranslations($arrayOfObject = [], $attrsToAdd = [], $keyOfArray = null)
+    {
+        $datas = [];
+        $unofficialLangs = (new ListLangue())->getNotOficialLangsIso();
+        $attrs = Translation::OFFICIAL_LANGUAGES;
+        $attrs = array_merge($attrs, $attrsToAdd);
+        foreach($arrayOfObject as $object){
+            $data = [];
+            foreach($attrs as $attributeName){
+                $data[$attributeName] = $object->{$attributeName};
+            }
+            $unnoficialTranslations = $object->unofficial_translations ? json_decode($object->unofficial_translations, true) : [];
+            foreach($unofficialLangs as $langIso => $langueObj){
+                $data[$langIso] = array_key_exists($langIso, $unnoficialTranslations) ? $unnoficialTranslations[$langIso] : null;
+            }
+            if($keyOfArray){
+                $datas[$object->{$keyOfArray}][] = $data;
+            }else{
+                $datas[] = $data;
+            }
+        }
+        return $datas;
+    }
     
     /**
      * Gets all sent $object as an array indexed by its id
@@ -110,11 +141,12 @@ class ModelUtils
      * @param String relationAttr 
      * @param Bool noKey - default = false
      * @param Bool addId - default = false
+     * @param Bool pureArray - default = false (parse data as array and not an object)
      * @return Array schema [
      *      $objectId => $object
      * ]
      */
-    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false)
+    public static function getIdIndexedAndTranslated(Object $object, $relationAttr = '', $noKey = false, $addId = false, $pureArray = false)
     {
         $listLanguages = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
         try {
@@ -139,7 +171,7 @@ class ModelUtils
                 if($noKey){
                     $data[] = $rawInstance;
                 }else{
-                    $data[$objectData->{$object->getKeyName()}] = $rawInstance;
+                    $data[$objectData->{$object->getKeyName()}] = $pureArray ? $rawInstance->toArray() : $rawInstance;
                 }
             }
             return $data;
