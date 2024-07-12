@@ -1,0 +1,342 @@
+[
+    {
+        "pt": "gerenciamento de projetos",
+        "es": "gestión de proyectos",
+        "en": "project management"
+    },
+    {
+        "pt": "segurança da informação",
+        "es": "seguridad de la información",
+        "en": "information security"
+    },
+    {
+        "pt": "desenvolvimento ágil",
+        "es": "desarrollo ágil",
+        "en": "agile development"
+    },
+    {
+        "pt": "redes",
+        "es": "redes",
+        "en": "networking"
+    },
+    {
+        "pt": "análise de dados",
+        "es": "análisis de datos",
+        "en": "data analysis"
+    },
+    {
+        "pt": "marketing digital",
+        "es": "marketing digital",
+        "en": "digital marketing"
+    },
+    {
+        "pt": "gestão financeira",
+        "es": "gestión financiera",
+        "en": "financial management"
+    },
+    {
+        "pt": "recursos humanos",
+        "es": "recursos humanos",
+        "en": "human resources"
+    },
+    {
+        "pt": "design gráfico",
+        "es": "diseño gráfico",
+        "en": "graphic design"
+    },
+    {
+        "pt": "programação",
+        "es": "programación",
+        "en": "programming"
+    },
+    {
+        "pt": "inteligência artificial",
+        "es": "inteligencia artificial",
+        "en": "artificial intelligence"
+    },
+    {
+        "pt": "gestão de qualidade",
+        "es": "gestión de calidad",
+        "en": "quality management"
+    },
+    {
+        "pt": "comércio eletrônico",
+        "es": "comercio electrónico",
+        "en": "e-commerce"
+    },
+    {
+        "pt": "ciência de dados",
+        "es": "ciencia de datos",
+        "en": "data science"
+    },
+    {
+        "pt": "análise de negócios",
+        "es": "análisis de negocios",
+        "en": "business analysis"
+    },
+    {
+        "pt": "gerenciamento de riscos",
+        "es": "gestión de riesgos",
+        "en": "risk management"
+    },
+    {
+        "pt": "desenvolvimento web",
+        "es": "desarrollo web",
+        "en": "web development"
+    },
+    {
+        "pt": "administração de banco de dados",
+        "es": "administración de bases de datos",
+        "en": "database administration"
+    },
+    {
+        "pt": "gestão de projetos ágeis",
+        "es": "gestión de proyectos ágiles",
+        "en": "agile project management"
+    },
+    {
+        "pt": "design de interface do usuário",
+        "es": "diseño de interfaz de usuario",
+        "en": "user interface design"
+    },
+    {
+        "pt": "python",
+        "es": "python",
+        "en": "python"
+    },
+    {
+        "pt": "java",
+        "es": "java",
+        "en": "java"
+    },
+    {
+        "pt": "javascript",
+        "es": "javascript",
+        "en": "javascript"
+    },
+    {
+        "pt": "react",
+        "es": "react",
+        "en": "react"
+    },
+    {
+        "pt": "angular",
+        "es": "angular",
+        "en": "angular"
+    },
+    {
+        "pt": "node.js",
+        "es": "node.js",
+        "en": "node.js"
+    },
+    {
+        "pt": "aws",
+        "es": "aws",
+        "en": "aws"
+    },
+    {
+        "pt": "azure",
+        "es": "azure",
+        "en": "azure"
+    },
+    {
+        "pt": "google cloud",
+        "es": "google cloud",
+        "en": "google cloud"
+    },
+    {
+        "pt": "docker",
+        "es": "docker",
+        "en": "docker"
+    },
+    {
+        "pt": "kubernetes",
+        "es": "kubernetes",
+        "en": "kubernetes"
+    },
+    {
+        "pt": "linux",
+        "es": "linux",
+        "en": "linux"
+    },
+    {
+        "pt": "scrum master",
+        "es": "scrum master",
+        "en": "scrum master"
+    },
+    {
+        "pt": "itil",
+        "es": "itil",
+        "en": "itil"
+    },
+    {
+        "pt": "devops",
+        "es": "devops",
+        "en": "devops"
+    },
+    {
+        "pt": "engenharia de software",
+        "es": "ingeniería de software",
+        "en": "software engineering"
+    },
+    {
+        "pt": "administração",
+        "es": "administración",
+        "en": "business administration"
+    },
+    {
+        "pt": "ciências contábeis",
+        "es": "ciencias contables",
+        "en": "accounting"
+    },
+    {
+        "pt": "economia",
+        "es": "economía",
+        "en": "economics"
+    },
+    {
+        "pt": "direito",
+        "es": "derecho",
+        "en": "law"
+    },
+    {
+        "pt": "medicina",
+        "es": "medicina",
+        "en": "medicine"
+    },
+    {
+        "pt": "enfermagem",
+        "es": "enfermería",
+        "en": "nursing"
+    },
+    {
+        "pt": "psicologia",
+        "es": "psicología",
+        "en": "psychology"
+    },
+    {
+        "pt": "arquitetura",
+        "es": "arquitectura",
+        "en": "architecture"
+    },
+    {
+        "pt": "engenharia civil",
+        "es": "ingeniería civil",
+        "en": "civil engineering"
+    },
+    {
+        "pt": "engenharia elétrica",
+        "es": "ingeniería eléctrica",
+        "en": "electrical engineering"
+    },
+    {
+        "pt": "engenharia mecânica",
+        "es": "ingeniería mecánica",
+        "en": "mechanical engineering"
+    },
+    {
+        "pt": "biologia",
+        "es": "biología",
+        "en": "biology"
+    },
+    {
+        "pt": "química",
+        "es": "química",
+        "en": "chemistry"
+    },
+    {
+        "pt": "física",
+        "es": "física",
+        "en": "physics"
+    },
+    {
+        "pt": "matemática",
+        "es": "matemáticas",
+        "en": "mathematics"
+    },
+    {
+        "pt": "ciência da computação",
+        "es": "ciencia de la computación",
+        "en": "computer science"
+    },
+    {
+        "pt": "sistemas de informação",
+        "es": "sistemas de información",
+        "en": "information systems"
+    },
+    {
+        "pt": "análise de sistemas",
+        "es": "análisis de sistemas",
+        "en": "systems analysis"
+    },
+    {
+        "pt": "administração pública",
+        "es": "administración pública",
+        "en": "public administration"
+    },
+    {
+        "pt": "educação",
+        "es": "educación",
+        "en": "education"
+    },
+    {
+        "pt": "gestão de projetos",
+        "es": "gestión de proyectos",
+        "en": "project management"
+    },
+    {
+        "pt": "gestão de saúde",
+        "es": "gestión de salud",
+        "en": "health management"
+    },
+    {
+        "pt": "gestão ambiental",
+        "es": "gestión ambiental",
+        "en": "environmental management"
+    },
+    {
+        "pt": "gestão de recursos humanos",
+        "es": "gestión de recursos humanos",
+        "en": "human resource management"
+    },
+    {
+        "pt": "gestão de operações",
+        "es": "gestión de operaciones",
+        "en": "operations management"
+    },
+    {
+        "pt": "gestão de tecnologia da informação",
+        "es": "gestión de tecnología de la información",
+        "en": "information technology management"
+    },
+    {
+        "pt": "finanças",
+        "es": "finanzas",
+        "en": "finance"
+    },
+    {
+        "pt": "logística",
+        "es": "logística",
+        "en": "logistics"
+    },
+    {
+        "pt": "gestão de cadeia de suprimentos",
+        "es": "gestión de cadena de suministro",
+        "en": "supply chain management"
+    },
+    {
+        "pt": "turismo",
+        "es": "turismo",
+        "en": "tourism"
+    },
+    {
+        "pt": "hotelaria",
+        "es": "hotelería",
+        "en": "hospitality"
+    },
+    {
+        "pt": "gastronomia",
+        "es": "gastronomía",
+        "en": "culinary arts"
+    }
+]

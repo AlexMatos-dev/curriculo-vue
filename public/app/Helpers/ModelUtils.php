@@ -58,6 +58,37 @@ class ModelUtils
             return $object->toArray();
         }
     }
+
+    /**
+     * Returns an array with requested data and with all languages isos with or without translations filed
+     * @param Array arrayOfObject
+     * @param Array attrsToAdd - the custom attributes to set
+     * @param String keyOfArray - if not sent will be the array index
+     * @return Array of object attributes 
+     */
+    public static function parseAsArrayWithAllLanguagesIsosAndTranslations($arrayOfObject = [], $attrsToAdd = [], $keyOfArray = null)
+    {
+        $datas = [];
+        $unofficialLangs = (new ListLangue())->getNotOficialLangsIso();
+        $attrs = Translation::OFFICIAL_LANGUAGES;
+        $attrs = array_merge($attrs, $attrsToAdd);
+        foreach($arrayOfObject as $object){
+            $data = [];
+            foreach($attrs as $attributeName){
+                $data[$attributeName] = $object->{$attributeName};
+            }
+            $unnoficialTranslations = $object->unofficial_translations ? json_decode($object->unofficial_translations, true) : [];
+            foreach($unofficialLangs as $langIso => $langueObj){
+                $data[$langIso] = array_key_exists($langIso, $unnoficialTranslations) ? $unnoficialTranslations[$langIso] : null;
+            }
+            if($keyOfArray){
+                $datas[$object->{$keyOfArray}][] = $data;
+            }else{
+                $datas[] = $data;
+            }
+        }
+        return $datas;
+    }
     
     /**
      * Gets all sent $object as an array indexed by its id

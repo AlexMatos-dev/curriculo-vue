@@ -32,7 +32,8 @@ class DatabaseSeeder extends Seeder
         (new JobPeriodsSeeder())->run();
         (new WorkingVisaSeeder())->run();
         (new JobContractSeeder())->run();
-        
+        (new DrivingLicenseSeeder())->run();
+        (new CertificationTypeSeeder())->run();
         // (new SystemTranslationsSyncSeeder())->run();
     }
 }

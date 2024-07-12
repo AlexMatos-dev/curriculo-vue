@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobDrivingLicense extends Model
 {
-    protected $primaryKey = 'job_certification';
-    protected $table = 'job_certifications';
+    protected $primaryKey = 'job_driving_license';
+    protected $table = 'job_driving_licenses';
     public $timestamps = true;
 
     /**

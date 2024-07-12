@@ -450,6 +450,12 @@ paths:
           example: 1
           schema:
             type: integer
+        - name: currency
+          in: query
+          description: CommonCurrency id
+          example: 1
+          schema:
+            type: integer
 
       # requestBody:
       #   description: Change password
@@ -1304,6 +1310,34 @@ paths:
               type: object
               properties:
                 job_seniority:
+                  type: integer
+                  example: 1
+        - name: job_driving_licenses
+          in: query
+          description: Array of DrivingLicense ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_driving_licenses:
+                  type: integer
+                  example: 1
+        - name: job_certifications
+          in: query
+          description: Array of CertificationType ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_certifications:
                   type: integer
                   example: 1
         - name: job_salary_start
@@ -4705,6 +4739,9 @@ components:
         person_langue:
           type: integer
           example: 1
+        currency:
+          type: integer
+          example: 1
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4962,6 +4999,18 @@ components:
           type: string
           example: [$visaName / $visaCoutry |Example -> vitem ix / brazil]
         visasIds:
+          type: string
+          example: [1]
+        drivingLicenses:
+          type: string
+          example: [drivingLicence / $symbol |Example -> Car / B]
+        drivingLicensesIds:
+          type: string
+          example: [1]
+        certifications:
+          type: string
+          example: [$certificationName]
+        certificationsIds:
           type: string
           example: [1]
         match:

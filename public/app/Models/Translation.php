@@ -29,6 +29,8 @@ class Translation extends Model
     const CATEGORY_JOB_CONTRACT                = 'job_contract_translation';
     const CATEGORY_JOB_PERIOD                  = 'job_period_translation';
     const CATEGORY_WORKING_VISA                = 'working_visa_translation';
+    const CATEGORY_DRIVING_LICENSE             = 'driving_license_translation';
+    const CATEGORY_CERTIFICATION_TYPE          = 'certification_type_translation';
 
     protected $primaryKey = 'translation_id';
     protected $table = 'translations';

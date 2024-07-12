@@ -56,6 +56,8 @@ class JobListController extends Controller
      * @param Int job_period
      * @param Int wage_currency
      * @param String filter - avaliable: (mostrecent)
+     * @param Array job_driving_licenses
+     * @param Array job_certifications
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
@@ -66,7 +68,6 @@ class JobListController extends Controller
      */
     public function index(Request $request)
     {
-        dtf('starting');
         set_time_limit(60);
         Validator::validateParameters($this->request, [
             'page' => 'integer',
@@ -84,6 +85,8 @@ class JobListController extends Controller
             'experience_in_months_end' => 'integer',
             'job_visas' => 'array',
             'job_visas_countries' => 'array',
+            'job_driving_licenses' => 'array',
+            'job_certifications' => 'array',
             'per_page' => 'integer',
             'filter' => 'string'
         ]);
@@ -91,24 +94,8 @@ class JobListController extends Controller
         $perPage = (int)request('per_page', 100);
         if(!$perPage)
             $perPage = 10;
-        $bdData = [
-            'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
-            'proficiencies' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level'),
-            'visaTypes' => ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name'),
-            'listLanguages' => ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name'),
-            'jobModalities' => ModelUtils::getIdIndexedAndTranslated(new JobModality(), 'name'),
-            'commonCurrencies' => ModelUtils::getIdIndexedAndTranslated(new CommonCurrency(), 'currency_name'),
-            'companyTypes' => ModelUtils::getIdIndexedAndTranslated(new CompanyType(), 'name'),
-            'listCountries' => (new ListCountry())->getAll(true),
-            'countriesTranslated' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, true),
-            'professions' => ModelUtils::getIdIndexedAndTranslated(new ListProfession(), 'profession_name'),
-            'JobPaymentTypes' => ModelUtils::getIdIndexedAndTranslated(new JobPaymentType(), 'name'),
-            'jobContracts' => ModelUtils::getIdIndexedAndTranslated(new JobContract(), 'name'),
-            'workingVisas' => ModelUtils::getIdIndexedAndTranslated(new WorkingVisa(), 'name'),
-            'jobPeriods' => ModelUtils::getIdIndexedAndTranslated(new JobPeriod(), 'name')
-        ];
-        dtf('got data files');
         $jobListObj = new JobList();
+        $bdData = $jobListObj->getJobListBdData();
         if(request('filter')){
             $results = [];
             switch(request('filter')){
@@ -143,20 +130,14 @@ class JobListController extends Controller
             ]);
         }else{
             $nonPaying = $jobListObj->listJobs($request, false);
-            dtf('listed non paying');
             $nonPaying = $jobListObj->gatherJobJoinData($nonPaying, $bdData, $this->request);
-            dtf('procecessed non paying');
             $paying = $jobListObj->listJobs($request, true);
-            dtf('listed paying');
             $paying = $jobListObj->gatherJobJoinData($paying, $bdData, $this->request);
-            dtf('procecessed paying');
             $orderedJobs = $jobListObj->orderByMatch($paying, $nonPaying);
-            dtf('ordered');
             $results = $jobListObj->processListedJobs([
                 'paying'    => $orderedJobs['paying'],
                 'nonPaying' => $orderedJobs['nonPaying']
             ], $perPage, $page);
-            dtf('procecessed all');
             if($page < 1){
                 $page = 1;
             }else{
@@ -165,7 +146,6 @@ class JobListController extends Controller
             $data = [];
             if(!empty($results['results']) && !empty($results['results'][$page]))
                 $data = $results['results'][$page];
-            dtf('finished');
             returnResponse([
                 'data' => $data,
                 'curent_page' => $page,
@@ -182,13 +162,16 @@ class JobListController extends Controller
      */
     public function show(int $joblistId)
     {
-        try{
-            $jobList = JobList::with('company')->findOrFail($joblistId);
-            $jobListObj = $jobList->splitjoinDataFromListedJobs([$jobList]);
-            returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
-        }catch(ModelNotFoundException $e){
-            returnResponse(["message" => translate('job not found'), "error" => $e], 400);
-        }
+        // Checar aqui como retornar, melhor retornar via o método de listar
+        // E coolocar essas  coisas abaixo em um método dentro do Model para ficar mais bonito
+        $obj = new JobList();
+        $bdData = $obj->getJobListBdData();
+        $jobList = $obj->getJob($joblistId);
+        if(!$jobList)
+            Validator::throwResponse(translate('job not found'), 400);
+        $result = $jobList->listJobs($this->request, (bool)$jobList->paying, 1, null, true, [$jobList->job_id]);
+        $jobListObj = $jobList->gatherJobJoinData($result, $bdData, $this->request)[0];
+        returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
     }
 
     /**

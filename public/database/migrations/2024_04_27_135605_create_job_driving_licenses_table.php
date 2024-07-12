@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('job_driving_licenses', function (Blueprint $table) {
             $table->bigIncrements('job_driving_license');
             $table->unsignedInteger('driving_license');
-            $table->unsignedInteger('country');
+            $table->unsignedInteger('country')->nullable();
             $table->unsignedBigInteger('job_id');
             $table->timestamps();
         });

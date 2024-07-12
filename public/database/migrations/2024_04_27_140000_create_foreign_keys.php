@@ -15,6 +15,12 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('persons', function (Blueprint $table)
+		{
+			$table->foreign('currency')->references('common_currency_id')->on('common_currencies')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 		Schema::table('companies', function (Blueprint $table)
 		{
 			$table->foreign('company_type')->references('company_type_id')->on('company_types')
@@ -556,6 +562,10 @@ class CreateForeignKeys extends Migration
 		Schema::table('persons', function (Blueprint $table)
 		{
 			$table->dropForeign('persons_person_langue_foreign');
+		});
+		Schema::table('persons', function (Blueprint $table)
+		{
+			$table->dropForeign('persons_currency_foreign');
 		});
 		Schema::table('companies', function (Blueprint $table)
 		{

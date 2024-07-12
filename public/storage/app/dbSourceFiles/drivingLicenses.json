@@ -1,0 +1,145 @@
+[
+    {
+        "pt": "sem especificar",
+        "es": "sin especificar",
+        "en": "not specified",
+        "symbol": "-",
+        "description": {
+            "pt": "não especificado",
+            "es": "no especificado",
+            "en": "not specified"
+        }
+    },
+    {
+        "pt": "nenhuma",
+        "es": "ninguna",
+        "en": "none",
+        "symbol": "N",
+        "description": {
+            "pt": "sem habilitação",
+            "es": "sin habilitación",
+            "en": "no license"
+        }
+    },
+    {
+        "pt": "carro",
+        "es": "coche",
+        "en": "car",
+        "symbol": "B",
+        "description": {
+            "pt": "habilitação para carro",
+            "es": "habilitación para coche",
+            "en": "car license"
+        }
+    },
+    {
+        "pt": "moto",
+        "es": "moto",
+        "en": "motorcycle",
+        "symbol": "A",
+        "description": {
+            "pt": "habilitação para moto",
+            "es": "habilitación para moto",
+            "en": "motorcycle license"
+        }
+    },
+    {
+        "pt": "ônibus",
+        "es": "autobús",
+        "en": "bus",
+        "symbol": "D",
+        "description": {
+            "pt": "habilitação para ônibus",
+            "es": "habilitación para autobús",
+            "en": "bus license"
+        }
+    },
+    {
+        "pt": "caminhão",
+        "es": "camión",
+        "en": "truck",
+        "symbol": "C",
+        "description": {
+            "pt": "habilitação para caminhão",
+            "es": "habilitación para camión",
+            "en": "truck license"
+        }
+    },
+    {
+        "pt": "veículo de transporte de passageiros",
+        "es": "vehículo de transporte de pasajeros",
+        "en": "passenger transport vehicle",
+        "symbol": "D1",
+        "description": {
+            "pt": "habilitação para transporte de passageiros",
+            "es": "habilitación para transporte de pasajeros",
+            "en": "passenger transport vehicle license"
+        }
+    },
+    {
+        "pt": "veículo comercial",
+        "es": "vehículo comercial",
+        "en": "commercial vehicle",
+        "symbol": "C1",
+        "description": {
+            "pt": "habilitação para veículo comercial",
+            "es": "habilitación para vehículo comercial",
+            "en": "commercial vehicle license"
+        }
+    },
+    {
+        "pt": "veículo de emergência",
+        "es": "vehículo de emergencia",
+        "en": "emergency vehicle",
+        "symbol": "E",
+        "description": {
+            "pt": "habilitação para veículo de emergência",
+            "es": "habilitación para vehículo de emergencia",
+            "en": "emergency vehicle license"
+        }
+    },
+    {
+        "pt": "veículo agrícola",
+        "es": "vehículo agrícola",
+        "en": "agricultural vehicle",
+        "symbol": "F",
+        "description": {
+            "pt": "habilitação para veículo agrícola",
+            "es": "habilitación para vehículo agrícola",
+            "en": "agricultural vehicle license"
+        }
+    },
+    {
+        "pt": "veículo especial",
+        "es": "vehículo especial",
+        "en": "special vehicle",
+        "symbol": "G",
+        "description": {
+            "pt": "habilitação para veículo especial",
+            "es": "habilitación para vehículo especial",
+            "en": "special vehicle license"
+        }
+    },
+    {
+        "pt": "reboque",
+        "es": "remolque",
+        "en": "trailer",
+        "symbol": "BE",
+        "description": {
+            "pt": "habilitação para reboque",
+            "es": "habilitación para remolque",
+            "en": "trailer license"
+        }
+    },
+    {
+        "pt": "veículo pesado",
+        "es": "vehículo pesado",
+        "en": "heavy vehicle",
+        "symbol": "CE",
+        "description": {
+            "pt": "habilitação para veículo pesado",
+            "es": "habilitación para vehículo pesado",
+            "en": "heavy vehicle license"
+        }
+    }
+]

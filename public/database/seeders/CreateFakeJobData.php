@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\CertificationType;
 use App\Models\CommonCurrency;
 use App\Models\Company;
 use App\Models\CompanyAdmin;
 use App\Models\CompanyType;
+use App\Models\DrivingLicense;
 use App\Models\JobContract;
 use App\Models\JobList;
 use App\Models\JobModality;
@@ -24,6 +26,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PhpParser\Node\Expr\Cast\Object_;
 
 class CreateFakeJobData extends Seeder
 {
@@ -59,6 +62,8 @@ class CreateFakeJobData extends Seeder
         $jobContracts = JobContract::all()->toArray();
         $workingVisas = WorkingVisa::all()->toArray();
         $jobPeriods = JobPeriod::all()->toArray();
+        $drivingLicences = DrivingLicense::all()->toArray();
+        $certificationTypes = CertificationType::all()->toArray();
         $dataForJobLanguage = [];
         foreach($languagesArray as $langData){
             for($i = 0; $i < 3; $i++){
@@ -145,6 +150,7 @@ class CreateFakeJobData extends Seeder
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
                     'job_title' => $faker->jobTitle(),
                     'job_city' => $faker->city(),
+                    'job_state' => $faker->city(),
                     'job_country' => $countryObj->lcountry_id,
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
                     'job_salary' => $faker->numberBetween(random_int(1000, 4999), random_int(5000, 10000)),
@@ -175,13 +181,25 @@ class CreateFakeJobData extends Seeder
                     for($i = 0; $i < 3; $i++){
                         $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   
                     }                   
-                    $job->sycnLanguages((Object) $langData);
+                    $job->syncLanguages((Object) $langData);
 
                     $visaData = [];
                     for($i = 0; $i < 3; $i++){
                         $visaData[] = $dataForJobVisas[array_rand($dataForJobVisas)];   
                     }                   
-                    $job->sycnVisas((Object) $visaData);
+                    $job->syncVisas((Object) $visaData);
+
+                    $driveLicenses = [];
+                    for($i = 0; $i < 2; $i++){
+                        $driveLicenses[] = (Object)$drivingLicences[array_rand($drivingLicences)];   
+                    } 
+                    $job->syncDrivingLicenses($driveLicenses);
+
+                    $certifications = [];
+                    for($i = 0; $i < 2; $i++){
+                        $certifications[] = (Object)$certificationTypes[array_rand($certificationTypes)];   
+                    } 
+                    $job->syncCertifications($certifications); 
                 }
             } catch (\Throwable $th) {
                 echo $th->getMessage();
