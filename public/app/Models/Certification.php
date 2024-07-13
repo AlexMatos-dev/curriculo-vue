@@ -22,7 +22,8 @@ class Certification extends Model
         'cerissue_date',
         'cert_hours',
         'cerdescription',
-        'cerlink'
+        'cerlink',
+        'certification_type'
     ];
 
     public function curriculum()

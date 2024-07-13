@@ -450,6 +450,12 @@ paths:
           example: 1
           schema:
             type: integer
+        - name: currency
+          in: query
+          description: CommonCurrency id
+          example: 1
+          schema:
+            type: integer
 
       # requestBody:
       #   description: Change password
@@ -1306,6 +1312,34 @@ paths:
                 job_seniority:
                   type: integer
                   example: 1
+        - name: job_driving_licenses
+          in: query
+          description: Array of DrivingLicense ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_driving_licenses:
+                  type: integer
+                  example: 1
+        - name: job_certifications
+          in: query
+          description: Array of CertificationType ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_certifications:
+                  type: integer
+                  example: 1
         - name: job_salary_start
           in: query
           description: search for jobs with given starting salary
@@ -1354,6 +1388,42 @@ paths:
           example: 100
           schema:
             type: integer
+        - name: profession_for_job
+          in: query
+          description: ListProfession id
+          example: 1
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: JobPaymentType id
+          example: 1
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: JobContract id
+          example: 1
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: WorkingVisa id
+          example: 1
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: JobPeriod id
+          example: 1
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: CommonCurrencies id
+          example: 1
+          schema:
+            type: integer
       responses:
         '200':
           description: A list of job
@@ -1392,6 +1462,13 @@ paths:
         - joblist
       summary: Create a new job
       parameters:
+        - name: job_title
+          in: query
+          description: Job title
+          example: Developer
+          required: true
+          schema:
+            type: string
         - name: job_modality_id
           in: query
           description: Job modality id
@@ -1402,31 +1479,40 @@ paths:
         - name: job_country
           in: query
           description: List country id
+          required: true
           example: 10
           schema:
             type: integer
-        - name: job_city
-          in: query
-          description: List city id | City must be located in the sent Country id
-          example: 15
-          schema:
-            type: integer
-        - name: job_seniority
-          in: query
-          description: Proficiency id of category = 'seniority'
-          example: 1
-          schema:
-            type: string
         - name: job_salary
           in: query
           description: Work Payment
           example: 7200.52
+          required: true
           schema:
             type: number
         - name: job_description
           in: query
+          required: true
           description: Work desctiption
           example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_city
+          in: query
+          description: Free text for city
+          example: curitiba
+          schema:
+            type: string
+        - name: job_state
+          in: query
+          description: Free text for state
+          example: paraná
+          schema:
+            type: string
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: experience_in_months
@@ -1447,6 +1533,54 @@ paths:
           example: food voucher and home office
           schema:
             type: string
+        - name: job_offer
+          in: query
+          description: free text field for job offer
+          example: we offer a healphy enviroment
+          schema:
+            type: string
+        - name: job_requirements
+          in: query
+          description: free text field for job requirements
+          example: we need an experience developer
+          schema:
+            type: string
+        - name: profession_for_job
+          in: query
+          description: profession id from ListProfession
+          example: 2
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: payment_type id
+          example: 2
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: job_contract id
+          example: 2
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: working_visa id
+          example: 2
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: job_period id
+          example: 2
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: common_currencies id
+          example: 2
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -1479,6 +1613,13 @@ paths:
           required: true
           schema:
             type: integer
+        - name: job_title
+          in: query
+          description: Job title
+          example: Developer
+          required: true
+          schema:
+            type: string
         - name: job_modality_id
           in: query
           description: Job modality id
@@ -1489,31 +1630,40 @@ paths:
         - name: job_country
           in: query
           description: List country id
+          required: true
           example: 10
           schema:
             type: integer
-        - name: job_city
-          in: query
-          description: List city id | City must be located in the sent Country id
-          example: 15
-          schema:
-            type: integer
-        - name: job_seniority
-          in: query
-          description: Proficiency id of category = 'seniority'
-          example: 1
-          schema:
-            type: string
         - name: job_salary
           in: query
           description: Work Payment
           example: 7200.52
+          required: true
           schema:
             type: number
         - name: job_description
           in: query
+          required: true
           description: Work desctiption
           example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_city
+          in: query
+          description: Free text for city
+          example: curitiba
+          schema:
+            type: string
+        - name: job_state
+          in: query
+          description: Free text for state
+          example: paraná
+          schema:
+            type: string
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: experience_in_months
@@ -1534,6 +1684,54 @@ paths:
           example: food voucher and home office
           schema:
             type: string
+        - name: job_offer
+          in: query
+          description: free text field for job offer
+          example: we offer a healphy enviroment
+          schema:
+            type: string
+        - name: job_requirements
+          in: query
+          description: free text field for job requirements
+          example: we need an experience developer
+          schema:
+            type: string
+        - name: profession_for_job
+          in: query
+          description: profession id from ListProfession
+          example: 2
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: payment_type id
+          example: 2
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: job_contract id
+          example: 2
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: working_visa id
+          example: 2
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: job_period id
+          example: 2
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: common_currencies id
+          example: 2
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -4541,6 +4739,9 @@ components:
         person_langue:
           type: integer
           example: 1
+        currency:
+          type: integer
+          example: 1
         created_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'
@@ -4721,6 +4922,9 @@ components:
         company_id:
           type: integer
           example: 1
+        job_title:
+          type: string
+          example: Developr
         job_modality:
           type: string
           example: presencial
@@ -4752,9 +4956,24 @@ components:
         job_offer:
           type: string
           example: Job offer
-        job_english_level:
-          type: integer
-          example: 1
+        profession_for_job:
+          type: string
+          example: developer
+        payment_type:
+          type: string
+          example: brute wage
+        job_contract:
+          type: string
+          example: temporary
+        working_visa:
+          type: string
+          example: don't require visa
+        job_period:
+          type: string
+          example: night
+        wage_currency:
+          type: string
+          example: $ / american dolar
         experience_in_months:
           type: integer
           example: 10
@@ -4782,13 +5001,22 @@ components:
         visasIds:
           type: string
           example: [1]
+        drivingLicenses:
+          type: string
+          example: [drivingLicence / $symbol |Example -> Car / B]
+        drivingLicensesIds:
+          type: string
+          example: [1]
+        certifications:
+          type: string
+          example: [$certificationName]
+        certificationsIds:
+          type: string
+          example: [1]
         match:
           type: number
           example: 100.00
           description: The float/double number of the match accordingly to sent parameters | This exists only in /api/joblist/show/{joblistId}
-        wage_currency:
-          type: string
-          example: reais
         job_created_at:
           type: string
           example: '01-01-20204'

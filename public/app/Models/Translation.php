@@ -18,12 +18,19 @@ class Translation extends Model
     const CATEGORY_DEGREE_TYPE                 = 'degree_type_translation';
     const CATEGORY_GENDER                      = 'gender_translation';
     const CATEGORY_JOB_MODALITY                = 'job_modality_translation';
+    const CATEGORY_JOB_MODALITY_DESCRIPTION    = 'job_modality_description_translation';
     const CATEGORY_LANGUAGE                    = 'language_translation';
     const CATEGORY_PROFESSION                  = 'profession_translation';
     const CATEGORY_PROFICIENCY                 = 'proficiency_translation';
     const CATEGORY_TAG                         = 'tag_translation';
     const CATEGORY_VISA_TYPE                   = 'visa_type_translation';
-    const CATEGORY_PROFESSION_TYPE             = 'category_type_translation';
+    const CATEGORY_PROFESSION_TYPE             = 'profession_type_translation';
+    const CATEGORY_JOB_PAYMENT_TYPE            = 'job_payment_translation';
+    const CATEGORY_JOB_CONTRACT                = 'job_contract_translation';
+    const CATEGORY_JOB_PERIOD                  = 'job_period_translation';
+    const CATEGORY_WORKING_VISA                = 'working_visa_translation';
+    const CATEGORY_DRIVING_LICENSE             = 'driving_license_translation';
+    const CATEGORY_CERTIFICATION_TYPE          = 'certification_type_translation';
 
     protected $primaryKey = 'translation_id';
     protected $table = 'translations';
