@@ -379,7 +379,6 @@ class JobList extends Model
             $thisObj->certificationsIds  = $values['jobCertificationsIds'];
             $thisObj->certifications     = $values['jobCertifications'];
             $thisObj->wage_currency_id   = $job->wage_currency;
-            $thisObj->job_modality_id    = $job->job_modality;
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
             $thisObj->job_created_at     = ModelUtils::parseDateByLanguage($job->job_created_at, false, $languageIso);
             $thisObj->job_updated_at     = ModelUtils::parseDateByLanguage($job->job_updated_at, false, $languageIso);
