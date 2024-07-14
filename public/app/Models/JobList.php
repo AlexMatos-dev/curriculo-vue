@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Helpers\ModelUtils;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class JobList extends Model
 {
@@ -34,6 +33,7 @@ class JobList extends Model
         'job_offer',
         'job_requirements',
         'profession_for_job',
+        'profession_suggestion',
         'payment_type',
         'job_contract',
         'working_visa',
@@ -105,14 +105,15 @@ class JobList extends Model
      * @param Int offset
      * @return Array
      */
-    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 200, $offset = null, $distinct = true, $byIds = [])
+    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null, $distinct = true, $byIds = [])
     {
         $limit = !is_numeric($limit) || $limit > 200 ? 200 : $limit;
         if($byIds)
             $limit = count($byIds);
         if($distinct){
             $query = JobList::select(
-                'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.*', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at'
+                'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.company_logo', 'company.company_description', 
+                'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type'
             )->distinct();
         }else{
             $query = JobList::select(
@@ -252,27 +253,33 @@ class JobList extends Model
         }
         // Gather expected data
         $ids = array_keys($usedAttr);
-        $jobLanguagesArray = JobLanguage::whereIn('joblist_id', $ids)->leftJoin('jobslist', function($join){
-            $join->on('jobslist.job_id', '=', 'job_languages.joblist_id');
-        })->leftJoin('listlangues', function($join){
-            $join->on('listlangues.llangue_id', '=', 'job_languages.language_id');
-        })->leftJoin('proficiency', function($join){
-            $join->on('proficiency.proficiency_id', '=', 'job_languages.proficiency_id');
-        })->get();
-        $jobSkillsArray = JobSkill::whereIn('joblist_id', $ids)->leftJoin('jobslist', function($join){
-            $join->on('jobslist.job_id', '=', 'job_skills.joblist_id');
-        })->leftJoin('tags', function($join){
-            $join->on('tags.tags_id', '=', 'job_skills.tag_id');
-        })->get();
-        $visaTypesArray = JobVisa::whereIn('joblist_id', $ids)->leftJoin('jobslist', function($join){
-            $join->on('jobslist.job_id', '=', 'job_visas.joblist_id');
-        })->leftJoin('type_visas', function($join){
-            $join->on('type_visas.typevisas_id', '=', 'job_visas.visas_type_id');
-        })->get();
-        $jobCertificationArray = JobCertification::whereIn('jobslist.job_id', $ids)->leftJoin('jobslist', function($join){
-            $join->on('jobslist.job_id', '=', 'job_certifications.joblist_id');
-        })->get();
-
+        $jobLanguagesArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
+            JobLanguage::whereIn('joblist_id', $ids)->leftJoin('listlangues', function($join){
+                $join->on('listlangues.llangue_id', '=', 'job_languages.language_id');
+            })->leftJoin('translations', function($join){
+                $join->on('translations.en', '=', 'listlangues.llangue_name');
+            })->get(), 
+            ['job_language_id','language_id','proficiency_id'],
+            'joblist_id'
+        );
+        $jobSkillsArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
+            JobSkill::whereIn('joblist_id', $ids)->leftJoin('tags', function($join){
+                $join->on('tags.tags_id', '=', 'job_skills.tag_id');
+            })->leftJoin('translations', function($join){
+                $join->on('translations.en', '=', 'tags.tags_name');
+            })->get(), 
+            ['job_skill_id','tag_id','proficiency_id'],
+            'joblist_id'
+        );
+        $visaTypesArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
+            JobVisa::whereIn('joblist_id', $ids)->leftJoin('type_visas', function($join){
+                $join->on('type_visas.typevisas_id', '=', 'job_visas.visas_type_id');
+            })->leftJoin('translations', function($join){
+                $join->on('translations.en', '=', 'type_visas.type_name');
+            })->get(), 
+            ['typevisas_id','type_name','job_visa_id', 'country_id'],
+            'joblist_id'
+        );
         $jobDrivingLicenseArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
             JobDrivingLicense::whereIn('job_driving_licenses.job_id', $ids)->leftJoin('driving_licenses', function($join){
                 $join->on('driving_licenses.driving_license', '=', 'job_driving_licenses.driving_license');
@@ -291,13 +298,7 @@ class JobList extends Model
             ['job_certification','certification_type','job_certification'],
             'joblist_id'
         );
-
-        $tags = $bdData['tags'];
-        $proficiencies = $bdData['proficiencies'];
-        $visaTypes = $bdData['visaTypes'];
-        $listLanguages = $bdData['listLanguages'];
         $commonCurrencies = $bdData['commonCurrencies'];
-        $listCountries = $bdData['listCountries'];
         $countriesTranslated = $bdData['countriesTranslated'];
         $languageIso = Session()->has('user_lang') ? Session()->get('user_lang') : ListLangue::DEFAULT_LANGUAGE;
         $defaultLanguage = ListLangue::DEFAULT_LANGUAGE;
@@ -308,40 +309,43 @@ class JobList extends Model
             'listCountries' => 'job_country', 'proficiencies' => 'job_seniority'
         ];
         // Preparing data to be consumed
-        foreach($jobLanguagesArray as $jobLanguage){
-            if(!in_array($jobLanguage->joblist_id, $usedAttr[$jobLanguage->joblist_id]['languagesIds'])){
-                $data = ModelUtils::getFillableData($jobLanguage, true, [
-                    'proficiency_id' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'proficiency'],
-                    'language_id' => ['objects' => $listLanguages, 'translated' => true, 'to' => 'language']
-                ]);
-                $proficiencyLang = $data['proficiency'][$languageIso] ? $data['proficiency'][$languageIso] : $data['proficiency'][ListLangue::DEFAULT_LANGUAGE];
-                $languageLang = $data['language'][$languageIso] ? $data['language'][$languageIso] : $data['language'][ListLangue::DEFAULT_LANGUAGE];
-                $usedAttr[$jobLanguage->joblist_id]['languages'][] = ucfirst($languageLang) . ' / ' . ucfirst($proficiencyLang);
-                $usedAttr[$jobLanguage->joblist_id]['languagesIds'][] = $data['language_id'];
+        foreach($jobLanguagesArray as $jobId => $jobLanguages){
+            foreach($jobLanguages as $jobLanguage){
+                $translation = $jobLanguage[$languageIso] ? $jobLanguage[$languageIso] : $jobLanguage[$defaultLanguage];
+                $proficiency = array_key_exists($jobLanguage['proficiency_id'], $bdData['proficienciesTrans']) ? $bdData['proficienciesTrans'][$jobLanguage['proficiency_id']] : '';
+                if($proficiency){
+                    $proficiencyTrans = $proficiency[$languageIso] ? $proficiency[$languageIso] : $proficiency[$defaultLanguage];
+                }else{
+                    $proficiencyTrans = '';
+                }
+                $usedAttr[$jobId]['languages'][] = ucfirst($translation) . ' / ' . ucfirst($proficiencyTrans);
+                $usedAttr[$jobId]['languagesIds'][] = $jobLanguage['language_id'];
             }
         }
-        foreach($jobSkillsArray as $jobSkill){
-            if(!in_array($jobSkill->joblist_id, $usedAttr[$jobSkill->joblist_id]['skillsIds'])){
-                $data = ModelUtils::getFillableData($jobSkill, true, [
-                    'tag_id' => ['objects' => $tags, 'translated' => true, 'to' => 'tag'],
-                    'proficiency_id' => ['objects' => $proficiencies, 'translated' => true, 'to' => 'proficiency']
-                ]);
-                $tagLang = $data['tag'][$languageIso] ? $data['tag'][$languageIso] : $data['tag'][ListLangue::DEFAULT_LANGUAGE];
-                $proficiencyLang = $data['proficiency'][$languageIso] ? $data['proficiency'][$languageIso] : $data['proficiency'][ListLangue::DEFAULT_LANGUAGE];
-                $usedAttr[$jobSkill->joblist_id]['skills'][] = ucfirst($tagLang) . ' / ' . ucfirst($proficiencyLang);
-                $usedAttr[$jobSkill->joblist_id]['skillsIds'][] = $data['tag_id'];
+        foreach($jobSkillsArray as $jobId => $jobSkills){
+            foreach($jobSkills as $jobSkill){
+                $translation = $jobSkill[$languageIso] ? $jobSkill[$languageIso] : $jobSkill[$defaultLanguage];
+                $proficiency = array_key_exists($jobSkill['proficiency_id'], $bdData['proficienciesTrans']) ? $bdData['proficienciesTrans'][$jobSkill['proficiency_id']] : '';
+                if($proficiency){
+                    $proficiencyTrans = $proficiency[$languageIso] ? $proficiency[$languageIso] : $proficiency[$defaultLanguage];
+                }else{
+                    $proficiencyTrans = '';
+                }
+                $usedAttr[$jobId]['skills'][] = ucfirst($translation) . ' / ' . ucfirst($proficiencyTrans);
+                $usedAttr[$jobId]['skillsIds'][] = $jobSkill['tag_id'];
             }
         }
-        foreach($visaTypesArray as $jobVisa){
-            if(!in_array($jobVisa->joblist_id, $usedAttr[$jobVisa->joblist_id]['visasIds'])){
-                $data = ModelUtils::getFillableData($jobVisa, true, [
-                    'visas_type_id' => ['objects' => $visaTypes, 'translated' => true, 'to' => 'visa_type'],
-                    'country_id' => ['objects' => $listCountries, 'translated' => true, 'to' => 'country'],
-                ]);
-                $visaTypeLang = $data['visa_type'][$languageIso] ? $data['visa_type'][$languageIso] : $data['visa_type'][ListLangue::DEFAULT_LANGUAGE];
-                $countryLang = $data['country'][$languageIso] ? $data['country'][$languageIso] : $data['country'][ListLangue::DEFAULT_LANGUAGE];
-                $usedAttr[$jobVisa->joblist_id]['visas'][] = ucfirst($visaTypeLang) . ' / ' . ucfirst($countryLang);
-                $usedAttr[$jobVisa->joblist_id]['visasIds'][] = $data['visas_type_id'];
+        foreach($visaTypesArray as $jobId => $jobVisas){
+            foreach($jobVisas as $jobVisa){
+                $translation = $jobVisa[$languageIso] ? $jobVisa[$languageIso] : $jobVisa[$defaultLanguage];
+                $country = array_key_exists($jobVisa['country_id'], $bdData['listCountriesTrans']) ? $bdData['listCountriesTrans'][$jobVisa['country_id']] : '';
+                if($country){
+                    $countryTrans = $country[$languageIso] ? $country[$languageIso] : $country[$defaultLanguage];
+                }else{
+                    $countryTrans = '';
+                }
+                $usedAttr[$jobId]['visas'][] = ucfirst($translation) . ' / ' . ucfirst($countryTrans);
+                $usedAttr[$jobId]['visasIds'][] = $jobVisa['typevisas_id'];
             }
         }
         foreach($jobCertificationArray as $jobId => $certifications){
@@ -361,7 +365,7 @@ class JobList extends Model
         // Set prepared data to objects
         $results = [];
         $usedJobIds = [];
-        $attrToUnset = ['job_skill_id','tag_id','proficiency_id','language_id','country_id','joblist_id','job_language_id','job_visa_id','visas_type_id','job_country','job_modality_id'];
+        $attrToUnset = ['job_skill_id','tag_id','proficiency_id','language_id','country_id','joblist_id','job_language_id','job_visa_id','visas_type_id','job_country'];
         foreach($jobListArray as $job){
             if(!array_key_exists($job->job_id, $usedAttr) || in_array($job->job_id, $usedJobIds))
                 continue;
@@ -379,7 +383,6 @@ class JobList extends Model
             $thisObj->certificationsIds  = $values['jobCertificationsIds'];
             $thisObj->certifications     = $values['jobCertifications'];
             $thisObj->wage_currency_id   = $job->wage_currency;
-            $thisObj->job_modality_id    = $job->job_modality;
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
             $thisObj->job_created_at     = ModelUtils::parseDateByLanguage($job->job_created_at, false, $languageIso);
             $thisObj->job_updated_at     = ModelUtils::parseDateByLanguage($job->job_updated_at, false, $languageIso);
@@ -407,7 +410,6 @@ class JobList extends Model
                 }
             }
             $thisObj->job_modality = $jobModality;
-
             foreach($simpleJoinData as $bdDataName => $key){
                 if(!empty($bdData[$bdDataName]) && !empty($bdData[$bdDataName][$thisObj->{$key}])){
                     $thisBdData = $bdData[$bdDataName][$thisObj->{$key}];
@@ -426,7 +428,8 @@ class JobList extends Model
                 unset($thisObj->{$attrName});
             }
             $thisObj->company_logo = base64_encode($thisObj->company_logo);
-            $thisObj->company_cover_photo = base64_encode($thisObj->company_cover_photo);
+            if($thisObj->company_cover_photo)
+                $thisObj->company_cover_photo = base64_encode($thisObj->company_cover_photo);
             $results[] = $thisObj;
         }
         return $results;
@@ -441,12 +444,14 @@ class JobList extends Model
         return [
             'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
             'proficiencies' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level'),
+            'proficienciesTrans' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level', false, false, true),
             'visaTypes' => ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name'),
             'listLanguages' => ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name'),
             'jobModalities' => ModelUtils::getIdIndexedAndTranslated(new JobModality(), 'name'),
             'commonCurrencies' => ModelUtils::getIdIndexedAndTranslated(new CommonCurrency(), 'currency_name'),
             'companyTypes' => ModelUtils::getIdIndexedAndTranslated(new CompanyType(), 'name'),
             'listCountries' => (new ListCountry())->getAll(true),
+            'listCountriesTrans' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, false, true),
             'countriesTranslated' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, true),
             'professions' => ModelUtils::getIdIndexedAndTranslated(new ListProfession(), 'profession_name'),
             'JobPaymentTypes' => ModelUtils::getIdIndexedAndTranslated(new JobPaymentType(), 'name'),

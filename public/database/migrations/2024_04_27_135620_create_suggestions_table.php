@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_skills', function (Blueprint $table) {
-            $table->bigIncrements('job_skill_id', true);
-            $table->unsignedBigInteger('joblist_id');
-            $table->unsignedBigInteger('tag_id');
-            $table->unsignedInteger('proficiency_id');
-            $table->unsignedBigInteger('suggestion_id')->nullable();
+        Schema::create('suggestions', function (Blueprint $table) {
+            $table->bigIncrements('suggestion_id');
+            $table->string('type', 100);
+            $table->bigInteger('type_id');
+            $table->unsignedBigInteger('author_id');
+            $table->unsignedInteger('lang');
+            $table->string('suggestion_name', 300);
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_skills');
+        Schema::dropIfExists('suggestions');
     }
 };

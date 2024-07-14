@@ -22,6 +22,7 @@ use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
 use Illuminate\Support\Facades\Route;
@@ -180,4 +181,9 @@ Route::prefix('countries')->group(function ()
 Route::prefix('professions')->group(function ()
 {
     Route::get('index', [ListProfessionController::class, 'getProfessions']);
+});
+
+Route::prefix('tags')->group(function ()
+{
+    Route::get('search', [TagController::class, 'search']);
 });
