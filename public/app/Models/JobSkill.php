@@ -18,7 +18,8 @@ class JobSkill extends Model
     protected $fillable = [
         'joblist_id',
         'tag_id',
-        'proficiency_id'
+        'proficiency_id',
+        'suggestion_id'
     ];
 
     public function joblist()

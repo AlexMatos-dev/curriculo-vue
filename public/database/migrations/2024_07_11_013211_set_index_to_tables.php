@@ -13,6 +13,23 @@ return new class extends Migration
      */
     public function up()
     {
+        /**
+         * Start of Jobslist
+         */
+        Schema::table('jobslist', function (Blueprint $table) {
+            $table->index('job_id');
+        });
+        Schema::table('jobslist', function (Blueprint $table) {
+            $table->index('created_at');
+        });
+         /**
+          * END of Jobslist
+          */
+
+        Schema::table('companies', function (Blueprint $table) {
+            $table->index('paying');
+        });
+
         Schema::table('tags', function (Blueprint $table) {
             $table->index('tags_id');
         });
@@ -60,6 +77,10 @@ return new class extends Migration
         Schema::table('certification_types', function (Blueprint $table) {
             $table->index('certification_type');
         });
+
+        Schema::table('listprofessions', function (Blueprint $table) {
+            $table->index('profession_name');
+        });
     }
 
     /**
@@ -69,6 +90,23 @@ return new class extends Migration
      */
     public function down()
     {
+        /**
+         * Start of Jobslist
+         */
+        Schema::table('jobslist', function (Blueprint $table) {
+            $table->dropIndex(['job_id']);
+        });
+        Schema::table('jobslist', function (Blueprint $table) {
+            $table->dropIndex(['created_at']);
+        });
+         /**
+          * END of Jobslist
+          */
+
+        Schema::table('companies', function (Blueprint $table) {
+            $table->dropIndex(['paying']);
+        });
+
         Schema::table('tags', function (Blueprint $table) {
             $table->dropIndex(['tags_id']);
         });
@@ -115,6 +153,10 @@ return new class extends Migration
         
         Schema::table('certification_types', function (Blueprint $table) {
             $table->dropIndex(['certification_type']);
+        });
+
+        Schema::table('listprofessions', function (Blueprint $table) {
+            $table->dropIndex(['profession_name']);
         });
     }
 };

@@ -85,6 +85,8 @@ tags:
     description: Job applied routes and methods
   - name: chat_message
     description: Chat message routes and methods
+  - name: tag
+    description: Tag routes and methods
 paths:
   /api/login:
     post:
@@ -4595,7 +4597,7 @@ paths:
           type: string
       - name: profession_name
         in: query
-        description: Accordingly to sent langaugeISO
+        description: Accordingly to sent languageISO
         example: developer
         schema:
           type: string
@@ -4606,6 +4608,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListProfessionPaginated'
+                
+  /api/tags/search:
+    get:
+      tags:
+        - tags
+      description: searches for tags
+      parameters:
+      - name: user_lang
+        in: query
+        description: Any language iso - Default is EN if none is sent
+        example: en
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Default = 5 | Max = 50
+        example: 5
+        schema:
+          type: integer
+      - name: term
+        in: query
+        description: Tag name
+        example: developer
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of tags translations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSearch'
 components:
   schemas:
     Login:
@@ -6370,6 +6404,13 @@ components:
           type: integer
           example: 100
           description: the default list max size
+    TagSearch:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            example: {"en":"en","pt":"pt","es":"es","tags_id":1,"$otherLanguageIso":""}
     
   securitySchemes:
     bearerAuth:

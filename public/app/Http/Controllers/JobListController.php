@@ -162,8 +162,6 @@ class JobListController extends Controller
      */
     public function show(int $joblistId)
     {
-        // Checar aqui como retornar, melhor retornar via o método de listar
-        // E coolocar essas  coisas abaixo em um método dentro do Model para ficar mais bonito
         $obj = new JobList();
         $bdData = $obj->getJobListBdData();
         $jobList = $obj->getJob($joblistId);

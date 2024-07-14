@@ -6,6 +6,44 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 
 class ApiThrottle extends ThrottleRequests
 {
+    protected $except = [
+        'api/tags/search'
+    ];
+
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  int|null  $maxAttempts
+     * @param  int|null  $decayMinutes
+     * @param  string|null  $prefix
+     * @return mixed
+     */
+    public function handle($request, \Closure $next, $maxAttempts = 60, $decayMinutes = 1, $prefix = '')
+    {
+        if ($this->isException($request)) {
+            return $next($request);
+        }
+        return parent::handle($request, $next, $maxAttempts, $decayMinutes, $prefix);
+    }
+
+    /**
+     * Verifica se a rota está na lista de exceções
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
+     */
+    protected function isException($request)
+    {
+        foreach ($this->except as $except) {
+            if ($request->is($except)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Returns custom response if max request attempts performed
      */
