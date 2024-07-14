@@ -34,9 +34,11 @@ function returnResponse($data = '', $code = 200, $headers = [], $options = 0)
  * @return Bool
  */
 function dtf($text = '', $name = 'default_log'){
-    // Quanto a pesquisa pelas VAGAS, talvez se fizer um JOIN melhor sejá mais rápido, até pq tem que trazer mais joins nela agr
     if($name == '')
         return false;
+    $tmpFolder = storage_path("app/tmp");
+    if(!is_dir($tmpFolder))
+        mkdir($tmpFolder);
     $path = storage_path("app/tmp/$name.txt");
     if(!file_exists($path))
         file_put_contents($path, '');

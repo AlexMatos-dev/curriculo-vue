@@ -31,6 +31,7 @@ class CreateJobsListTable extends Migration
 			$table->unsignedInteger('working_visa')->nullable();
 			$table->unsignedInteger('wage_currency')->nullable();
 			$table->unsignedBigInteger('profession_for_job')->nullable();
+			$table->unsignedBigInteger('profession_suggestion')->nullable();
 			$table->timestamps();
 		});
 	}
