@@ -181,6 +181,46 @@ class ModelUtils
     }
 
     /**
+     * Returns all languages iso + translations table data accordingly to sent instance related by parameters
+     * @param Object object
+     * @param String relationAttr - to relate to translations table
+     * @param Array dataIds - only sent if wnats to filter the results
+     * @param String attrName - to set the attr name to use the dataIds parameter
+     * @param Array languagesToInsert - the languages to insert besides the oficial
+     * @param Bool asObject - to return value as object
+     * @return Array
+     */
+    public static function getTranslationsArray(Object $object, $relationAttr = '', $dataIds = [], $attrName = '', $languagesToInsert = [], $asObject = false)
+    {
+        try {
+            $query = $object::leftJoin('translations', function($join) use($object, $relationAttr){
+                $join->on('translations.en', $object->getTable() . '.' . $relationAttr);
+            });
+            if($dataIds || !empty($dataIds))
+                $query->whereIn($attrName, $dataIds);
+            $foundObjectArray = $query->get();
+            $data = [];
+            $attributes = array_merge($object->getFillable(), (new Translation())->getFillable());
+            foreach($foundObjectArray as $objectData){
+                $rawInstance = self::makeInstance($object);
+                foreach($attributes as $attributeName){
+                    $rawInstance->{$attributeName} = $objectData->{$attributeName};
+                }
+                $unofficialTrans = $objectData->unofficial_translations ? json_decode($objectData->unofficial_translations, true) : [];
+                foreach($languagesToInsert as $langIso){
+                    $rawInstance->{$langIso->llangue_acronyn} = null;
+                    if(array_key_exists($langIso->llangue_acronyn, $unofficialTrans))
+                        $rawInstance->{$langIso->llangue_acronyn} = $unofficialTrans[$langIso->llangue_acronyn];
+                }
+                $data[$objectData->{$object->getKeyName()}] = $asObject ? $rawInstance : $rawInstance->toArray();
+            }
+            return $data;
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
+
+    /**
      * Creates a new Instance of the same as sent $object
      * @param Object $object
      * @return Object the same type of $object

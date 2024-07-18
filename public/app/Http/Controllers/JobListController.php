@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\CommonCurrency;
-use App\Models\Company;
-use App\Models\CompanyType;
 use App\Models\JobContract;
 use App\Models\JobLanguage;
 use App\Models\JobList;
@@ -27,7 +24,6 @@ use App\Models\WorkingVisa;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class JobListController extends Controller
 {
@@ -66,7 +62,7 @@ class JobListController extends Controller
      *      "last_page": int,
      * ]
      */
-    public function index(Request $request)
+    public function index()
     {
         set_time_limit(60);
         Validator::validateParameters($this->request, [
@@ -90,67 +86,38 @@ class JobListController extends Controller
             'per_page' => 'integer',
             'filter' => 'string'
         ]);
-        $page = (int)request('page', 1);
-        $perPage = (int)request('per_page', 100);
+        $page       = (int)request('page', 1);
+        $perPage    = (int)request('per_page', 10);
         if(!$perPage)
             $perPage = 10;
         $jobListObj = new JobList();
-        $bdData = $jobListObj->getJobListBdData();
         if(request('filter')){
             $results = [];
             switch(request('filter')){
                 case 'mostrecent':
-                    $data = $jobListObj->listJobs($request, true);
-                    $dataSize = count($data);
-                    if($dataSize > 0){
-                        if($dataSize < $perPage){
-                            $notPaying = $jobListObj->listJobs($request, true);
-                            $data = array_merge($data, $notPaying);
-                        }
-                        $results = $jobListObj->gatherJobJoinData($data, $bdData, $this->request);
-                        $resized = [];
-                        foreach($results as $result){
-                            if(count($resized) < $perPage){
-                                $resized[] = $result;
-                            }else{
-                                break;
-                            }
-                        }
-                        $results = $resized;
-                    }else{
-                        $results = [];
-                    }
+                    $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage);
+                break;
+                default:
+                    $results = [
+                        'results'  => [],
+                        'page'     => 1,
+                        'lastPage' => 1
+                    ];
                 break;
             }
             returnResponse([
-                'data' => $results,
-                'curent_page' => 1,
+                'data' => $results['results'],
+                'curent_page' => $results['page'],
                 'per_page' => $perPage,
-                'last_page' => 1
+                'last_page' => $results['lastPage']
             ]);
         }else{
-            $nonPaying = $jobListObj->listJobs($request, false);
-            $nonPaying = $jobListObj->gatherJobJoinData($nonPaying, $bdData, $this->request);
-            $paying = $jobListObj->listJobs($request, true);
-            $paying = $jobListObj->gatherJobJoinData($paying, $bdData, $this->request);
-            $orderedJobs = $jobListObj->orderByMatch($paying, $nonPaying);
-            $results = $jobListObj->processListedJobs([
-                'paying'    => $orderedJobs['paying'],
-                'nonPaying' => $orderedJobs['nonPaying']
-            ], $perPage, $page);
-            if($page < 1){
-                $page = 1;
-            }else{
-                $page = $page > $results['last_page'] ? $results['last_page'] : $page;
-            }
-            $data = [];
-            if(!empty($results['results']) && !empty($results['results'][$page]))
-                $data = $results['results'][$page];
+            $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage);
             returnResponse([
-                'data' => $data,
-                'curent_page' => $page,
-                'per_page' => $results['curent_page'],
-                'last_page' => $results['last_page']
+                'data' => $results['results'],
+                'curent_page' => $results['page'],
+                'per_page' => $perPage,
+                'last_page' => $results['lastPage']
             ]);
         }
     }
@@ -163,10 +130,10 @@ class JobListController extends Controller
     public function show(int $joblistId)
     {
         $obj = new JobList();
-        $bdData = $obj->getJobListBdData();
         $jobList = $obj->getJob($joblistId);
-        if(!$jobList)
+        if(!$jobList || (is_array($jobList) && !empty($jobList)))
             Validator::throwResponse(translate('job not found'), 400);
+        $bdData = $obj->getJobListBdData();
         $result = $jobList->listJobs($this->request, (bool)$jobList->paying, 1, null, true, [$jobList->job_id]);
         $jobListObj = $jobList->gatherJobJoinData($result, $bdData, $this->request)[0];
         returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
