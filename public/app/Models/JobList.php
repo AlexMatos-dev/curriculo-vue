@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Helpers\ModelUtils;
 use App\Models\Company;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class JobList extends Model
@@ -105,7 +106,7 @@ class JobList extends Model
      * @param Int offset
      * @return Array
      */
-    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 100, $offset = null, $distinct = true, $byIds = [])
+    public function listJobs(\Illuminate\Http\Request $request, $paying = false, $limit = 200, $offset = null, $distinct = true, $byIds = [])
     {
         $limit = !is_numeric($limit) || $limit > 200 ? 200 : $limit;
         if($byIds)
@@ -113,7 +114,8 @@ class JobList extends Model
         if($distinct){
             $query = JobList::select(
                 'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.company_logo', 'company.company_description', 
-                'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type'
+                'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type',
+                'company.company_name'
             )->distinct();
         }else{
             $query = JobList::select(
@@ -228,6 +230,194 @@ class JobList extends Model
     }
 
     /**
+     * Calculates the offset for the query
+     * @param Array totals
+     * @param Int perPage
+     * @param Int coeficient
+     * @return Array - schema: ['offset' => Array, 'limit' => Array, 'perPage' => Int, 'lastPage' => Int]
+     */
+    public function calculatePaginationData($totals = [], $page = 1, $perPage = 10, $coeficient = 5)
+    {
+        $payingCount    = array_key_exists('paying', $totals)    ? $totals['paying']    : 0;
+        $nonPayingCount = array_key_exists('nonPaying', $totals) ? $totals['nonPaying'] : 0;
+        $totalJobs = $payingCount + $nonPayingCount;
+        if($payingCount == $nonPayingCount)
+            $totalJobs = (int)ceil($totalJobs / 2);
+        $maxPages     = (int)ceil($totalJobs / $perPage);
+        $logics = [
+            'paying'        => 0,
+            'nonPaying'     => 0,
+            'maxPages'      => $maxPages,
+            'offset'        => [
+                'paying'    => 0,
+                'nonPaying' => 0
+            ],
+            'limit'         => [
+                'paying'    => 0,
+                'nonPaying' => 0
+            ]
+        ];
+        $index = 0;
+        for($i = 0; $i < $perPage; $i++){
+            if($index < $coeficient){
+                $logics['paying']++;
+            }else{
+                $logics['nonPaying']++;
+                $index = 0;
+            }
+            $index++;
+            if($index >= $perPage)
+                break;
+        }
+        if($payingCount == 0){
+            $logics['paying']    = 0;
+            $logics['nonPaying'] = $perPage;
+        }
+        $lastPage = $maxPages;
+        if($page > $lastPage)
+            $page = $lastPage;
+        if($page < 1)
+            $page = 1;
+        $logics['offset']['paying']    = (int)$page * $logics['paying'];
+        $logics['offset']['nonPaying'] = (int)$page * $logics['nonPaying'];
+        if($logics['offset']['paying'] > $payingCount && $logics['offset']['nonPaying'] < $nonPayingCount){
+            $logics['limit']['paying']    = 0;
+            $logics['limit']['nonPaying'] = $perPage;
+        }else if($logics['offset']['paying'] < $payingCount && $logics['offset']['nonPaying'] > $nonPayingCount){
+            $logics['limit']['nonPaying'] = 0;
+            $logics['limit']['paying']    = $perPage;
+        }else{
+            $logics['limit']['paying']    = $logics['paying'];
+            $logics['limit']['nonPaying'] = $logics['nonPaying'];
+        }
+        return [
+            'limit'     => $logics['limit'],
+            'offset'    => $logics['offset'],
+            'lastPage'  => $lastPage,
+            'page'      => $page
+        ];
+    }
+
+    /**
+     * Get jobs paginated
+     * @param request request
+     * @param Int page
+     * @param Int perPage
+     * @param Int coeficient
+     * @return Array
+     */
+    public function getPaginatedJobs($request, $page = 1, $perPage = 10, $coeficient = 5)
+    {
+        $nonPaying      = $this->listJobs($request, false);
+        $totalNonPaying = count($nonPaying);
+        // $paying = $this->listJobs($request, true);
+        $paying = [];
+        $totalPaying = count($paying);
+        $paginationData = $this->calculatePaginationData([
+            'nonPaying' => $totalNonPaying,
+            'paying'    => $totalPaying
+        ], $page, $perPage, $coeficient);
+
+        $data['ids'] = [
+            'job_modality_id'    => [],
+            'job_country'        => [],
+            'job_seniority'      => [],
+            'payment_type'       => [],
+            'job_contract'       => [],
+            'job_period'         => [],
+            'working_visa'       => [],
+            'wage_currency'      => [],
+            'profession_for_job' => [],
+            'company_type'       => []
+        ];
+        $attrsToGatherIds = array_keys($data['ids']);
+
+        $data['nonPaying']    = [];
+        $data['nonPayingIds'] = [];
+        if($totalNonPaying > 0){
+            $nonPayingIndex = $paginationData['offset']['nonPaying'];
+            for($i = 0; $i < $paginationData['limit']['nonPaying']; $i++){
+                if(!empty($nonPaying[$nonPayingIndex])){
+                    $job = $nonPaying[$nonPayingIndex];
+                    foreach($attrsToGatherIds as $attr){
+                        $val = $job->{$attr};
+                        if(in_array($val, $data['ids'][$attr]))
+                            continue;
+                        $data['ids'][$attr][] = $val;
+                    }
+                    $data['nonPayingIds'][] = $job->job_id;
+                    $data['nonPaying'][] = $job;
+                }
+                $nonPayingIndex++;
+            }
+            $nonPaying = $data['nonPaying'];
+        }else{
+            $nonPaying = [];
+        }
+        $data['paying']    = [];
+        $data['payingIds'] = [];
+        if($totalPaying > 0){
+            $payingIndex = $paginationData['offset']['paying'];
+            for($i = 0; $i < $paginationData['limit']['paying']; $i++){
+                if(!empty($paying[$payingIndex])){
+                    $job = $paying[$payingIndex];
+                    foreach($attrsToGatherIds as $attr){
+                        $val = $job->{$attr};
+                        if(in_array($val, $data['ids'][$attr]))
+                            continue;
+                        $data['ids'][$attr][] = $val;
+                    }
+                    $data['payingIds'][] = $job->job_id;
+                    $data['paying'][] = $job;
+                }
+                $payingIndex++;
+            }
+            $paying = $data['paying'];
+        }else{
+            $paying = [];
+        }
+
+        $bdData = $this->getJobListBdData($data['ids']);
+
+        $nonPaying = $this->gatherJobJoinData($nonPaying, $bdData, $request);
+        $paying    = $this->gatherJobJoinData($paying, $bdData, $request);
+        $data      = $this->orderByMatch($paying, $nonPaying);
+        $nonPaying = $data['nonPaying'];
+        $paying    = $data['paying'];
+        $jobs = [];
+        $tracker = 0;
+        $indexes = [
+            'paying'    => 0,
+            'nonPaying' => 0
+        ];
+        if($totalPaying > 0){
+            for($i = 0; $i < $perPage; $i++){
+                if($tracker == $coeficient){
+                    if(!empty($paying[$indexes['nonPaying']]))
+                        $jobs[] = $nonPaying[$indexes['nonPaying']];
+                    $tracker = 0;
+                    $indexes['nonPaying']++;
+                }else{
+                    if(!empty($paying[$indexes['paying']]))
+                        $jobs[] = $paying[$indexes['paying']];
+                    $indexes['paying']++;
+                    $tracker++;
+                }
+            }
+        }
+        while(count($jobs) < $perPage){
+            if(!empty($nonPaying[$indexes['nonPaying']])){
+                $jobs[] = $nonPaying[$indexes['nonPaying']];
+                $indexes['nonPaying']++;
+            }else{
+                break;
+            }
+        }
+        $paginationData['results'] = $jobs;
+        return $paginationData;
+    }
+
+    /**
      * Loops each result of Joblist Object array and settes its corresponding language, skill and proficiency
      * @param Array jobListArray
      * @param Array bdData
@@ -299,14 +489,13 @@ class JobList extends Model
             'joblist_id'
         );
         $commonCurrencies = $bdData['commonCurrencies'];
-        $countriesTranslated = $bdData['countriesTranslated'];
+        $countriesTranslated = $bdData['listCountriesTrans'];
         $languageIso = Session()->has('user_lang') ? Session()->get('user_lang') : ListLangue::DEFAULT_LANGUAGE;
         $defaultLanguage = ListLangue::DEFAULT_LANGUAGE;
         $officialLanguages = Translation::OFFICIAL_LANGUAGES;
         $simpleJoinData = [
             'professions' => 'profession_for_job', 'JobPaymentTypes' => 'payment_type', 'jobContracts' => 'job_contract', 
-            'workingVisas' => 'working_visa', 'jobPeriods' => 'job_period', 'companyTypes' => 'company_type', 
-            'listCountries' => 'job_country', 'proficiencies' => 'job_seniority'
+            'workingVisas' => 'working_visa', 'jobPeriods' => 'job_period', 'companyTypes' => 'company_type', 'proficienciesTrans' => 'job_seniority'
         ];
         // Preparing data to be consumed
         foreach($jobLanguagesArray as $jobId => $jobLanguages){
@@ -365,7 +554,7 @@ class JobList extends Model
         // Set prepared data to objects
         $results = [];
         $usedJobIds = [];
-        $attrToUnset = ['job_skill_id','tag_id','proficiency_id','language_id','country_id','joblist_id','job_language_id','job_visa_id','visas_type_id','job_country'];
+        $attrToUnset = ['job_skill_id','tag_id','proficiency_id','language_id','joblist_id','job_language_id','job_visa_id','visas_type_id'];
         foreach($jobListArray as $job){
             if(!array_key_exists($job->job_id, $usedAttr) || in_array($job->job_id, $usedJobIds))
                 continue;
@@ -383,12 +572,16 @@ class JobList extends Model
             $thisObj->certificationsIds  = $values['jobCertificationsIds'];
             $thisObj->certifications     = $values['jobCertifications'];
             $thisObj->wage_currency_id   = $job->wage_currency;
+            $thisObj->posted_at          = $this->getTimeSincePosted($job->job_created_at);
+            $thisObj->exp_required       = $this->getRequiredExperience($job->experience_in_months);
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
             $thisObj->job_created_at     = ModelUtils::parseDateByLanguage($job->job_created_at, false, $languageIso);
             $thisObj->job_updated_at     = ModelUtils::parseDateByLanguage($job->job_updated_at, false, $languageIso);
-            $location = rtrim(trim($thisObj->job_city . ' | ' . $thisObj->job_state), ' | ');
+            $location = $thisObj->job_city;
             if(array_key_exists($thisObj->job_country, $countriesTranslated)){
-                $location .= ' / ' . $countriesTranslated[$thisObj->job_country][$languageIso] ? $countriesTranslated[$thisObj->job_country][$languageIso] : $countriesTranslated[$thisObj->job_country]['en'];
+                $countryName = $countriesTranslated[$thisObj->job_country][$languageIso] ? $countriesTranslated[$thisObj->job_country][$languageIso] : $countriesTranslated[$thisObj->job_country]['en'];
+                $thisObj->job_country = ucfirst($countryName);
+                $location .= ', ' . $thisObj->job_country;
             }
             $thisObj->location = $location;
             $thisObj->salary = '$' . str_replace('.', ',', $thisObj->job_salary);
@@ -436,29 +629,92 @@ class JobList extends Model
     }
 
     /**
+     * Returns a string representing the required experience for the job
+     * @param Int experience_in_months
+     * @return String
+     */
+    public function getRequiredExperience($experience_in_months = 0)
+    {
+        $requiredExperience = '';
+        $years = round($experience_in_months / 12);
+        if($years < 1){
+            $monthTrans = $experience_in_months > 1 ? translate('months') : translate('month');
+            $requiredExperience = $experience_in_months . ' ' . ucfirst($monthTrans) . ' ' . ucfirst(translate('exp'));
+        }else{
+            $yearTrans = $years > 1 ? translate('years') : translate('year');
+            $requiredExperience = $years . ' ' . ucfirst($yearTrans) . ' ' . ucfirst(translate('exp'));
+        }
+        return $requiredExperience;
+    }
+
+    /**
+     * Returns the time in days or months since job was created
+     * @param String jobCreatedAt
+     * @return String
+     */
+    public function getTimeSincePosted($jobCreatedAt = '')
+    {
+        if($jobCreatedAt == '')
+            return '';
+        $today = Carbon::now();
+        $jobCreatedAt = Carbon::parse($jobCreatedAt);
+        $inDays = abs((int)$today->diffInDays($jobCreatedAt));
+        if($inDays > 90){
+            $months = round($inDays / 30);
+            return $months . 'm';
+        }else{
+            return $inDays . 'd';
+        }
+    }
+
+    /**
      * Returns an array containing all possible data for Joblist
+     * @param Array jobsIds
      * @return Array
      */
-    public function getJobListBdData()
+    public function getJobListBdData($ids = [])
     {
-        return [
-            'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
-            'proficiencies' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level'),
-            'proficienciesTrans' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level', false, false, true),
-            'visaTypes' => ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name'),
-            'listLanguages' => ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name'),
-            'jobModalities' => ModelUtils::getIdIndexedAndTranslated(new JobModality(), 'name'),
-            'commonCurrencies' => ModelUtils::getIdIndexedAndTranslated(new CommonCurrency(), 'currency_name'),
-            'companyTypes' => ModelUtils::getIdIndexedAndTranslated(new CompanyType(), 'name'),
-            'listCountries' => (new ListCountry())->getAll(true),
-            'listCountriesTrans' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, false, true),
-            'countriesTranslated' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, true),
-            'professions' => ModelUtils::getIdIndexedAndTranslated(new ListProfession(), 'profession_name'),
-            'JobPaymentTypes' => ModelUtils::getIdIndexedAndTranslated(new JobPaymentType(), 'name'),
-            'jobContracts' => ModelUtils::getIdIndexedAndTranslated(new JobContract(), 'name'),
-            'workingVisas' => ModelUtils::getIdIndexedAndTranslated(new WorkingVisa(), 'name'),
-            'jobPeriods' => ModelUtils::getIdIndexedAndTranslated(new JobPeriod(), 'name')
+        $listLangObj = new ListLangue();
+        $languagesIso = $listLangObj->getNotOficialLangsIso();
+        $datas = [
+            'jobModalities'   => ModelUtils::getTranslationsArray(
+                new JobModality(), 'name', !empty($ids['job_modality_id']) ? $ids['job_modality_id'] : [], 'job_modality_id', $languagesIso
+            ),
+            'job_country'     => ModelUtils::getTranslationsArray(
+                new ListCountry(), 'lcountry_name', !empty($ids['job_country']) ? $ids['job_country'] : [], 'lcountry_id', $languagesIso
+            ),
+            'JobPaymentTypes' => ModelUtils::getTranslationsArray(
+                new JobPaymentType(), 'name', !empty($ids['payment_type']) ? $ids['payment_type'] : [], 'job_payment_type', $languagesIso
+            ),
+            'jobContracts'    => ModelUtils::getTranslationsArray(
+                new JobContract(), 'name', !empty($ids['job_contract']) ? $ids['job_contract'] : [], 'job_contract', $languagesIso
+            ),
+            'jobPeriods'      => ModelUtils::getTranslationsArray(
+                new JobPeriod(), 'name', !empty($ids['job_period']) ? $ids['job_period'] : [], 'job_period', $languagesIso
+            ),
+            'workingVisas'    => ModelUtils::getTranslationsArray(
+                new WorkingVisa(), 'name', !empty($ids['working_visa']) ? $ids['working_visa'] : [] , 'working_visa', $languagesIso
+            ),
+            'commonCurrencies'=> ModelUtils::getTranslationsArray(
+                new CommonCurrency(), 'currency_name', !empty($ids['wage_currency']) ? $ids['wage_currency'] : [], 'common_currency_id', $languagesIso, true
+            ),
+            'professions'     => ModelUtils::getTranslationsArray(
+                new ListProfession(), 'profession_name', !empty($ids['profession_for_job']) ? $ids['profession_for_job'] : [], 'lprofession_id', $languagesIso
+            ),
+            'companyTypes'    => ModelUtils::getTranslationsArray(
+                new CompanyType(), 'name', !empty($ids['company_type']) ? $ids['company_type'] : [], 'company_type_id', $languagesIso
+            ),
+
+            
+            'listCountriesTrans' => ModelUtils::getTranslationsArray(
+                new ListCountry(), 'lcountry_name', !empty($ids['job_country']) ? $ids['job_country'] : [], 'lcountry_id', $languagesIso
+            ),
+            'tags' => ModelUtils::getTranslationsArray(new Tag(), 'tags_name', null, null, $languagesIso),
+            'proficienciesTrans' => ModelUtils::getTranslationsArray(new Proficiency(), 'proficiency_level', null, null, $languagesIso),
+            'visaTypes' => ModelUtils::getTranslationsArray(new TypeVisas(), 'type_name', null, null, $languagesIso),
+            'listLanguages' => ModelUtils::getTranslationsArray(new ListLangue(), 'llangue_name', null, null, $languagesIso),
         ];
+        return $datas;
     }
 
     /**
