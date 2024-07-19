@@ -90,13 +90,18 @@ Route::prefix('professional')->group(function ()
     });
 });
 
-Route::prefix('company')->middleware('auth:sanctum')->group(function ()
+Route::prefix('company')->group(function ()
 {
-    Route::post('update', [CompanyController::class, 'update']);
-    Route::middleware(['companyadmin',  'verify_email'])->group(function ()
-    {
-        Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
-        Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
+    Route::get('index', [CompanyController::class, 'index']);
+    Route::get('{company_slug}', [CompanyController::class, 'show']);
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('update', [CompanyController::class, 'update']);
+        Route::middleware(['companyadmin',  'verify_email'])->group(function ()
+        {
+            Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
+            Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
+        });
+
     });
 });
 

@@ -240,10 +240,10 @@ class JobList extends Model
     {
         $payingCount    = array_key_exists('paying', $totals)    ? $totals['paying']    : 0;
         $nonPayingCount = array_key_exists('nonPaying', $totals) ? $totals['nonPaying'] : 0;
-        $totalJobs = $payingCount + $nonPayingCount;
+        $totalCompanies = $payingCount + $nonPayingCount;
         if($payingCount == $nonPayingCount)
-            $totalJobs = (int)ceil($totalJobs / 2);
-        $maxPages     = (int)ceil($totalJobs / $perPage);
+            $totalCompanies = (int)ceil($totalCompanies / 2);
+        $maxPages     = (int)ceil($totalCompanies / $perPage);
         $logics = [
             'paying'        => 0,
             'nonPaying'     => 0,
@@ -271,15 +271,15 @@ class JobList extends Model
         }
         if($payingCount == 0){
             $logics['paying']    = 0;
-            $logics['nonPaying'] = $perPage;
+            $logics['nonPaying'] = $nonPayingCount < $perPage ? $nonPayingCount : $perPage;
         }
         $lastPage = $maxPages;
         if($page > $lastPage)
             $page = $lastPage;
         if($page < 1)
             $page = 1;
-        $logics['offset']['paying']    = (int)$page * $logics['paying'];
-        $logics['offset']['nonPaying'] = (int)$page * $logics['nonPaying'];
+        $logics['offset']['paying']    = $page == 1 ? 0 : (int)$page * $logics['paying'];
+        $logics['offset']['nonPaying'] = $page == 1 ? 0 : (int)$page * $logics['paying'];
         if($logics['offset']['paying'] > $payingCount && $logics['offset']['nonPaying'] < $nonPayingCount){
             $logics['limit']['paying']    = 0;
             $logics['limit']['nonPaying'] = $perPage;
@@ -289,6 +289,12 @@ class JobList extends Model
         }else{
             $logics['limit']['paying']    = $logics['paying'];
             $logics['limit']['nonPaying'] = $logics['nonPaying'];
+        }
+
+        $total = $totals['nonPaying'] + $totals['paying'];
+        if($page == 1 && $total != $perPage){
+            $logics['limit']['paying']    = $totals['paying'];
+            $logics['limit']['nonPaying'] = $totals['nonPaying'];
         }
         return [
             'limit'     => $logics['limit'],
@@ -393,7 +399,7 @@ class JobList extends Model
         if($totalPaying > 0){
             for($i = 0; $i < $perPage; $i++){
                 if($tracker == $coeficient){
-                    if(!empty($paying[$indexes['nonPaying']]))
+                    if(!empty($nonPaying[$indexes['nonPaying']]))
                         $jobs[] = $nonPaying[$indexes['nonPaying']];
                     $tracker = 0;
                     $indexes['nonPaying']++;
