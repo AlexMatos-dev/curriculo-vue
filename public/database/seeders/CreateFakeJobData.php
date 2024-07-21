@@ -26,7 +26,6 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use PhpParser\Node\Expr\Cast\Object_;
 
 class CreateFakeJobData extends Seeder
 {
@@ -43,7 +42,11 @@ class CreateFakeJobData extends Seeder
             $limit = 1;
         $faker = Faker::create('pt_BR');
         // -- Start of Essential Data --
-        $sourceImage = file_exists(storage_path('app/placeholder.png')) ? file_get_contents(storage_path('app/placeholder.png')) : null;
+        $logoPlaceholder       = file_exists(storage_path('app/placeholder/logo-icon-jobifull.png'))  ? file_get_contents(storage_path('app/placeholder/logo-icon-jobifull.png'))  : null;
+        $coverPhotoPlaceholder = file_exists(storage_path('app/placeholder/jobifull-retangular.png')) ? file_get_contents(storage_path('app/placeholder/jobifull-retangular.png')) : null;
+        $logoPlaceholder       = null;
+        $coverPhotoPlaceholder = null;
+
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$countryObj)
             return;
@@ -113,8 +116,8 @@ class CreateFakeJobData extends Seeder
                     'company_register_number' => $faker->uuid(),
                     'company_name' => $companyName,
                     'company_type' => $companyTypes[array_rand($companyTypes)]['company_type_id'],
-                    'company_logo' => $sourceImage,
-                    'company_cover_photo' => $sourceImage,
+                    'company_logo' => $logoPlaceholder,
+                    'company_cover_photo' => $coverPhotoPlaceholder,
                     'company_video' => $faker->url('youtube'),
                     'company_email' => $faker->unique()->companyEmail(),
                     'company_phone' => $faker->unique()->phoneNumber(),

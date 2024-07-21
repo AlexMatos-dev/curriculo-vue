@@ -12,6 +12,70 @@ use Illuminate\Support\Facades\Auth;
 class CompanyController extends Controller
 {
     /**
+     * Perform a search accordingly to sent parameters and returns a list ofjobs paginated and with a 'match' percentage
+     * @param Int page - default 1
+     * @param String company_register_number
+     * @param String company_name
+     * @param Int company_type 
+     * @param String company_description
+     * @param Int start_company_number_employees
+     * @param Int end_company_number_employees
+     * @param String company_benefits
+     * @param Int per_page
+     * @return \Illuminate\Http\JsonResponse - Schema [
+     *      "data": Array,
+     *      "curent_page": int,
+     *      "per_page": int,
+     *      "last_page": int,
+     * ]
+     */
+    public function index()
+    {
+        Validator::validateParameters($this->request, [
+            'page' => 'integer',
+            'company_register_number' => 'string',
+            'company_name' => 'string',
+            'company_type' => 'numeric',
+            'company_description' => 'string',
+            'start_company_number_employees' => 'numeric',
+            'end_company_number_employees' => 'numeric',
+            'company_benefits' => 'string',
+            'per_page' => 'integer'
+        ]);
+        $page       = (int)request('page', 1);
+        $perPage    = (int)request('per_page', 10);
+        if(!$perPage)
+            $perPage = 10;
+        $companyListObj = new Company();
+        $results = $companyListObj->getPaginatedCompanies($this->request, $page, $perPage);
+        returnResponse([
+            'data' => $results['results'],
+            'curent_page' => $results['page'],
+            'per_page' => $perPage,
+            'last_page' => $results['lastPage']
+        ]);
+    }
+
+    /**
+     * Tries to get Company from sent companySlug and them display its values
+     * @param String companySlug
+     * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
+     */
+    public function show(String $companySlug)
+    {
+        $company = Company::where('company_slug', $companySlug)->first();
+        if(!$company || (is_array($company) && !empty($company)))
+            Validator::throwResponse(translate('company not found'), 400);
+        $result = $company->listCompanies($this->request, (bool)$company->paying, 1, null, [$company->company_id]);
+        if(empty($result))
+            Validator::throwResponse(translate('company not found'), 400);
+        $company = $company->gatherCompanyInfo($result);
+        if(empty($company))
+            Validator::throwResponse(translate('company not found'), 400);
+        returnResponse(["message" => translate('company found'), "data" => $company[0]]);
+    }
+
+    /**
      * Updates logged person Company account.
      * @param String company_register_number - required
      * @param String company_name - required

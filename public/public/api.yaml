@@ -1190,6 +1190,111 @@ paths:
                   value:
                     message: you have no privilegies
                   summary: Logged person is not an admin or not an admin with privilegies
+  /api/company/index:
+    get:
+      tags:
+        - company
+      summary: List all companies
+      description: retrieves a list of companies with optional filters.
+      parameters:
+        - name: company_register_number
+          in: query
+          schema:
+            type: string
+          description: company registration number
+          example: 01562
+        - name: company_name
+          in: query
+          schema:
+            type: string
+          description: company name
+          example: google corp
+        - name: company_type
+          in: query
+          schema:
+            type: integer
+          description: id of companyType
+          example: 1
+        - name: company_description
+          in: query
+          schema:
+            type: string
+          description: company description
+          example: a service company
+        - name: start_company_number_employees
+          in: query
+          schema:
+            type: integer
+          description: start of company nunmber of employees
+          example: 1
+        - name: end_company_number_employees
+          in: query
+          schema:
+            type: integer
+          description: end of company nunmber of employees
+          example: 10
+        - name: company_benefits
+          in: query
+          schema:
+            type: string
+          description: company benefits
+          example: a gym
+        - name: page
+          in: query
+          description: The page for list | 1 is defaut
+          example: 1
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Results per page | 10 is default
+          example: 10
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListCompanyPaginated'
+  /api/company/{company_slug}:
+    get:
+      tags:
+        - company
+      summary: Get company detail by its slugs
+      description: Returns information about a company.
+      parameters:
+        - name: company_slug
+          in: path
+          schema:
+            type: string
+          description: company slug
+          example: roque-vasques
+          required: true
+      responses:
+        '200':
+          description: A list of companies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListCompany'
+                  message:
+                    type: string
+                    example: company found
+                    description: sucess message
+        '400':
+          description: slug is invalid or was not found
+          content:
+            application/json:
+              example: {"message":"company not found"}
 
   /api/recruiter/update:
     post:
@@ -6392,6 +6497,81 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ListProfession'
+        curent_page:
+          type: integer
+          example: 1
+          description: the current page
+        last_page:
+          type: integer
+          example: 1
+          description: the last page
+        per_page:
+          type: integer
+          example: 100
+          description: the default list max size
+    ListCompany:
+      type: object
+      properties:
+        company_id:
+          type: integer
+          example: 1
+        company_slug:
+          type: string
+          example: gloog-corp
+        company_register_number:
+          type: string
+          example: 15515151515  
+        company_type:
+          type: string
+          description: returns the company type accordingly to user_lang
+          example: web service  
+        company_logo:
+          type: string
+          example: encoded as base64  
+        company_cover_photo:
+          type: string
+          example: encoded as base64  
+        company_video:
+          type: string
+          example: https://google.com/about  
+        company_website:
+          type: string
+          example: https://google.com 
+        company_description:
+          type: string
+          example: google exists since 1900   
+        company_benefits:
+          type: string
+          example: an amazing gym
+        paying:
+          type: integer
+          example: 1 OR 0 
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        company_created_at:
+          type: string
+          description: date formated by language
+          example: '2024/04/01'
+        company_updated_at:
+          type: string
+          description: date formated by language
+          example: '2024/04/01'
+        match:
+          type: number
+          example: 99.00
+    ListCompanyPaginated:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListCompany'
         curent_page:
           type: integer
           example: 1

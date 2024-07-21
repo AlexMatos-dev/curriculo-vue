@@ -13,7 +13,6 @@ use App\Models\Profile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -75,11 +74,14 @@ class AuthController extends Controller
     {
         Validator::validateParameters($this->request, [
             'person_username' => 'required|max:300',
-            'person_email' => 'required|max:200|email|unique:persons',
+            'person_email' => 'required|max:200|email',
             'person_ddi' => 'max:10',
             'person_phone' => 'max:20',
-            'person_langue' => 'integer'
+            'person_langue' => 'integer',
+            'profile_type' => 'string'
         ]);
+        if(Person::where('person_email', request('person_email'))->first())
+            returnResponse(['message' => translate('email already in use')], 400);
         Validator::validatePassword(request('person_password'));
         if(request('person_langue') && !ListLangue::find(request('person_langue')))
             returnResponse(['message' => translate('invalid person language')], 400);
@@ -89,6 +91,8 @@ class AuthController extends Controller
             returnResponse(['message' => translate('phone number is required')], 400);
         if(request('ddi') && !ListCountry::where('ddi', request('ddi'))->first())
             returnResponse(['message' => translate('invalid ddi')], 400);
+        if(!in_array(request('profile_type'), [Profile::PROFESSIONAL, Profile::COMPANY, PROFILE::RECRUITER]))
+            returnResponse(['message' => translate('invalid profile type')], 400);
         $person_phone = request('person_phone');
         if(request('person_phone'))
             $person_phone = preg_replace('/[^0-9]/', '', $person_phone);
@@ -102,6 +106,11 @@ class AuthController extends Controller
         ]);
         if(!$person)
             returnResponse(['message' => translate('person not created')], 500);
+        $profile = (new Profile())->createProfile($person, request('profile_type'));
+        if(!$profile){
+            $person->delete();
+            returnResponse(['message' => translate('person not created')], 500);
+        }
         returnResponse($person);
     }
 
