@@ -135,8 +135,12 @@ class JobListController extends Controller
             Validator::throwResponse(translate('job not found'), 400);
         $bdData = $obj->getJobListBdData();
         $result = $jobList->listJobs($this->request, (bool)$jobList->paying, 1, null, true, [$jobList->job_id]);
-        $jobListObj = $jobList->gatherJobJoinData($result, $bdData, $this->request)[0];
-        returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
+        if(empty($result))
+            Validator::throwResponse(translate('job not found'), 400);
+        $jobListObj = $jobList->gatherJobJoinData($result, $bdData, $this->request);
+        if(empty($jobListObj))
+            Validator::throwResponse(translate('job not found'), 400);
+        returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj[0]]);
     }
 
     /**

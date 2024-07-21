@@ -10,7 +10,7 @@ class CreatePersonsTable extends Migration {
 		Schema::create('persons', function(Blueprint $table) {
 			$table->bigIncrements('person_id', true);
 			$table->string('person_username', 300);
-			$table->string('person_email', 200)->unique();
+			$table->string('person_email', 200);
 			$table->string('person_password', 80);
 			$table->string('person_ddi', 10)->nullable();
 			$table->string('person_phone', 20)->nullable();
