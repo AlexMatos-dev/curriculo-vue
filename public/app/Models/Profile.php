@@ -99,4 +99,63 @@ class Profile extends Model
         }
         return $data;
     }
+
+    public function createProfile(Person $person, String $profileType)
+    {
+        $objectId = null;
+        $object  = null;
+        try {
+            switch($profileType){
+                case Profile::PROFESSIONAL:
+                    $professionalName = explode(' ', $person->person_username);
+                    if(count($professionalName) == 1){
+                        $professionalName = [$professionalName[0], ucfirst($professionalName[0][0])];
+                    }
+                    $professional = (new Professional())->saveProfessional([
+                        'professional_firstname' => $professionalName[0], 
+                        'professional_lastname' => $professionalName[1], 
+                        'professional_email' => $person->person_email,
+                        'professional_slug' => $person->makeSlug($professionalName[0], $professionalName[0][0]),
+                        'person_id' => $person->person_id
+                    ]);
+                    if(!$professional)
+                        return false;
+                    $objectId = $professional->professional_id;
+                    $object   = $professional;
+                break;
+                case Profile::COMPANY:
+                    $company = (new Company())->saveCompany([
+                        'company_slug'  => \Illuminate\Support\Str::slug($person->person_username),
+                        'company_name'  => $person->person_username,
+                        'company_email' => $person->person_email
+                    ]);
+                    if(!$company)
+                        return false;
+                    $company->syncAdmins($person->person_id, true);
+                    $objectId = $company->company_id;
+                    $object   = $company;
+                break;
+                case Profile::RECRUITER:
+                    $recruiter = Recruiter::create([
+                        'person_id' => $person->person_id
+                    ]);
+                    if(!$recruiter)
+                        return false;
+                    $objectId = $recruiter->recruiter_id;
+                    $object   = $recruiter;
+                break;
+            }
+        } catch (\Throwable $th) {
+            dd($th->getMessage());
+            return false;
+        }
+        $result = Profile::create([
+            'person_id'       => $person->person_id,
+            'profile_type_id' => $objectId,
+            'profile_type'    => $profileType
+        ]);
+        if(!$result && $object)
+            $object->delete();
+        return true;
+    }
 }

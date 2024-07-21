@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Helpers\ModelUtils;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Professional extends Model
 {
+    use SoftDeletes;
+
     protected $primaryKey = 'professional_id';
     protected $table = 'professionals';
     public $timestamps = true;
