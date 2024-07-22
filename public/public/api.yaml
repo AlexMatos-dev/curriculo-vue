@@ -57,6 +57,7 @@ externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 servers:
+  - url: https://api.jobifull.com/
   - url: https://api.jobifull.eu/
 tags:
   - name: auth
@@ -87,6 +88,14 @@ tags:
     description: Chat message routes and methods
   - name: tag
     description: Tag routes and methods
+  - name: job_payment_type
+    description: Job Payment Type routes and methods
+  - name: job_contract
+    description: Job Contract routes and methods
+  - name: working_visa
+    description: Working Visa routes and methods
+  - name: job_period
+    description: Job Period routes and methods
 paths:
   /api/login:
     post:
@@ -4713,11 +4722,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListProfessionPaginated'
-                
   /api/tags/search:
     get:
       tags:
-        - tags
+        - tag
       description: searches for tags
       parameters:
       - name: user_lang
@@ -4745,6 +4753,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TagSearch'
+  /api/job_payment_type/index:
+    get:
+      tags:
+        - job_payment_type
+      description: get all job payment types
+      responses:
+        '200':
+          description: A list of jobPaymentTypes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/job_contract/index:
+    get:
+      tags:
+        - job_contract
+      description: get all job contracts
+      responses:
+        '200':
+          description: A list of jobContracts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/working_visa/index:
+    get:
+      tags:
+        - working_visa
+      description: get all working visas
+      responses:
+        '200':
+          description: A list of workingVisas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/job_period/index:
+    get:
+      tags:
+        - job_period
+      description: get all job periods 
+      responses:
+        '200':
+          description: A list of jobPeriods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+                
 components:
   schemas:
     Login:
@@ -6591,6 +6648,24 @@ components:
           type: array
           items:
             example: {"en":"en","pt":"pt","es":"es","tags_id":1,"$otherLanguageIso":""}
+    TranslationArrayObject:
+      type: object
+      properties:
+        object_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: 'english'
+        pt:
+          type: string
+          example: 'português'
+        es:
+          type: string
+          example: 'español'
+        $anyLanguageIso:
+          type: string
+          example: 'any language iso | NULL'
     
   securitySchemes:
     bearerAuth:

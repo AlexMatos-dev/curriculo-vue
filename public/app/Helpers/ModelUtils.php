@@ -212,6 +212,8 @@ class ModelUtils
                     if(array_key_exists($langIso->llangue_acronyn, $unofficialTrans))
                         $rawInstance->{$langIso->llangue_acronyn} = $unofficialTrans[$langIso->llangue_acronyn];
                 }
+                unset($rawInstance->unofficial_translations);
+                $rawInstance->object_id = $objectData->{$object->getKeyName()};
                 $data[$objectData->{$object->getKeyName()}] = $asObject ? $rawInstance : $rawInstance->toArray();
             }
             return $data;
