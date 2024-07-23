@@ -13,17 +13,22 @@ use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\CompanyTypeController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\JobAppliedController;
+use App\Http\Controllers\JobContractController;
 use App\Http\Controllers\JobModalityController;
+use App\Http\Controllers\JobPeriodController;
 use App\Http\Controllers\ListLangueController;
 use App\Http\Controllers\ListProfessionController;
+use App\Http\Controllers\JobPaymentTypeController;
 use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
+use App\Http\Controllers\WorkingVisaController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
@@ -89,13 +94,18 @@ Route::prefix('professional')->group(function ()
     });
 });
 
-Route::prefix('company')->middleware('auth:sanctum')->group(function ()
+Route::prefix('company')->group(function ()
 {
-    Route::post('update', [CompanyController::class, 'update']);
-    Route::middleware(['companyadmin',  'verify_email'])->group(function ()
-    {
-        Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
-        Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
+    Route::get('index', [CompanyController::class, 'index']);
+    Route::get('{company_slug}', [CompanyController::class, 'show']);
+    Route::middleware('auth:sanctum')->group(function(){
+        Route::post('update', [CompanyController::class, 'update']);
+        Route::middleware(['companyadmin',  'verify_email'])->group(function ()
+        {
+            Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
+            Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
+        });
+
     });
 });
 
@@ -180,4 +190,29 @@ Route::prefix('countries')->group(function ()
 Route::prefix('professions')->group(function ()
 {
     Route::get('index', [ListProfessionController::class, 'getProfessions']);
+});
+
+Route::prefix('tags')->group(function ()
+{
+    Route::get('search', [TagController::class, 'search']);
+});
+
+Route::prefix('job_payment_type')->group(function ()
+{
+    Route::get('index', [JobPaymentTypeController::class, 'index']);
+});
+
+Route::prefix('job_contract')->group(function ()
+{
+    Route::get('index', [JobContractController::class, 'index']);
+});
+
+Route::prefix('working_visa')->group(function ()
+{
+    Route::get('index', [WorkingVisaController::class, 'index']);
+});
+
+Route::prefix('job_period')->group(function ()
+{
+    Route::get('index', [JobPeriodController::class, 'index']);
 });

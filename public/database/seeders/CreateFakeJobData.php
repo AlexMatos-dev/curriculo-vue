@@ -2,12 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\CertificationType;
 use App\Models\CommonCurrency;
 use App\Models\Company;
 use App\Models\CompanyAdmin;
 use App\Models\CompanyType;
+use App\Models\DrivingLicense;
+use App\Models\JobContract;
 use App\Models\JobList;
 use App\Models\JobModality;
+use App\Models\JobPaymentType;
+use App\Models\JobPeriod;
 use App\Models\JobSkill;
 use App\Models\ListCountry;
 use App\Models\ListLangue;
@@ -16,6 +21,7 @@ use App\Models\Person;
 use App\Models\Proficiency;
 use App\Models\Tag;
 use App\Models\TypeVisas;
+use App\Models\WorkingVisa;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +42,11 @@ class CreateFakeJobData extends Seeder
             $limit = 1;
         $faker = Faker::create('pt_BR');
         // -- Start of Essential Data --
-        $sourceImage = file_exists(storage_path('app/placeholder.png')) ? file_get_contents(storage_path('app/placeholder.png')) : null;
+        $logoPlaceholder       = file_exists(storage_path('app/placeholder/logo-icon-jobifull.png'))  ? file_get_contents(storage_path('app/placeholder/logo-icon-jobifull.png'))  : null;
+        $coverPhotoPlaceholder = file_exists(storage_path('app/placeholder/jobifull-retangular.png')) ? file_get_contents(storage_path('app/placeholder/jobifull-retangular.png')) : null;
+        $logoPlaceholder       = null;
+        $coverPhotoPlaceholder = null;
+
         $countryObj = ListCountry::where('lcountry_acronyn', 'br')->first();
         if(!$countryObj)
             return;
@@ -51,6 +61,12 @@ class CreateFakeJobData extends Seeder
         $professions = ListProfession::all()->toArray();
         $currencies = CommonCurrency::all()->toArray();
         $companyTypes = CompanyType::all()->toArray();
+        $paymentTypes = JobPaymentType::all()->toArray();
+        $jobContracts = JobContract::all()->toArray();
+        $workingVisas = WorkingVisa::all()->toArray();
+        $jobPeriods = JobPeriod::all()->toArray();
+        $drivingLicences = DrivingLicense::all()->toArray();
+        $certificationTypes = CertificationType::all()->toArray();
         $dataForJobLanguage = [];
         foreach($languagesArray as $langData){
             for($i = 0; $i < 3; $i++){
@@ -100,8 +116,8 @@ class CreateFakeJobData extends Seeder
                     'company_register_number' => $faker->uuid(),
                     'company_name' => $companyName,
                     'company_type' => $companyTypes[array_rand($companyTypes)]['company_type_id'],
-                    'company_logo' => $sourceImage,
-                    'company_cover_photo' => $sourceImage,
+                    'company_logo' => $logoPlaceholder,
+                    'company_cover_photo' => $coverPhotoPlaceholder,
                     'company_video' => $faker->url('youtube'),
                     'company_email' => $faker->unique()->companyEmail(),
                     'company_phone' => $faker->unique()->phoneNumber(),
@@ -124,12 +140,6 @@ class CreateFakeJobData extends Seeder
         }        
         // Create jobs
         $created = 0;
-        $jobSeniorities = [
-            'trainee' => ['salary' => [500, 900], 'exp' => 0],
-            'junior' => ['salary' => [2000,3000], 'exp' => 2],
-            'middle' => ['salary' => [4000,7000], 'exp' => 5],
-            'senior' => ['salary' => [7000,20000], 'exp' => 10],
-        ];
         $companiesData = Company::inRandomOrder()->get()->toArray();
         for($o = 0; $o < $limit; $o++){
             if($created > $limit)
@@ -137,23 +147,28 @@ class CreateFakeJobData extends Seeder
             $job = null;
             try {
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
-                $jobData = $jobSeniorities[$seniorityOfJob['proficiency_level']];
                 $profession = $professions[array_rand($professions)];
                 $job = JobList::create([
                     'company_id' => $companiesData[array_rand($companiesData)]['company_id'],
                     'job_modality_id' => $jobModalities[array_rand($jobModalities)]['job_modality_id'],
+                    'job_title' => $faker->jobTitle(),
                     'job_city' => $faker->city(),
+                    'job_state' => $faker->city(),
                     'job_country' => $countryObj->lcountry_id,
                     'job_seniority' => $seniorityOfJob['proficiency_id'],
-                    'job_salary' => $faker->numberBetween($jobData['salary'][0], $jobData['salary'][1]),
+                    'job_salary' => $faker->numberBetween(random_int(1000, 4999), random_int(5000, 10000)),
                     'job_description' => $profession['profession_name'],
                     'job_experience_description' => $faker->text(80),
-                    'experience_in_months' => $jobData['exp'],
+                    'experience_in_months' => random_int(2, 10),
                     'job_benefits' => $faker->text(500),
                     'job_offer' => $faker->text(499),
                     'job_requirements' => $faker->text(499),
                     'wage_currency' => $currencies[array_rand($currencies)]['common_currency_id'],
-                    'profession_for_job' => $profession['lprofession_id']
+                    'profession_for_job' => $profession['lprofession_id'],
+                    'payment_type' => $paymentTypes[array_rand($paymentTypes)]['job_payment_type'],
+                    'job_contract' => $jobContracts[array_rand($jobContracts)]['job_contract'],
+                    'working_visa' => $workingVisas[array_rand($workingVisas)]['working_visa'],
+                    'job_period' => $jobPeriods[array_rand($jobPeriods)]['job_period']
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
@@ -169,16 +184,29 @@ class CreateFakeJobData extends Seeder
                     for($i = 0; $i < 3; $i++){
                         $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   
                     }                   
-                    $job->sycnLanguages((Object) $langData);
+                    $job->syncLanguages((Object) $langData);
 
                     $visaData = [];
                     for($i = 0; $i < 3; $i++){
                         $visaData[] = $dataForJobVisas[array_rand($dataForJobVisas)];   
                     }                   
-                    $job->sycnVisas((Object) $visaData);
+                    $job->syncVisas((Object) $visaData);
+
+                    $driveLicenses = [];
+                    for($i = 0; $i < 2; $i++){
+                        $driveLicenses[] = (Object)$drivingLicences[array_rand($drivingLicences)];   
+                    } 
+                    $job->syncDrivingLicenses($driveLicenses);
+
+                    $certifications = [];
+                    for($i = 0; $i < 2; $i++){
+                        $certifications[] = (Object)$certificationTypes[array_rand($certificationTypes)];   
+                    } 
+                    $job->syncCertifications($certifications); 
                 }
             } catch (\Throwable $th) {
                 echo $th->getMessage();
+                die();
             }
             if($job)
                 $created++;

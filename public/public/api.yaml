@@ -57,6 +57,7 @@ externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 servers:
+  - url: https://api.jobifull.com/
   - url: https://api.jobifull.eu/
 tags:
   - name: auth
@@ -85,6 +86,16 @@ tags:
     description: Job applied routes and methods
   - name: chat_message
     description: Chat message routes and methods
+  - name: tag
+    description: Tag routes and methods
+  - name: job_payment_type
+    description: Job Payment Type routes and methods
+  - name: job_contract
+    description: Job Contract routes and methods
+  - name: working_visa
+    description: Working Visa routes and methods
+  - name: job_period
+    description: Job Period routes and methods
 paths:
   /api/login:
     post:
@@ -447,6 +458,12 @@ paths:
         - name: person_langue
           in: query
           description: Language from ListLanguages
+          example: 1
+          schema:
+            type: integer
+        - name: currency
+          in: query
+          description: CommonCurrency id
           example: 1
           schema:
             type: integer
@@ -1182,6 +1199,111 @@ paths:
                   value:
                     message: you have no privilegies
                   summary: Logged person is not an admin or not an admin with privilegies
+  /api/company/index:
+    get:
+      tags:
+        - company
+      summary: List all companies
+      description: retrieves a list of companies with optional filters.
+      parameters:
+        - name: company_register_number
+          in: query
+          schema:
+            type: string
+          description: company registration number
+          example: 01562
+        - name: company_name
+          in: query
+          schema:
+            type: string
+          description: company name
+          example: google corp
+        - name: company_type
+          in: query
+          schema:
+            type: integer
+          description: id of companyType
+          example: 1
+        - name: company_description
+          in: query
+          schema:
+            type: string
+          description: company description
+          example: a service company
+        - name: start_company_number_employees
+          in: query
+          schema:
+            type: integer
+          description: start of company nunmber of employees
+          example: 1
+        - name: end_company_number_employees
+          in: query
+          schema:
+            type: integer
+          description: end of company nunmber of employees
+          example: 10
+        - name: company_benefits
+          in: query
+          schema:
+            type: string
+          description: company benefits
+          example: a gym
+        - name: page
+          in: query
+          description: The page for list | 1 is defaut
+          example: 1
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Results per page | 10 is default
+          example: 10
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of companies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListCompanyPaginated'
+  /api/company/{company_slug}:
+    get:
+      tags:
+        - company
+      summary: Get company detail by its slugs
+      description: Returns information about a company.
+      parameters:
+        - name: company_slug
+          in: path
+          schema:
+            type: string
+          description: company slug
+          example: roque-vasques
+          required: true
+      responses:
+        '200':
+          description: A list of companies
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ListCompany'
+                  message:
+                    type: string
+                    example: company found
+                    description: sucess message
+        '400':
+          description: slug is invalid or was not found
+          content:
+            application/json:
+              example: {"message":"company not found"}
 
   /api/recruiter/update:
     post:
@@ -1306,6 +1428,34 @@ paths:
                 job_seniority:
                   type: integer
                   example: 1
+        - name: job_driving_licenses
+          in: query
+          description: Array of DrivingLicense ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_driving_licenses:
+                  type: integer
+                  example: 1
+        - name: job_certifications
+          in: query
+          description: Array of CertificationType ids
+          example: 1
+          schema:
+            type: array
+            items:
+              required:
+                - test
+              type: object
+              properties:
+                job_certifications:
+                  type: integer
+                  example: 1
         - name: job_salary_start
           in: query
           description: search for jobs with given starting salary
@@ -1354,6 +1504,42 @@ paths:
           example: 100
           schema:
             type: integer
+        - name: profession_for_job
+          in: query
+          description: ListProfession id
+          example: 1
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: JobPaymentType id
+          example: 1
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: JobContract id
+          example: 1
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: WorkingVisa id
+          example: 1
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: JobPeriod id
+          example: 1
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: CommonCurrencies id
+          example: 1
+          schema:
+            type: integer
       responses:
         '200':
           description: A list of job
@@ -1392,6 +1578,13 @@ paths:
         - joblist
       summary: Create a new job
       parameters:
+        - name: job_title
+          in: query
+          description: Job title
+          example: Developer
+          required: true
+          schema:
+            type: string
         - name: job_modality_id
           in: query
           description: Job modality id
@@ -1402,31 +1595,40 @@ paths:
         - name: job_country
           in: query
           description: List country id
+          required: true
           example: 10
           schema:
             type: integer
-        - name: job_city
-          in: query
-          description: List city id | City must be located in the sent Country id
-          example: 15
-          schema:
-            type: integer
-        - name: job_seniority
-          in: query
-          description: Proficiency id of category = 'seniority'
-          example: 1
-          schema:
-            type: string
         - name: job_salary
           in: query
           description: Work Payment
           example: 7200.52
+          required: true
           schema:
             type: number
         - name: job_description
           in: query
+          required: true
           description: Work desctiption
           example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_city
+          in: query
+          description: Free text for city
+          example: curitiba
+          schema:
+            type: string
+        - name: job_state
+          in: query
+          description: Free text for state
+          example: paraná
+          schema:
+            type: string
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: experience_in_months
@@ -1447,6 +1649,54 @@ paths:
           example: food voucher and home office
           schema:
             type: string
+        - name: job_offer
+          in: query
+          description: free text field for job offer
+          example: we offer a healphy enviroment
+          schema:
+            type: string
+        - name: job_requirements
+          in: query
+          description: free text field for job requirements
+          example: we need an experience developer
+          schema:
+            type: string
+        - name: profession_for_job
+          in: query
+          description: profession id from ListProfession
+          example: 2
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: payment_type id
+          example: 2
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: job_contract id
+          example: 2
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: working_visa id
+          example: 2
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: job_period id
+          example: 2
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: common_currencies id
+          example: 2
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -1479,6 +1729,13 @@ paths:
           required: true
           schema:
             type: integer
+        - name: job_title
+          in: query
+          description: Job title
+          example: Developer
+          required: true
+          schema:
+            type: string
         - name: job_modality_id
           in: query
           description: Job modality id
@@ -1489,31 +1746,40 @@ paths:
         - name: job_country
           in: query
           description: List country id
+          required: true
           example: 10
           schema:
             type: integer
-        - name: job_city
-          in: query
-          description: List city id | City must be located in the sent Country id
-          example: 15
-          schema:
-            type: integer
-        - name: job_seniority
-          in: query
-          description: Proficiency id of category = 'seniority'
-          example: 1
-          schema:
-            type: string
         - name: job_salary
           in: query
           description: Work Payment
           example: 7200.52
+          required: true
           schema:
             type: number
         - name: job_description
           in: query
+          required: true
           description: Work desctiption
           example: We need a person who knows advanced flutter
+          schema:
+            type: string
+        - name: job_city
+          in: query
+          description: Free text for city
+          example: curitiba
+          schema:
+            type: string
+        - name: job_state
+          in: query
+          description: Free text for state
+          example: paraná
+          schema:
+            type: string
+        - name: job_seniority
+          in: query
+          description: Proficiency id of category = 'seniority'
+          example: 1
           schema:
             type: string
         - name: experience_in_months
@@ -1534,6 +1800,54 @@ paths:
           example: food voucher and home office
           schema:
             type: string
+        - name: job_offer
+          in: query
+          description: free text field for job offer
+          example: we offer a healphy enviroment
+          schema:
+            type: string
+        - name: job_requirements
+          in: query
+          description: free text field for job requirements
+          example: we need an experience developer
+          schema:
+            type: string
+        - name: profession_for_job
+          in: query
+          description: profession id from ListProfession
+          example: 2
+          schema:
+            type: integer
+        - name: payment_type
+          in: query
+          description: payment_type id
+          example: 2
+          schema:
+            type: integer
+        - name: job_contract
+          in: query
+          description: job_contract id
+          example: 2
+          schema:
+            type: integer
+        - name: working_visa
+          in: query
+          description: working_visa id
+          example: 2
+          schema:
+            type: integer
+        - name: job_period
+          in: query
+          description: job_period id
+          example: 2
+          schema:
+            type: integer
+        - name: wage_currency
+          in: query
+          description: common_currencies id
+          example: 2
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
@@ -4397,7 +4711,7 @@ paths:
           type: string
       - name: profession_name
         in: query
-        description: Accordingly to sent langaugeISO
+        description: Accordingly to sent languageISO
         example: developer
         schema:
           type: string
@@ -4408,6 +4722,86 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListProfessionPaginated'
+  /api/tags/search:
+    get:
+      tags:
+        - tag
+      description: searches for tags
+      parameters:
+      - name: user_lang
+        in: query
+        description: Any language iso - Default is EN if none is sent
+        example: en
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Default = 5 | Max = 50
+        example: 5
+        schema:
+          type: integer
+      - name: term
+        in: query
+        description: Tag name
+        example: developer
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A list of tags translations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagSearch'
+  /api/job_payment_type/index:
+    get:
+      tags:
+        - job_payment_type
+      description: get all job payment types
+      responses:
+        '200':
+          description: A list of jobPaymentTypes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/job_contract/index:
+    get:
+      tags:
+        - job_contract
+      description: get all job contracts
+      responses:
+        '200':
+          description: A list of jobContracts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/working_visa/index:
+    get:
+      tags:
+        - working_visa
+      description: get all working visas
+      responses:
+        '200':
+          description: A list of workingVisas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+  /api/job_period/index:
+    get:
+      tags:
+        - job_period
+      description: get all job periods 
+      responses:
+        '200':
+          description: A list of jobPeriods
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationArrayObject'
+                
 components:
   schemas:
     Login:
@@ -4539,6 +4933,9 @@ components:
           example: '999999999'
           maxLength: 20
         person_langue:
+          type: integer
+          example: 1
+        currency:
           type: integer
           example: 1
         created_at:
@@ -4721,6 +5118,9 @@ components:
         company_id:
           type: integer
           example: 1
+        job_title:
+          type: string
+          example: Developr
         job_modality:
           type: string
           example: presencial
@@ -4752,9 +5152,24 @@ components:
         job_offer:
           type: string
           example: Job offer
-        job_english_level:
-          type: integer
-          example: 1
+        profession_for_job:
+          type: string
+          example: developer
+        payment_type:
+          type: string
+          example: brute wage
+        job_contract:
+          type: string
+          example: temporary
+        working_visa:
+          type: string
+          example: don't require visa
+        job_period:
+          type: string
+          example: night
+        wage_currency:
+          type: string
+          example: $ / american dolar
         experience_in_months:
           type: integer
           example: 10
@@ -4782,13 +5197,22 @@ components:
         visasIds:
           type: string
           example: [1]
+        drivingLicenses:
+          type: string
+          example: [drivingLicence / $symbol |Example -> Car / B]
+        drivingLicensesIds:
+          type: string
+          example: [1]
+        certifications:
+          type: string
+          example: [$certificationName]
+        certificationsIds:
+          type: string
+          example: [1]
         match:
           type: number
           example: 100.00
           description: The float/double number of the match accordingly to sent parameters | This exists only in /api/joblist/show/{joblistId}
-        wage_currency:
-          type: string
-          example: reais
         job_created_at:
           type: string
           example: '01-01-20204'
@@ -6142,6 +6566,106 @@ components:
           type: integer
           example: 100
           description: the default list max size
+    ListCompany:
+      type: object
+      properties:
+        company_id:
+          type: integer
+          example: 1
+        company_slug:
+          type: string
+          example: gloog-corp
+        company_register_number:
+          type: string
+          example: 15515151515  
+        company_type:
+          type: string
+          description: returns the company type accordingly to user_lang
+          example: web service  
+        company_logo:
+          type: string
+          example: encoded as base64  
+        company_cover_photo:
+          type: string
+          example: encoded as base64  
+        company_video:
+          type: string
+          example: https://google.com/about  
+        company_website:
+          type: string
+          example: https://google.com 
+        company_description:
+          type: string
+          example: google exists since 1900   
+        company_benefits:
+          type: string
+          example: an amazing gym
+        paying:
+          type: integer
+          example: 1 OR 0 
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        company_created_at:
+          type: string
+          description: date formated by language
+          example: '2024/04/01'
+        company_updated_at:
+          type: string
+          description: date formated by language
+          example: '2024/04/01'
+        match:
+          type: number
+          example: 99.00
+    ListCompanyPaginated:
+      required:
+        - test
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListCompany'
+        curent_page:
+          type: integer
+          example: 1
+          description: the current page
+        last_page:
+          type: integer
+          example: 1
+          description: the last page
+        per_page:
+          type: integer
+          example: 100
+          description: the default list max size
+    TagSearch:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            example: {"en":"en","pt":"pt","es":"es","tags_id":1,"$otherLanguageIso":""}
+    TranslationArrayObject:
+      type: object
+      properties:
+        object_id:
+          type: integer
+          example: 1
+        en:
+          type: string
+          example: 'english'
+        pt:
+          type: string
+          example: 'português'
+        es:
+          type: string
+          example: 'español'
+        $anyLanguageIso:
+          type: string
+          example: 'any language iso | NULL'
     
   securitySchemes:
     bearerAuth:

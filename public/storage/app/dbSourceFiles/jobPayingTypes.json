@@ -1,0 +1,87 @@
+[
+    {
+        "pt": "por hora",
+        "es": "por hora",
+        "en": "per hour"
+    },
+    {
+        "pt": "por dia",
+        "es": "por día",
+        "en": "per day"
+    },
+    {
+        "pt": "semanal",
+        "es": "semanal",
+        "en": "weekly"
+    },
+    {
+        "pt": "mensal",
+        "es": "mensual",
+        "en": "monthly"
+    },
+    {
+        "pt": "anual",
+        "es": "anual",
+        "en": "annual"
+    },
+    {
+        "pt": "por projeto",
+        "es": "por proyecto",
+        "en": "per project"
+    },
+    {
+        "pt": "por tarefa",
+        "es": "por tarea",
+        "en": "per task"
+    },
+    {
+        "pt": "comissão",
+        "es": "comisión",
+        "en": "commission"
+    },
+    {
+        "pt": "participação nos lucros",
+        "es": "participación en las ganancias",
+        "en": "profit sharing"
+    },
+    {
+        "pt": "bonificação",
+        "es": "bonificación",
+        "en": "bonus"
+    },
+    {
+        "pt": "variável",
+        "es": "variable",
+        "en": "variable"
+    },
+    {
+        "pt": "por produção",
+        "es": "por producción",
+        "en": "by production"
+    },
+    {
+        "pt": "salário mínimo",
+        "es": "salario mínimo",
+        "en": "minimum wage"
+    },
+    {
+        "pt": "salário base",
+        "es": "salario base",
+        "en": "base salary"
+    },
+    {
+        "pt": "pró-labore",
+        "es": "pró-labore",
+        "en": "pro-labore"
+    },
+    {
+        "pt": "salário bruto",
+        "es": "salario bruto",
+        "en": "gross salary"
+    },
+    {
+        "pt": "salário líquido",
+        "es": "salario neto",
+        "en": "net salary"
+    }
+]

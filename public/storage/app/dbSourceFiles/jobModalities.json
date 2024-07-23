@@ -1,0 +1,32 @@
+[
+    {
+        "pt": "remoto",
+        "es": "remoto",
+        "en": "remote",
+        "description": {
+            "en":"distance work, outside the office or company",
+            "pt":"trabalho a distancia, fora do escritório ou empresa",
+            "es":"trabajar de forma remota, fuera de la oficina o empresa"
+        }
+    },
+    {
+        "pt": "híbrido",
+        "es": "híbrido",
+        "en": "hybrid",
+        "description": {
+            "en":"work part of the time remotely and the other part in person",
+            "pt":"trabalhar parte do tempo remotamente e outra parte pessoalmente",
+            "es":"trabajar parte del tiempo de forma remota y la otra parte en persona"
+        }
+    },
+    {
+        "pt": "presencial",
+        "es": "presencial",
+        "en": "in-person",
+        "description": {
+            "en":"face-to-face work, within the office or company",
+            "pt":"trabalho presencial, dentro do escritório ou empresa",
+            "es":"trabajo presencial, dentro de la oficina o empresa"
+        }
+    }
+]

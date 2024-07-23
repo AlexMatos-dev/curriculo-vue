@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\JobPeriod;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -27,6 +28,12 @@ class DatabaseSeeder extends Seeder
         (new CommonCurrencySeeder())->run();
         (new CompanyTypeSeeder())->run();
         (new NotifierSeeder())->run();
+        (new JobPaymentTypeSeeder())->run();
+        (new JobPeriodsSeeder())->run();
+        (new WorkingVisaSeeder())->run();
+        (new JobContractSeeder())->run();
+        (new DrivingLicenseSeeder())->run();
+        (new CertificationTypeSeeder())->run();
         // (new SystemTranslationsSyncSeeder())->run();
     }
 }

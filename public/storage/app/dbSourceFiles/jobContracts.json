@@ -1,0 +1,57 @@
+[
+    {
+        "pt": "sem especificar",
+        "es": "sin especificar",
+        "en": "not specified"
+    },
+    {
+        "pt": "contrato",
+        "es": "contrato",
+        "en": "contract"
+    },
+    {
+        "pt": "contrato indefinido",
+        "es": "contrato indefinido",
+        "en": "indefinite contract"
+    },
+    {
+        "pt": "temporário",
+        "es": "temporal",
+        "en": "temporary"
+    },
+    {
+        "pt": "freelancer",
+        "es": "freelance",
+        "en": "freelancer"
+    },
+    {
+        "pt": "estágio",
+        "es": "pasantía",
+        "en": "internship"
+    },
+    {
+        "pt": "trainee",
+        "es": "trainee",
+        "en": "trainee"
+    },
+    {
+        "pt": "autônomo",
+        "es": "autónomo",
+        "en": "self-employed"
+    },
+    {
+        "pt": "voluntário",
+        "es": "voluntario",
+        "en": "volunteer"
+    },
+    {
+        "pt": "contrato por hora",
+        "es": "contrato por hora",
+        "en": "hourly contract"
+    },
+    {
+        "pt": "outro",
+        "es": "otro",
+        "en": "other"
+    }
+]

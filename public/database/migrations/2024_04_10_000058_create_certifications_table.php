@@ -16,6 +16,7 @@ class CreateCertificationsTable extends Migration {
 			$table->integer('cert_hours')->default('1');
 			$table->string('cerdescription', 500)->nullable();
 			$table->string('cerlink', 100)->nullable();
+			$table->unsignedInteger('certification_type')->nullable();
 			$table->timestamps();
 		});
 	}

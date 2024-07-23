@@ -21,4 +21,18 @@ class ListLangue extends Model
         'llangue_name',
         'llangue_acronyn'
     ];
+
+    /**
+     * Returns an array of all unofficial languages
+     * @return Array
+     */
+    public function getNotOficialLangsIso()
+    {
+        $data = [];
+        $results = ListLangue::whereNotIn('llangue_acronyn', Translation::OFFICIAL_LANGUAGES)->get();
+        foreach($results as $language){
+            $data[$language->llangue_acronyn] = $language;
+        }
+        return $data;
+    }
 }

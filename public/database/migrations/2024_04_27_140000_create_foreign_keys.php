@@ -15,6 +15,12 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('persons', function (Blueprint $table)
+		{
+			$table->foreign('currency')->references('common_currency_id')->on('common_currencies')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 		Schema::table('companies', function (Blueprint $table)
 		{
 			$table->foreign('company_type')->references('company_type_id')->on('company_types')
@@ -99,6 +105,42 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->foreign('payment_type')->references('job_payment_type')->on('job_payment_types')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->foreign('job_contract')->references('job_contract')->on('job_contracts')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->foreign('profession_suggestion')->references('suggestion_id')->on('suggestions')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_certifications', function (Blueprint $table)
+		{
+			$table->foreign('certification_type')->references('certification_type')->on('certification_types')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_certifications', function (Blueprint $table)
+		{
+			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->foreign('job_period')->references('job_period')->on('job_periods')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 		Schema::table('job_skills', function (Blueprint $table)
 		{
 			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
@@ -114,6 +156,12 @@ class CreateForeignKeys extends Migration
 		Schema::table('job_skills', function (Blueprint $table)
 		{
 			$table->foreign('proficiency_id')->references('proficiency_id')->on('proficiency')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_skills', function (Blueprint $table)
+		{
+			$table->foreign('suggestion_id')->references('suggestion_id')->on('suggestions')
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
@@ -309,6 +357,12 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('certifications', function (Blueprint $table)
+		{
+			$table->foreign('certification_type')->references('certification_type')->on('certification_types')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 		Schema::table('experiences', function (Blueprint $table)
 		{
 			$table->foreign('excurriculum_id')->references('curriculum_id')->on('curriculums')
@@ -471,6 +525,60 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->foreign('working_visa')->references('working_visa')->on('working_visas')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('driving_license')->references('driving_license')->on('driving_licenses')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('country')->references('lcountry_id')->on('listcountries')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('job_id')->references('job_id')->on('jobslist')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('driving_license')->references('driving_license')->on('driving_licenses')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('country')->references('lcountry_id')->on('listcountries')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->foreign('professional_id')->references('professional_id')->on('professionals')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('suggestions', function (Blueprint $table)
+		{
+			$table->foreign('author_id')->references('person_id')->on('persons')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
+		Schema::table('suggestions', function (Blueprint $table)
+		{
+			$table->foreign('lang')->references('llangue_id')->on('listlangues')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 	}
 
 	public function down()
@@ -478,6 +586,10 @@ class CreateForeignKeys extends Migration
 		Schema::table('persons', function (Blueprint $table)
 		{
 			$table->dropForeign('persons_person_langue_foreign');
+		});
+		Schema::table('persons', function (Blueprint $table)
+		{
+			$table->dropForeign('persons_currency_foreign');
 		});
 		Schema::table('companies', function (Blueprint $table)
 		{
@@ -517,6 +629,30 @@ class CreateForeignKeys extends Migration
 		});
 		Schema::table('jobslist', function (Blueprint $table)
 		{
+			$table->dropForeign('jobslist_payment_type_foreign');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->dropForeign('jobslist_job_contract_foreign');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->dropForeign('jobslist_job_period_foreign');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->dropForeign('jobslist_working_visa_foreign');
+		});
+		Schema::table('job_certifications', function (Blueprint $table)
+		{
+			$table->dropForeign('job_certifications_certification_type_foreign');
+		});
+		Schema::table('job_certifications', function (Blueprint $table)
+		{
+			$table->dropForeign('job_certifications_joblist_id_foreign');
+		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
 			$table->dropForeign('jobslist_company_id_foreign');
 		});
 		Schema::table('jobslist', function (Blueprint $table)
@@ -535,6 +671,10 @@ class CreateForeignKeys extends Migration
 		{
 			$table->dropForeign('jobslist_wage_currency_foreign');
 		});
+		Schema::table('jobslist', function (Blueprint $table)
+		{
+			$table->dropForeign('jobslist_profession_suggestion_foreign');
+		});
 		Schema::table('job_skills', function (Blueprint $table)
 		{
 			$table->dropForeign('job_skills_joblist_id_foreign');
@@ -546,6 +686,10 @@ class CreateForeignKeys extends Migration
 		Schema::table('job_skills', function (Blueprint $table)
 		{
 			$table->dropForeign('job_skills_proficiency_id_foreign');
+		});
+		Schema::table('job_skills', function (Blueprint $table)
+		{
+			$table->dropForeign('job_skills_suggestion_id_foreign');
 		});
 		Schema::table('job_languages', function (Blueprint $table)
 		{
@@ -675,6 +819,10 @@ class CreateForeignKeys extends Migration
 		{
 			$table->dropForeign('certifications_cercurriculum_id_foreign');
 		});
+		Schema::table('certifications', function (Blueprint $table)
+		{
+			$table->dropForeign('certifications_certification_type_foreign');
+		});
 		Schema::table('experiences', function (Blueprint $table)
 		{
 			$table->dropForeign('experiences_excurriculum_id_foreign');
@@ -782,6 +930,38 @@ class CreateForeignKeys extends Migration
 		Schema::table('jobslist', function (Blueprint $table)
 		{
 			$table->dropForeign('jobslist_profession_for_job_foreign');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('job_driving_licenses_driving_license_foreign');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('job_driving_licenses_country_foreign');
+		});
+		Schema::table('job_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('job_driving_licenses_job_id_foreign');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('professional_driving_licenses_driving_license_foreign');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('professional_driving_licenses_country_foreign');
+		});
+		Schema::table('professional_driving_licenses', function (Blueprint $table)
+		{
+			$table->dropForeign('professional_driving_licenses_professional_id_foreign');
+		});
+		Schema::table('suggestions', function (Blueprint $table)
+		{
+			$table->dropForeign('suggestions_author_id_foreign');
+		});
+		Schema::table('suggestions', function (Blueprint $table)
+		{
+			$table->dropForeign('suggestions_lang_foreign');
 		});
 	}
 }

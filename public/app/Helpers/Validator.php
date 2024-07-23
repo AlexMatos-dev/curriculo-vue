@@ -142,6 +142,8 @@ class Validator
             }
             if(!$foundObject && $required)
                 self::throwResponse(translate('invalid parameters for validation'), 500);
+            if(!$required && !$foundObject && $data['data'])
+                returnResponse(['message' => translate('invalid parameters for validation'), 'checkParam' => $key], 500);
             $attrToCheck = array_key_exists('attrToCheck', $data) ? $data['attrToCheck'] : false;
             $expectedValue = array_key_exists('expectedValue', $data) ? $data['expectedValue'] : false;
             if($attrToCheck && $expectedValue && $foundObject->{$attrToCheck} != $expectedValue)

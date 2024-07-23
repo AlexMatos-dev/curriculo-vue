@@ -1,0 +1,62 @@
+[
+    {
+        "pt": "sem estudo",
+        "es": "sin estudio",
+        "en": "no education"
+    },
+    {
+        "pt": "primária",
+        "es": "primaria",
+        "en": "primary"
+    },
+    {
+        "pt": "secundária",
+        "es": "secundaria",
+        "en": "secondary"
+    },
+    {
+        "pt": "ensino médio",
+        "es": "educación media",
+        "en": "high school"
+    },
+    {
+        "pt": "técnico",
+        "es": "técnico",
+        "en": "technical"
+    },
+    {
+        "pt": "técnólogo",
+        "es": "tecnólogo",
+        "en": "technologist"
+    },
+    {
+        "pt": "superior",
+        "es": "superior",
+        "en": "higher education"
+    },
+    {
+        "pt": "pós",
+        "es": "postgrado",
+        "en": "postgraduate"
+    },
+    {
+        "pt": "mestrado",
+        "es": "maestría",
+        "en": "master's degree"
+    },
+    {
+        "pt": "doutorado",
+        "es": "doctorado",
+        "en": "doctorate"
+    },
+    {
+        "pt": "pós doutorado",
+        "es": "posdoctorado",
+        "en": "postdoctorate"
+    },
+    {
+        "pt": "outro",
+        "es": "otro",
+        "en": "other"
+    }
+]

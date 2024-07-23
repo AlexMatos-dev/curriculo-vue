@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\CommonCurrency;
-use App\Models\Company;
-use App\Models\CompanyType;
+use App\Models\JobContract;
 use App\Models\JobLanguage;
 use App\Models\JobList;
 use App\Models\JobModality;
+use App\Models\JobPaymentType;
+use App\Models\JobPeriod;
 use App\Models\JobSkill;
 use App\Models\JobVisa;
 use App\Models\ListCountry;
 use App\Models\ListLangue;
+use App\Models\ListProfession;
 use App\Models\Proficiency;
 use App\Models\Profile;
 use App\Models\Tag;
 use App\Models\TypeVisas;
 use App\Models\Visa;
+use App\Models\WorkingVisa;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +45,15 @@ class JobListController extends Controller
      * @param Int experience_in_months_end
      * @param Array job_visas
      * @param Array job_visas_countries
+     * @param Int profession_for_job
+     * @param Int payment_type
+     * @param Int job_contract
+     * @param Int working_visa
+     * @param Int job_period
+     * @param Int wage_currency
      * @param String filter - avaliable: (mostrecent)
+     * @param Array job_driving_licenses
+     * @param Array job_certifications
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
@@ -52,8 +62,9 @@ class JobListController extends Controller
      *      "last_page": int,
      * ]
      */
-    public function index(Request $request)
+    public function index()
     {
+        set_time_limit(60);
         Validator::validateParameters($this->request, [
             'page' => 'integer',
             'company_id' => 'array',
@@ -70,82 +81,43 @@ class JobListController extends Controller
             'experience_in_months_end' => 'integer',
             'job_visas' => 'array',
             'job_visas_countries' => 'array',
+            'job_driving_licenses' => 'array',
+            'job_certifications' => 'array',
             'per_page' => 'integer',
             'filter' => 'string'
         ]);
-        $page = (int)request('page', 1);
-        $perPage = (int)request('per_page', 100);
+        $page       = (int)request('page', 1);
+        $perPage    = (int)request('per_page', 10);
         if(!$perPage)
             $perPage = 10;
-
-        $bdData = [
-            'tags' => ModelUtils::getIdIndexedAndTranslated(new Tag(), 'tags_name'),
-            'proficiencies' => ModelUtils::getIdIndexedAndTranslated(new Proficiency(), 'proficiency_level'),
-            'visaTypes' => ModelUtils::getIdIndexedAndTranslated(new TypeVisas(), 'type_name'),
-            'listLanguages' => ModelUtils::getIdIndexedAndTranslated(new ListLangue(), 'llangue_name'),
-            'jobModalities' => ModelUtils::getIdIndexedAndTranslated(new JobModality(), 'name'),
-            'commonCurrencies' => ModelUtils::getIdIndexedAndTranslated(new CommonCurrency(), 'currency_name'),
-            'companyTypes' => ModelUtils::getIdIndexedAndTranslated(new CompanyType(), 'name'),
-            'listCountries' => (new ListCountry())->getAll(true),
-            'countriesTranslated' => ModelUtils::getIdIndexedAndTranslated(new ListCountry(), 'lcountry_name', false, true)
-        ];
-
         $jobListObj = new JobList();
         if(request('filter')){
             $results = [];
             switch(request('filter')){
                 case 'mostrecent':
-                    $data = $jobListObj->listJobs($request, true);
-                    $dataSize = count($data);
-                    if($dataSize > 0){
-                        if($dataSize < $perPage){
-                            $notPaying = $jobListObj->listJobs($request, true);
-                            $data = array_merge($data, $notPaying);
-                        }
-                        $results = $jobListObj->gatherJobJoinData($data, $bdData, $this->request);
-                        $resized = [];
-                        foreach($results as $result){
-                            if(count($resized) < $perPage){
-                                $resized[] = $result;
-                            }else{
-                                break;
-                            }
-                        }
-                        $results = $resized;
-                    }else{
-                        $results = [];
-                    }
+                    $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage);
+                break;
+                default:
+                    $results = [
+                        'results'  => [],
+                        'page'     => 1,
+                        'lastPage' => 1
+                    ];
                 break;
             }
             returnResponse([
-                'data' => $results,
-                'curent_page' => 1,
+                'data' => $results['results'],
+                'curent_page' => $results['page'],
                 'per_page' => $perPage,
-                'last_page' => 1
+                'last_page' => $results['lastPage']
             ]);
         }else{
-            $nonPaying = $jobListObj->listJobs($request, false);
-            $nonPaying = $jobListObj->gatherJobJoinData($nonPaying, $bdData, $this->request);
-            $paying = $jobListObj->listJobs($request, true);
-            $paying = $jobListObj->gatherJobJoinData($paying, $bdData, $this->request);
-            $orderedJobs = $jobListObj->orderByMatch($paying, $nonPaying);
-            $results = $jobListObj->processListedJobs([
-                'paying'    => $orderedJobs['paying'],
-                'nonPaying' => $orderedJobs['nonPaying']
-            ], $perPage, $page);
-            if($page < 1){
-                $page = 1;
-            }else{
-                $page = $page > $results['last_page'] ? $results['last_page'] : $page;
-            }
-            $data = [];
-            if(!empty($results['results']) && !empty($results['results'][$page]))
-                $data = $results['results'][$page];
+            $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage);
             returnResponse([
-                'data' => $data,
-                'curent_page' => $page,
-                'per_page' => $results['curent_page'],
-                'last_page' => $results['last_page']
+                'data' => $results['results'],
+                'curent_page' => $results['page'],
+                'per_page' => $perPage,
+                'last_page' => $results['lastPage']
             ]);
         }
     }
@@ -157,13 +129,18 @@ class JobListController extends Controller
      */
     public function show(int $joblistId)
     {
-        try{
-            $jobList = JobList::with('company')->findOrFail($joblistId);
-            $jobListObj = $jobList->splitjoinDataFromListedJobs([$jobList]);
-            returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj]);
-        }catch(ModelNotFoundException $e){
-            returnResponse(["message" => translate('job not found'), "error" => $e], 400);
-        }
+        $obj = new JobList();
+        $jobList = $obj->getJob($joblistId);
+        if(!$jobList || (is_array($jobList) && !empty($jobList)))
+            Validator::throwResponse(translate('job not found'), 400);
+        $bdData = $obj->getJobListBdData();
+        $result = $jobList->listJobs($this->request, (bool)$jobList->paying, 1, null, true, [$jobList->job_id]);
+        if(empty($result))
+            Validator::throwResponse(translate('job not found'), 400);
+        $jobListObj = $jobList->gatherJobJoinData($result, $bdData, $this->request);
+        if(empty($jobListObj))
+            Validator::throwResponse(translate('job not found'), 400);
+        returnResponse(["message" => translate('job found successfully'), "data" => $jobListObj[0]]);
     }
 
     /**
@@ -171,6 +148,7 @@ class JobListController extends Controller
      * @param Int job_modality_id - required
      * @param String job_city
      * @param String job_state
+     * @param String job_title
      * @param Int job_country
      * @param Int job_seniority
      * @param Float job_salary
@@ -178,6 +156,14 @@ class JobListController extends Controller
      * @param Int experience_in_months
      * @param String job_experience_description
      * @param String job_benefits
+     * @param String job_offer
+     * @param String job_requirements
+     * @param Int profession_for_job
+     * @param Int payment_type
+     * @param Int job_contract
+     * @param Int working_visa
+     * @param Int job_period
+     * @param Int wage_currency
      * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
      */
     public function store(Request $request)
@@ -186,24 +172,40 @@ class JobListController extends Controller
         $company = $person->getProfile(Profile::COMPANY);
         if(!$company)
             Validator::throwResponse('company profile not found');
+        if(!$company->isAdminOrRecruiter($person->person_id))
+            Validator::throwResponse(translate('you do not have the rights, not your company'));
         try{
             Validator::validateParameters($request, [
                 'job_modality_id'   => 'required|integer',
                 'job_city'          => 'string|max:300',
-                'job_state'          => 'string|max:300',
-                'job_country'       => 'integer',
+                'job_state'         => 'string|max:300',
+                'job_title'         => 'required|string|max:300',
+                'job_country'       => 'required|integer',
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
                 'job_description'   => 'required|max:500',
                 'experience_in_months' => 'integer',
-                'job_experience_description' => 'max:100',
+                'job_experience_description' => 'max:500',
                 'job_benefits'      => 'max:65535',
-                'job_languages'     => 'Array'
+                'job_offer'         => 'max:65535',
+                'job_requirements'  => 'max:65535',
+                'profession_for_job'=> 'integer',
+                'payment_type'      => 'integer',
+                'job_contract'      => 'integer',
+                'working_visa'      => 'integer',
+                'job_period'        => 'integer',
+                'wage_currency'     => 'integer'
             ]);
             $objects = Validator::checkExistanceOnTable([
-                'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
-                'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
-                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
+                'job_modality_id'   => ['object' => JobModality::class,    'data' => $request->job_modality_id],
+                'job_country'       => ['object' => ListCountry::class,    'data' => $request->job_country],
+                'job_seniority'     => ['object' => Proficiency::class,    'data' => $request->job_seniority,      'required' => false],
+                'profession_for_job'=> ['object' => ListProfession::class, 'data' => $request->profession_for_job, 'required' => false],
+                'payment_type'      => ['object' => JobPaymentType::class, 'data' => $request->payment_type,       'required' => false],
+                'job_contract'      => ['object' => JobContract::class,    'data' => $request->job_contract,       'required' => false],
+                'working_visa'      => ['object' => WorkingVisa::class,    'data' => $request->working_visa,       'required' => false],
+                'job_period'        => ['object' => JobPeriod::class,      'data' => $request->job_period,         'required' => false],
+                'wage_currency'     => ['object' => CommonCurrency::class, 'data' => $request->wage_currency,      'required' => false],
             ]);
             if($request->job_state && !$request->job_country)
                 Validator::throwResponse(translate('a country is required'));
@@ -212,9 +214,8 @@ class JobListController extends Controller
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse(translate('invalid proficiency, must be seniority type'));
             $data = $request->all();
-            unset($data['job_skills']);
-            $data['job_city'] = mb_strtolower($data['job_city']);
-            $data['job_state'] = mb_strtolower($data['job_state']);
+            $data['job_city'] = array_key_exists('job_city', $data) ? mb_strtolower($data['job_city']) : null;
+            $data['job_state'] = array_key_exists('job_state', $data) ? mb_strtolower($data['job_state']) : null;
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
             $jobList = JobList::create($data);
@@ -227,10 +228,10 @@ class JobListController extends Controller
 
     /**
      * Update JobList by sent parameters
-     * @param Int jobListId - required
      * @param Int job_modality_id - required
      * @param String job_city
      * @param String job_state
+     * @param String job_title
      * @param Int job_country
      * @param Int job_seniority
      * @param Float job_salary
@@ -238,6 +239,14 @@ class JobListController extends Controller
      * @param Int experience_in_months
      * @param String job_experience_description
      * @param String job_benefits
+     * @param String job_offer
+     * @param String job_requirements
+     * @param Int profession_for_job
+     * @param Int payment_type
+     * @param Int job_contract
+     * @param Int working_visa
+     * @param Int job_period
+     * @param Int wage_currency
      * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
      */
     public function update(int $jobListId, Request $request)
@@ -245,42 +254,52 @@ class JobListController extends Controller
         $jobList = JobList::find($jobListId);
         if(!$jobList)
             Validator::throwResponse(translate('job not found'));
-        $company = Company::find($jobList->company_id);
-        if(!$company)
-            Validator::throwResponse(translate('company not found found'));
         $person = Auth::user();
-        if(!$company->isAdmin($person->person_id))
+        $company = $person->getProfile(Profile::COMPANY);
+        if(!$company)
+            Validator::throwResponse('company profile not found');
+        if(!$company->isAdminOrRecruiter($person->person_id) || $company->company_id != $jobList->company_id)
             Validator::throwResponse(translate('you do not have the rights, not your company'));
         try{
             Validator::validateParameters($request, [
                 'job_modality_id'   => 'required|integer',
                 'job_city'          => 'string|max:300',
                 'job_state'         => 'string|max:300',
-                'job_country'       => 'integer',
+                'job_title'         => 'required|string|max:300',
+                'job_country'       => 'required|integer',
                 'job_seniority'     => 'integer',
                 'job_salary'        => 'required|min:0',
                 'job_description'   => 'required|max:500',
                 'experience_in_months' => 'integer',
-                'job_experience_description' => 'max:100',
-                'job_benefits'      => 'max:65535'
+                'job_experience_description' => 'max:500',
+                'job_benefits'      => 'max:65535',
+                'job_offer'         => 'max:65535',
+                'job_requirements'  => 'max:65535',
+                'profession_for_job'=> 'integer',
+                'payment_type'      => 'integer',
+                'job_contract'      => 'integer',
+                'working_visa'      => 'integer',
+                'job_period'        => 'integer',
+                'wage_currency'     => 'integer'
             ]);
             $objects = Validator::checkExistanceOnTable([
-                'job_modality_id'   => ['object' => JobModality::class, 'data' => $request->job_modality_id],
-                'job_country'       => ['object' => ListCountry::class, 'data' => $request->job_country,       'required' => false],
-                'job_seniority'     => ['object' => Proficiency::class, 'data' => $request->job_seniority,     'required' => false]
+                'job_modality_id'   => ['object' => JobModality::class,    'data' => $request->job_modality_id],
+                'job_country'       => ['object' => ListCountry::class,    'data' => $request->job_country],
+                'job_seniority'     => ['object' => Proficiency::class,    'data' => $request->job_seniority,      'required' => false],
+                'profession_for_job'=> ['object' => ListProfession::class, 'data' => $request->profession_for_job, 'required' => false],
+                'payment_type'      => ['object' => JobPaymentType::class, 'data' => $request->payment_type,       'required' => false],
+                'job_contract'      => ['object' => JobContract::class,    'data' => $request->job_contract,       'required' => false],
+                'working_visa'      => ['object' => WorkingVisa::class,    'data' => $request->working_visa,       'required' => false],
+                'job_period'        => ['object' => JobPeriod::class,      'data' => $request->job_period,         'required' => false],
+                'wage_currency'     => ['object' => CommonCurrency::class, 'data' => $request->wage_currency,      'required' => false],
             ]);
-            if($request->job_state && !$request->job_country)
-                Validator::throwResponse(translate('a country is required'));
-            if($request->job_city && !$request->job_state)
-                Validator::throwResponse(translate('a state is required'));
             if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse(translate('invalid proficiency, must be seniority type'));
             $data = $request->all();
-            unset($data['job_skills']);
+            $data['job_city'] = array_key_exists('job_city', $data) ? mb_strtolower($data['job_city']) : null;
+            $data['job_state'] = array_key_exists('job_state', $data) ? mb_strtolower($data['job_state']) : null;
             $data['job_salary'] = (float)str_replace(',', '.', $request->job_salary);
             $data['company_id'] = $company->company_id;
-            $data['job_city'] = mb_strtolower($data['job_city']);
-            $data['job_state'] = mb_strtolower($data['job_state']);
             $result = $jobList->update($data);
             if(!$result)
                 Validator::throwResponse(translate('job not updated'), 500);
