@@ -207,11 +207,5 @@ class Validator
     public static function throwResponse($message = '', $code = 400)
     {
         returnResponse(['message' => $message], $code);
-        // response()->json(['message' => $message], $code, [
-        //     'Access-Control-Allow-Origin' => env('FRONTEND_URL'), 
-        //     'Access-Control-Allow-Credentials' => 'true',
-        //     'Content-Type' => 'application/json'
-        // ])->send();
-        // die();
     }
 }
