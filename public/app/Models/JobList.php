@@ -26,7 +26,8 @@ class JobList extends Model
         'job_state',
         'job_country',
         'job_seniority',
-        'job_salary',
+        'minimum_wage',
+        'max_wage',
         'job_description',
         'job_experience_description',
         'experience_in_months',
@@ -113,7 +114,7 @@ class JobList extends Model
             $limit = count($byIds);
         if($distinct){
             $query = JobList::select(
-                'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.company_logo', 'company.company_description', 
+                'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.company_logo', 'company.company_cover_photo', 'company.company_description', 
                 'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type',
                 'company.company_name'
             )->distinct();
@@ -154,11 +155,11 @@ class JobList extends Model
             }
         }
         if ($request->has("job_seniority"))
-            $query->whereIn("jobslist.job_seniority", $request->job_seniority);
+            $query->where("jobslist.job_seniority", $request->job_seniority);
         if ($request->has("job_salary_start"))
-            $query->where("jobslist.job_salary", ">=", $request->job_salary_start);
+            $query->where("jobslist.minimum_wage", ">=", $request->job_salary_start);
         if ($request->has("job_salary_end"))
-            $query->where("jobslist.job_salary", "<=", $request->job_salary_end);
+            $query->where("jobslist.max_wage", "<=", $request->job_salary_end);
         if ($request->has("experience_in_months_start"))
             $query->where("jobslist.experience_in_months", ">=", $request->experience_in_months_start);
         if ($request->has("experience_in_months_end"))
@@ -197,6 +198,25 @@ class JobList extends Model
         if ($request->has("job_certifications")){
             foreach($request->job_certifications as $certification){
                 $query->orWhere("job_certifications.job_certification", $certification);
+            }
+        }
+        if ($request->has("location")){
+            $location = explode(',', $request->location);
+            foreach($location as $term){
+                $term = trim($term);
+                $country = (new ListCountry)->getByNameAndLanguageIso($term, Session()->get('user_lang'));
+                $query->where(function($query) use ($term, $country) {
+                    $countryId = $country ? $country->lcountry_id : null;
+                    $query->where('job_city', 'like', "%{$term}%")
+                          ->orWhere('job_state', 'like', "%{$term}%")
+                          ->orWhere('job_country', $countryId);
+                });
+            }
+        }
+        if ($request->has("free_term")){
+            $attrs = ['jobslist.job_title'];
+            foreach($attrs as $attr){
+                $query->where($attr, 'like', '%'.$request->working_visa.'%');
             }
         }
         if($limit)
@@ -382,9 +402,7 @@ class JobList extends Model
         }else{
             $paying = [];
         }
-
         $bdData = $this->getJobListBdData($data['ids']);
-
         $nonPaying = $this->gatherJobJoinData($nonPaying, $bdData, $request);
         $paying    = $this->gatherJobJoinData($paying, $bdData, $request);
         $data      = $this->orderByMatch($paying, $nonPaying);
@@ -526,7 +544,8 @@ class JobList extends Model
                 }else{
                     $proficiencyTrans = '';
                 }
-                $usedAttr[$jobId]['skills'][] = ucfirst($translation) . ' / ' . ucfirst($proficiencyTrans);
+                $usedAttr[$jobId]['skills'][] = ucfirst($translation);
+                $usedAttr[$jobId]['skillsProficiency'][] = ucfirst($translation) . ' / ' . ucfirst($proficiencyTrans);
                 $usedAttr[$jobId]['skillsIds'][] = $jobSkill['tag_id'];
             }
         }
@@ -568,6 +587,7 @@ class JobList extends Model
             $values = $usedAttr[$job->job_id];
             $thisObj = $job;
             $thisObj->skills             = $values['skills'];
+            $thisObj->skillsProficiency  = $values['skillsProficiency'];
             $thisObj->skillsIds          = $values['skillsIds'];
             $thisObj->languages          = $values['languages'];
             $thisObj->languagesIds       = $values['languagesIds'];
@@ -580,6 +600,7 @@ class JobList extends Model
             $thisObj->wage_currency_id   = $job->wage_currency;
             $thisObj->posted_at          = $this->getTimeSincePosted($job->job_created_at);
             $thisObj->exp_required       = $this->getRequiredExperience($job->experience_in_months);
+            $thisObj->experience_required= $this->getRequiredExperience($job->experience_in_months, true);
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
             $thisObj->job_created_at     = ModelUtils::parseDateByLanguage($job->job_created_at, false, $languageIso);
             $thisObj->job_updated_at     = ModelUtils::parseDateByLanguage($job->job_updated_at, false, $languageIso);
@@ -590,7 +611,15 @@ class JobList extends Model
                 $location .= ', ' . $thisObj->job_country;
             }
             $thisObj->location = $location;
-            $thisObj->salary = '$' . str_replace('.', ',', $thisObj->job_salary);
+            $fullLocation = $thisObj->job_city;
+            if($thisObj->job_state)
+                $fullLocation .= ", {$thisObj->job_state}";
+            $thisObj->full_location = "$fullLocation, {$thisObj->job_country}";
+            $minimunWage = str_replace('.', ',', $thisObj->minimum_wage);
+            $maxWage = str_replace('.', ',', $thisObj->max_wage);
+            $thisObj->minimunWage = (float)$thisObj->minimum_wage;
+            $thisObj->maxWage = (float)$thisObj->maxWage;
+            $thisObj->salary = '$' . ($minimunWage ? $minimunWage : '0,00') . ' - $' . ($maxWage ? $maxWage : '0,00');
             if(array_key_exists($thisObj->wage_currency, $commonCurrencies)){
                 $wage_currency_name = $commonCurrencies[$thisObj->wage_currency][$languageIso] ? $commonCurrencies[$thisObj->wage_currency][$languageIso] : ListLangue::DEFAULT_LANGUAGE;
                 $thisObj->wage_currency = $commonCurrencies[$thisObj->wage_currency]->currency_symbol . ' / ' . $wage_currency_name;
@@ -627,8 +656,7 @@ class JobList extends Model
                 unset($thisObj->{$attrName});
             }
             $thisObj->company_logo = base64_encode($thisObj->company_logo);
-            if($thisObj->company_cover_photo)
-                $thisObj->company_cover_photo = base64_encode($thisObj->company_cover_photo);
+            $thisObj->company_cover_photo = base64_encode($thisObj->company_cover_photo);
             $results[] = $thisObj;
         }
         return $results;
@@ -637,18 +665,19 @@ class JobList extends Model
     /**
      * Returns a string representing the required experience for the job
      * @param Int experience_in_months
+     * @param Bool fullText - to return full 'experience' word instead of 'exp'
      * @return String
      */
-    public function getRequiredExperience($experience_in_months = 0)
+    public function getRequiredExperience($experience_in_months = 0, $fullText = false)
     {
         $requiredExperience = '';
         $years = round($experience_in_months / 12);
         if($years < 1){
             $monthTrans = $experience_in_months > 1 ? translate('months') : translate('month');
-            $requiredExperience = $experience_in_months . ' ' . ucfirst($monthTrans) . ' ' . ucfirst(translate('exp'));
+            $requiredExperience = $experience_in_months . ' ' . ucfirst($monthTrans) . ' ' . ($fullText ? ucfirst(translate('experience')) : ucfirst(translate('exp')));
         }else{
             $yearTrans = $years > 1 ? translate('years') : translate('year');
-            $requiredExperience = $years . ' ' . ucfirst($yearTrans) . ' ' . ucfirst(translate('exp'));
+            $requiredExperience = $years . ' ' . ucfirst($yearTrans) . ' ' . ($fullText ? ucfirst(translate('experience')) : ucfirst(translate('exp')));
         }
         return $requiredExperience;
     }
@@ -713,7 +742,7 @@ class JobList extends Model
 
             
             'listCountriesTrans' => ModelUtils::getTranslationsArray(
-                new ListCountry(), 'lcountry_name', !empty($ids['job_country']) ? $ids['job_country'] : [], 'lcountry_id', $languagesIso
+                new ListCountry(), 'lcountry_name', [], 'lcountry_id', $languagesIso
             ),
             'tags' => ModelUtils::getTranslationsArray(new Tag(), 'tags_name', null, null, $languagesIso),
             'proficienciesTrans' => ModelUtils::getTranslationsArray(new Proficiency(), 'proficiency_level', null, null, $languagesIso),
@@ -849,7 +878,7 @@ class JobList extends Model
         $validParameters = [
             'equal'   => [],
             'like'    => ['job_description', 'job_experience_description'],
-            'in'      => ['job_salary::job_salary_start|job_salary_end', 'experience_in_months::experience_in_months_start|experience_in_months_end'],
+            'in'      => ['minimum_wage::job_salary_start|job_salary_end', 'max_wage::job_salary_start|job_salary_end', 'experience_in_months::experience_in_months_start|experience_in_months_end'],
             'inArray' => ['company_id', 'job_modality_id', 'job_city', 'job_country', 'job_seniority', 'job_driving_licenses', 'job_certifications'],
             'many'    => ['job_skills::tags_id', 'job_languages::llangue_id', 'job_visas::typevisas_id', 'job_visas_countries::lcountry_id']
         ];

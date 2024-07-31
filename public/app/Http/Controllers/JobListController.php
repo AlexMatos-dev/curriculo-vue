@@ -54,6 +54,8 @@ class JobListController extends Controller
      * @param String filter - avaliable: (mostrecent)
      * @param Array job_driving_licenses
      * @param Array job_certifications
+     * @param String free_term
+     * @param String location
      * @param Int per_page
      * @return \Illuminate\Http\JsonResponse - Schema [
      *      "data": Array,
@@ -84,7 +86,9 @@ class JobListController extends Controller
             'job_driving_licenses' => 'array',
             'job_certifications' => 'array',
             'per_page' => 'integer',
-            'filter' => 'string'
+            'filter' => 'string',
+            'free_term' => 'string',
+            'location' => 'string'
         ]);
         $page       = (int)request('page', 1);
         $perPage    = (int)request('per_page', 10);
@@ -182,7 +186,8 @@ class JobListController extends Controller
                 'job_title'         => 'required|string|max:300',
                 'job_country'       => 'required|integer',
                 'job_seniority'     => 'integer',
-                'job_salary'        => 'required|min:0',
+                'minimum_wage'      => 'required|min:0',
+                'max_wage'          => 'required|min:0',
                 'job_description'   => 'required|max:500',
                 'experience_in_months' => 'integer',
                 'job_experience_description' => 'max:500',
@@ -268,7 +273,8 @@ class JobListController extends Controller
                 'job_title'         => 'required|string|max:300',
                 'job_country'       => 'required|integer',
                 'job_seniority'     => 'integer',
-                'job_salary'        => 'required|min:0',
+                'minimum_wage'      => 'required|min:0',
+                'max_wage'          => 'required|min:0',
                 'job_description'   => 'required|max:500',
                 'experience_in_months' => 'integer',
                 'job_experience_description' => 'max:500',

@@ -22,6 +22,8 @@ class TagController extends Controller
         $limit = request('limit', 5);
         if($limit > 50)
             $limit = 50;
+        if(!request('term'))
+            returnResponse(['data' => []]);
         $results = (new Tag())->getTagByNameAndLanguage((string)request('term', ''), $limit);
         if(count($results) > 0)
             $results = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations($results, ['tags_id']);

@@ -23,7 +23,7 @@ class ProficiencyController extends Controller
             $join->on('proficiency.proficiency_level', '=', 'translations.en');
         });
         if($category = Proficiency::getCategory($categoryName)){
-            $proficiencies->where('category', $category);
+            $proficiencies->where('proficiency.category', $category);
         }
         returnResponse($proficiencies->get(), 200);
     }

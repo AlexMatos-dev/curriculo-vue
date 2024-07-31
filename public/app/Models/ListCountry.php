@@ -40,4 +40,17 @@ class ListCountry extends Model
         }
         return $filtered;
     }
+
+    /**
+     * Searches for counttry accordingly to its translation
+     * @param String name
+     * @param String langIso
+     * @return ListLang or Null
+     */
+    public function getByNameAndLanguageIso($name, $langIso = 'en')
+    {
+        return ListCountry::leftJoin('translations', function($join){
+            $join->on("translations.en", '=', "listcountries.lcountry_name");
+        })->where("translations.$langIso", 'like', "%$name%")->first();
+    }
 }

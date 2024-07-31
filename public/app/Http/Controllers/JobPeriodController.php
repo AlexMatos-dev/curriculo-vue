@@ -10,7 +10,6 @@ class JobPeriodController extends Controller
 {
     /**
      * List all job contracts
-     * @param Stirng currency
      * @return \Illuminate\Http\JsonResponse 
      */
     public function index()
