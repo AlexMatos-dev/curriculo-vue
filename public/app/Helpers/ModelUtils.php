@@ -188,14 +188,21 @@ class ModelUtils
      * @param String attrName - to set the attr name to use the dataIds parameter
      * @param Array languagesToInsert - the languages to insert besides the oficial
      * @param Bool asObject - to return value as object
+     * @param Bool foreigRelation - to perform query with translation table id
+     * @param Query customQuery - from queryBuilder
      * @return Array
      */
-    public static function getTranslationsArray(Object $object, $relationAttr = '', $dataIds = [], $attrName = '', $languagesToInsert = [], $asObject = false)
+    public static function getTranslationsArray(Object $object, $relationAttr = '', $dataIds = [], $attrName = '', $languagesToInsert = [], $asObject = false, $foreigRelation = false, $customQuery = null)
     {
         try {
-            $query = $object::leftJoin('translations', function($join) use($object, $relationAttr){
-                $join->on('translations.en', $object->getTable() . '.' . $relationAttr);
+            $translationsRel = 'en';
+            if($foreigRelation)
+                $translationsRel = 'translation_id';
+            $query = $object::leftJoin('translations', function($join) use($object, $relationAttr, $translationsRel){
+                $join->on("translations.$translationsRel", $object->getTable() . '.' . $relationAttr);
             });
+            if($customQuery)
+                $query = $customQuery;
             if($dataIds || !empty($dataIds))
                 $query->whereIn($attrName, $dataIds);
             $foundObjectArray = $query->get();

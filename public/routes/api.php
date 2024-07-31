@@ -12,7 +12,9 @@ use App\Http\Controllers\LinkController;
 use App\Http\Controllers\CompanySocialNetworkController;
 use App\Http\Controllers\CompanyTypeController;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\DrivingLicenseController;
 use App\Http\Controllers\JobAppliedController;
+use App\Http\Controllers\JobCertificationController;
 use App\Http\Controllers\JobContractController;
 use App\Http\Controllers\JobModalityController;
 use App\Http\Controllers\JobPeriodController;
@@ -215,4 +217,14 @@ Route::prefix('working_visa')->group(function ()
 Route::prefix('job_period')->group(function ()
 {
     Route::get('index', [JobPeriodController::class, 'index']);
+});
+
+Route::prefix('driving_license')->group(function ()
+{
+    Route::get('index', [DrivingLicenseController::class, 'index']);
+});
+
+Route::prefix('job_certification')->group(function ()
+{
+    Route::get('index', [JobCertificationController::class, 'index']);
 });
