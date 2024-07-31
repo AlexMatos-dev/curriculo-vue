@@ -619,14 +619,17 @@ class JobList extends Model
             $maxWage = str_replace('.', ',', $thisObj->max_wage);
             $thisObj->minimunWage = (float)$thisObj->minimum_wage;
             $thisObj->maxWage = (float)$thisObj->maxWage;
-            $thisObj->salary = '$' . ($minimunWage ? $minimunWage : '0,00') . ' - $' . ($maxWage ? $maxWage : '0,00');
             if(array_key_exists($thisObj->wage_currency, $commonCurrencies)){
                 $wage_currency_name = $commonCurrencies[$thisObj->wage_currency][$languageIso] ? $commonCurrencies[$thisObj->wage_currency][$languageIso] : ListLangue::DEFAULT_LANGUAGE;
-                $thisObj->wage_currency = $commonCurrencies[$thisObj->wage_currency]->currency_symbol . ' / ' . $wage_currency_name;
+                $symbol = $commonCurrencies[$thisObj->wage_currency]->currency_symbol;
+                $thisObj->wage_currency = $symbol . ' / ' . $wage_currency_name;
+                $thisObj->wage_currency_symbol = $symbol;
             }else{
                 $thisObj->wage_currency = '';
                 $thisObj->wage_currency_name = '';
+                $thisObj->wage_currency_symbol = '$';
             }
+            $thisObj->salary = $thisObj->wage_currency_symbol . ' ' . ($minimunWage ? $minimunWage : '0,00') . ' - ' . $thisObj->wage_currency_symbol . ' ' . ($maxWage ? $maxWage : '0,00');
             $jobModality = '';
             if(array_key_exists($thisObj->job_modality_id, $bdData['jobModalities'])){
                 $thisBdData = $bdData['jobModalities'][$thisObj->job_modality_id];
