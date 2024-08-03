@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\JobList;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -32,7 +33,11 @@ class CreateJobsListTable extends Migration
 			$table->unsignedInteger('working_visa')->nullable();
 			$table->unsignedInteger('wage_currency')->nullable();
 			$table->unsignedBigInteger('profession_for_job')->nullable();
-			$table->unsignedBigInteger('profession_suggestion')->nullable();
+			$table->unsignedInteger('job_language');
+			$table->string('job_status', '10')->default(JobList::DRAFT_JOB);
+			$table->string('contact_email', 300)->nullable();
+			$table->string('contact_name', 300)->nullable();
+			$table->string('contact_phone', 20)->nullable();
 			$table->timestamps();
 		});
 	}

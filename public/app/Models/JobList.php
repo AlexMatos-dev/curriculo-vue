@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobList extends Model
 {
+    const PUBLISHED_JOB = 'published';
+    const PENDING_JOB   = 'validating';
+    const DRAFT_JOB     = 'draft';
+    const HIDDEN_JOB    = 'hidden';
+
     protected $primaryKey = 'job_id';
     protected $table = 'jobslist';
     public $timestamps = true;
@@ -35,12 +40,16 @@ class JobList extends Model
         'job_offer',
         'job_requirements',
         'profession_for_job',
-        'profession_suggestion',
         'payment_type',
         'job_contract',
         'working_visa',
         'job_period',
-        'wage_currency'
+        'wage_currency',
+        'job_language',
+        'job_status',
+        'contact_email',
+        'contact_name',
+        'contact_phone'
     ];
 
     public function company()
@@ -114,7 +123,7 @@ class JobList extends Model
             $limit = count($byIds);
         if($distinct){
             $query = JobList::select(
-                'jobslist.job_id', 'jobslist.created_at', 'jobslist.*', 'company.company_logo', 'company.company_cover_photo', 'company.company_description', 
+                'jobslist.job_id', 'jobslist.created_at', 'jobslist.job_status', 'jobslist.*', 'company.company_logo', 'company.company_cover_photo', 'company.company_description', 
                 'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type',
                 'company.company_name'
             )->distinct();
@@ -135,7 +144,7 @@ class JobList extends Model
             $join->on('jobslist.job_id', '=', 'job_driving_licenses.job_id');
         })->leftJoin('job_certifications', function($join){
             $join->on('jobslist.job_id', '=', 'job_certifications.joblist_id');
-        })->where('company.paying', $paying);
+        })->where('company.paying', $paying)->where('job_status', $this::PUBLISHED_JOB);
         if($byIds && !empty($byIds))
             $query->whereIn('jobslist.job_id', $byIds);
         if ($request->has("company_id")) 
@@ -579,7 +588,10 @@ class JobList extends Model
         // Set prepared data to objects
         $results = [];
         $usedJobIds = [];
-        $attrToUnset = ['job_skill_id','tag_id','proficiency_id','language_id','joblist_id','job_language_id','job_visa_id','visas_type_id'];
+        $attrToUnset = [
+            'job_skill_id','tag_id','proficiency_id','language_id','joblist_id','job_language_id','job_visa_id','visas_type_id',
+            'contact_email','contact_name','contact_phone'
+        ];
         foreach($jobListArray as $job){
             if(!array_key_exists($job->job_id, $usedAttr) || in_array($job->job_id, $usedJobIds))
                 continue;
@@ -604,6 +616,11 @@ class JobList extends Model
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
             $thisObj->job_created_at     = ModelUtils::parseDateByLanguage($job->job_created_at, false, $languageIso);
             $thisObj->job_updated_at     = ModelUtils::parseDateByLanguage($job->job_updated_at, false, $languageIso);
+            $thisObj->job_language_name  = '';
+            if(array_key_exists($thisObj->job_language, $bdData['listLanguages'])){
+                $langData = $bdData['listLanguages'][$thisObj->job_language];
+                $thisObj->job_language_name = $langData[$languageIso] ? $langData[$languageIso] : $langData[$defaultLanguage];
+            }
             $location = $thisObj->job_city;
             if(array_key_exists($thisObj->job_country, $countriesTranslated)){
                 $countryName = $countriesTranslated[$thisObj->job_country][$languageIso] ? $countriesTranslated[$thisObj->job_country][$languageIso] : $countriesTranslated[$thisObj->job_country]['en'];
