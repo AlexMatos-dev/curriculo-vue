@@ -20,7 +20,8 @@ class ListProfession extends Model
         'parent_profession_id',
         'valid_profession',
         'person_id',
-        'profession_category_id'
+        'profession_category_id',
+        'suggestion_id'
     ];
 
     public function person()

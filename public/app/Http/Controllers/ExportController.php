@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
+use App\Models\CommonCurrency;
+use App\Models\ListCountry;
 use App\Models\ListLangue;
 use App\Models\Translation;
 use Illuminate\Support\Facades\Log;
@@ -61,6 +64,54 @@ class ExportController extends Controller
             }
             $data['llangue_id'] = $language->llangue_id;
             $result[$language->llangue_acronyn] = $data;
+        }
+        try {
+            file_put_contents($path, json_encode($result));
+            exit(json_encode(['message' => 'done']));
+        } catch (\Throwable $th) {
+            Log::alert('Export languages failed: ' . $th->getMessage());
+            exit(json_encode(['message' => 'Erro: ' . $th->getMessage()]));
+        }
+    }
+
+    /**
+     * Exports system common currency
+     */
+    function exportCommonCurrencies()
+    {
+        if(!is_dir(storage_path('app/exports')))
+            mkdir(storage_path('app/exports'));
+        $path = storage_path('app/exports/currencies.json');
+        $data = ModelUtils::getTranslationsArray(
+            new CommonCurrency(), 'currency_name', [], null, (new ListLangue())->getNotOficialLangsIso()
+        );
+        $result = [];
+        foreach($data as $values){
+            $result[] = $values;
+        }
+        try {
+            file_put_contents($path, json_encode($result));
+            exit(json_encode(['message' => 'done']));
+        } catch (\Throwable $th) {
+            Log::alert('Export languages failed: ' . $th->getMessage());
+            exit(json_encode(['message' => 'Erro: ' . $th->getMessage()]));
+        }
+    }
+
+    /**
+     * Exports system common currency
+     */
+    function exportCountries()
+    {
+        if(!is_dir(storage_path('app/exports')))
+            mkdir(storage_path('app/exports'));
+        $path = storage_path('app/exports/countries.json');
+        $data = ModelUtils::getTranslationsArray(
+            new ListCountry(), 'lcountry_name', [], null, (new ListLangue())->getNotOficialLangsIso()
+        );
+        $result = [];
+        foreach($data as $values){
+            $result[] = $values;
         }
         try {
             file_put_contents($path, json_encode($result));

@@ -63,7 +63,7 @@ Route::get('joblist/index', [JobListController::class, 'index']);
 Route::get('joblist/{joblist}', [JobListController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function ()
 {
-    Route::post('joblist', [JobListController::class, 'store']);
+    Route::post('joblist/store', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
     Route::delete('joblist/{joblist}', [JobListController::class, 'destroy']);
     Route::prefix('joblist')->middleware(['job', 'verify_email'])->group(function ()
@@ -99,7 +99,6 @@ Route::prefix('professional')->group(function ()
 Route::prefix('company')->group(function ()
 {
     Route::get('index', [CompanyController::class, 'index']);
-    Route::get('{company_slug}', [CompanyController::class, 'show']);
     Route::middleware('auth:sanctum')->group(function(){
         Route::post('update', [CompanyController::class, 'update']);
         Route::middleware(['companyadmin',  'verify_email'])->group(function ()
@@ -108,7 +107,17 @@ Route::prefix('company')->group(function ()
             Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
         });
 
+        Route::middleware('company_recruiter')->group(function(){
+            Route::get('job/search/{job_id}', [CompanyController::class, 'searchCompanyJob']);
+            Route::get('jobs', [CompanyController::class, 'getMyCompanyJobs']);
+            Route::post('postjob', [CompanyController::class, 'postJob']);
+            Route::post('trashjob', [CompanyController::class, 'desactivateJob']);
+            Route::post('untrashjob', [CompanyController::class, 'reactivateJob']);
+        });
     });
+
+    
+    Route::get('{company_slug}', [CompanyController::class, 'show']);
 });
 
 Route::prefix('recruiter')->middleware('auth:sanctum', 'recruiter')->group(function ()
@@ -192,6 +201,7 @@ Route::prefix('countries')->group(function ()
 Route::prefix('professions')->group(function ()
 {
     Route::get('index', [ListProfessionController::class, 'getProfessions']);
+    Route::get('list', [ListProfessionController::class, 'list']);
 });
 
 Route::prefix('tags')->group(function ()

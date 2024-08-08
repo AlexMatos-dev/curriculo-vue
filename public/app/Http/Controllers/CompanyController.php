@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\Validator;
 use App\Models\Company;
 use App\Models\CompanyType;
+use App\Models\JobList;
 use App\Models\Person;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
@@ -234,5 +235,111 @@ class CompanyController extends Controller
         if(!$result)
             returnResponse(['message' => translate('action not completed with success')], 500);
         returnResponse(['message' => translate('action performed'), 'data' => $company->getRecruiters()]);
+    }
+
+    /**
+     * Gets all my company jobs
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMyCompanyJobs()
+    {
+        $jobsIds = request('job_id') ? [request('job_id')] : [];
+        $page    = (int)request('page', 1);
+        $perPage = (int)request('per_page', 10);
+        if(!$perPage)
+            $perPage = 10;
+        $jobListObj = new JobList();
+        $company = $this->getCompanyBySession();
+        $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage, 5, [
+            'company_id' => [$company->company_id], 
+            'status' => [$jobListObj::PUBLISHED_JOB, $jobListObj::PENDING_JOB, $jobListObj::DRAFT_JOB, $jobListObj::HIDDEN_JOB]
+        ], $jobsIds);
+        $results['results'] = $jobListObj->setApplicationsToJobs($results['results']);
+        returnResponse([
+            'data' => $results['results'],
+            'curent_page' => $results['page'],
+            'per_page' => $perPage,
+            'last_page' => $results['lastPage']
+        ]);
+    }
+
+    /**
+     * Gets company job details
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchCompanyJob()
+    {
+        $jobsIds = request('job_id') ? [request('job_id')] : [];
+        $page    = (int)request('page', 1);
+        $perPage = (int)request('per_page', 1);
+        $jobListObj = new JobList();
+        $company = $this->getCompanyBySession();
+        $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage, 5, [
+            'company_id' => [$company->company_id], 
+            'status' => [$jobListObj::PUBLISHED_JOB, $jobListObj::PENDING_JOB, $jobListObj::DRAFT_JOB, $jobListObj::HIDDEN_JOB]
+        ], $jobsIds);
+        if(count($results['results']) != 1)
+            Validator::throwResponse(translate('job not found'), 400);
+        returnResponse(["message" => translate('job found successfully'), "data" => $results['results'][0]]);
+    }
+
+    /**
+     * Sends a draft job to validation
+     * @param Int job_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function postJob()
+    {
+        $job = JobList::find(request('job_id'));
+        if(!$job)
+            Validator::throwResponse(translate('job not found'), 400);
+        if(in_array($job->job_status, [JobList::PENDING_JOB, JobList::PUBLISHED_JOB]))
+            returnResponse(['message' => translate('job already published or in validation'), 'data' => $job], 200);
+        // Here there will be a method to check it and let it on validation
+        $job->job_status = JobList::PUBLISHED_JOB;
+        if(!$job->save())
+            Validator::throwResponse(translate('job not published, try again later'), 500);
+        returnResponse(['message' => translate('job published'), 'data' => $job->getJobFullData(null, [
+            'company_id' => [$job->company_id], 
+            'status' => [$job::PUBLISHED_JOB, $job::PENDING_JOB, $job::DRAFT_JOB, $job::HIDDEN_JOB]
+        ])], 200);
+    }
+
+    /**
+     * Sends a job to trash (inactivate it)
+     * @param Int job_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function desactivateJob()
+    {
+        $job = JobList::find(request('job_id'));
+        if(!$job)
+            Validator::throwResponse(translate('job not found'), 400);
+        $job->job_status = JobList::HIDDEN_JOB;
+        if(!$job->save())
+            Validator::throwResponse(translate('job not sent to trash, try again later'), 500);
+        returnResponse(['message' => translate('job sent to trash'), 'data' => $job->getJobFullData(null, [
+            'company_id' => [$job->company_id], 
+            'status' => [$job::PUBLISHED_JOB, $job::PENDING_JOB, $job::DRAFT_JOB, $job::HIDDEN_JOB]
+        ])], 200);
+    }
+
+    /**
+     * Sends a job to trash (inactivate it)
+     * @param Int job_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reactivateJob()
+    {
+        $job = JobList::find(request('job_id'));
+        if(!$job)
+            Validator::throwResponse(translate('job not found'), 400);
+        $job->job_status = JobList::HIDDEN_JOB;
+        if(!$job->save())
+            Validator::throwResponse(translate('job not sent to trash, try again later'), 500);
+        returnResponse(['message' => translate('job removed from trash'), 'data' => $job->getJobFullData(null, [
+            'company_id' => [$job->company_id], 
+            'status' => [$job::PUBLISHED_JOB, $job::PENDING_JOB, $job::DRAFT_JOB, $job::HIDDEN_JOB]
+        ])], 200);
     }
 }

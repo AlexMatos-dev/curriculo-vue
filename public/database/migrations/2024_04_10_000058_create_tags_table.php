@@ -10,6 +10,7 @@ class CreateTagsTable extends Migration {
 		Schema::create('tags', function(Blueprint $table) {
 			$table->bigIncrements('tags_id', true);
 			$table->string('tags_name', 150);
+			$table->unsignedBigInteger('suggestion_id')->nullable();
 			$table->timestamps();
 		});
 	}

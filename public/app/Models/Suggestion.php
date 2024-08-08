@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Suggestion extends Model
 {
@@ -43,15 +44,21 @@ class Suggestion extends Model
      * @param String type
      * @param Int typeId
      * @param String suggestionName
-     * @return Bool
+     * @return Object|Bool
      */
-    public function saveSuggestion($type = '', $typeId = null, $suggestionName)
+    public function saveSuggestion($type = '', $typeId = null, $suggestionName = '')
     {
         if(!in_array($type, $this->suggestionTypes()))
             return false;
+        $userLangId = ListLangue::where('llangue_acronyn', Session()->get('user_lang'))->first();
+        $userLangId = $userLangId ? $userLangId->llangue_id : (new ListLangue())->getDefaultLangObj('llangue_id');
         $this->type = $type;
         $this->type_id = $typeId;
+        $this->author_id = Auth::user()->person_id;
+        $this->lang = $userLangId;
         $this->suggestion_name = $suggestionName;
-        return $this->save();
+        if(!$this->save())
+            return false;
+        return $this;
     }
 }

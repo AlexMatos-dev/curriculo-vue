@@ -141,9 +141,13 @@ class CreateFakeJobData extends Seeder
         // Create jobs
         $created = 0;
         $companiesData = Company::inRandomOrder()->get()->toArray();
+        $half = (int)($limit / 2);
         for($o = 0; $o < $limit; $o++){
             if($created > $limit)
                 break;
+            $gender = 'male';
+            if($half)
+                $gender = 'female';
             $job = null;
             try {
                 $seniorityOfJob = $seniorities[array_rand($seniorities)];
@@ -169,7 +173,12 @@ class CreateFakeJobData extends Seeder
                     'payment_type' => $paymentTypes[array_rand($paymentTypes)]['job_payment_type'],
                     'job_contract' => $jobContracts[array_rand($jobContracts)]['job_contract'],
                     'working_visa' => $workingVisas[array_rand($workingVisas)]['working_visa'],
-                    'job_period' => $jobPeriods[array_rand($jobPeriods)]['job_period']
+                    'job_period' => $jobPeriods[array_rand($jobPeriods)]['job_period'],
+                    'job_language' => $languagesArray[array_rand($languagesArray)]['llangue_id'],
+                    'contact_email' => $faker->email(),
+                    'contact_name' => $faker->name($gender),
+                    'contact_phone' => $faker->phoneNumber(),
+                    'job_status' => JobList::PUBLISHED_JOB
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
