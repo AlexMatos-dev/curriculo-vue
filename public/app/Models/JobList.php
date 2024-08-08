@@ -1079,7 +1079,6 @@ class JobList extends Model
             $tagsCreated = [];
             $proficiencies = [];
             $suggestionsCreated = [];
-            $suggestionsCreatedIds = [];
             for($i = 0; $i < count($ids); $i++){
                 $data = [
                     'id'   => $ids[$i],

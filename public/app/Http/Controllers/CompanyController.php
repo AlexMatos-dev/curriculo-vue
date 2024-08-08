@@ -334,7 +334,7 @@ class CompanyController extends Controller
         $job = JobList::find(request('job_id'));
         if(!$job)
             Validator::throwResponse(translate('job not found'), 400);
-        $job->job_status = JobList::HIDDEN_JOB;
+        $job->job_status = JobList::DRAFT_JOB;
         if(!$job->save())
             Validator::throwResponse(translate('job not sent to trash, try again later'), 500);
         returnResponse(['message' => translate('job removed from trash'), 'data' => $job->getJobFullData(null, [

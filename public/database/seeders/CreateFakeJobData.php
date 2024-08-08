@@ -137,7 +137,7 @@ class CreateFakeJobData extends Seeder
             }
             if($company)
                 $created++;
-        }        
+        }
         // Create jobs
         $created = 0;
         $companiesData = Company::inRandomOrder()->get()->toArray();
@@ -191,10 +191,12 @@ class CreateFakeJobData extends Seeder
                         ]);
                     }
                     $langData = [];
+                    $langSeniorities = [];
                     for($i = 0; $i < 3; $i++){
-                        $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)];   
-                    }                   
-                    $job->syncLanguages((Object) $langData);
+                        $langSeniorities[] = $languageProfeciency[array_rand($languageProfeciency)]['proficiency_id'];
+                        $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)]->llangue_id;   
+                    }             
+                    $job->syncLanguages($langData, $langSeniorities);
 
                     $visaData = [];
                     for($i = 0; $i < 3; $i++){
