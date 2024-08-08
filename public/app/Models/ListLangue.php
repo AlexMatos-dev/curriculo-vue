@@ -35,4 +35,19 @@ class ListLangue extends Model
         }
         return $data;
     }
+
+    /**
+     * Returns the default ListLang object (EN)
+     * @param String attr - send this to return a specific attr
+     * @return Object|String
+     */
+    public function getDefaultLangObj($attr = null)
+    {
+        $enLanguage = $this::where('llangue_acronyn', 'en')->first();
+        if(!$enLanguage)
+            return null;
+        if($attr)
+            return $enLanguage->{$attr};
+        return $enLanguage;
+    }
 }

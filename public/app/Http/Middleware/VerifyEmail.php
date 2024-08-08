@@ -17,8 +17,8 @@ class VerifyEmail
     public function handle(Request $request, Closure $next): Response
     {
         $person = Auth::user() ? Auth::user() : auth('api')->user();
-        if(!$person->verified_at)
-            return response()->json(['message' => 'account not verified'], 406);
+        // if(!$person->verified_at)
+        //     return response()->json(['message' => 'account not verified'], 406);
         return $next($request);
     }
 }

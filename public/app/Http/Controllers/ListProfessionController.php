@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
+use App\Models\ListLangue;
 use App\Models\ListProfession;
 use App\Models\Translation;
 use Illuminate\Http\Request;
@@ -54,5 +56,14 @@ class ListProfessionController extends Controller
             ->paginate(request('per_page', 20));
 
         return response()->json($professional);
+    }
+
+    /**
+     * List all professions
+     * @return \Illuminate\Http\JsonResponse 
+     */
+    public function list()
+    {
+        returnResponse(ModelUtils::getTranslationsArray(new ListProfession(), 'profession_name', null, null, (new ListLangue())->getNotOficialLangsIso()), 200);
     }
 }

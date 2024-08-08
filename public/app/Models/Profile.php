@@ -71,6 +71,7 @@ class Profile extends Model
                         $val = $val ? base64_encode($val) : null;
                     $data[$attr] = $val;
                 }
+                $data[$object->getKeyName()] = $object->{$object->getKeyName()};
                 $myProfiles[$profileType] = $data;
             }
         }
