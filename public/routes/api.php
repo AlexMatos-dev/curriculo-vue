@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function ()
         Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
         Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
         Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
+        Route::post('managedrivinglicense/{joblist_id}', [JobListController::class, 'manageDrivingLicenses']);
     });
 });
 
@@ -237,4 +238,5 @@ Route::prefix('driving_license')->group(function ()
 Route::prefix('job_certification')->group(function ()
 {
     Route::get('index', [JobCertificationController::class, 'index']);
+    Route::get('search', [JobCertificationController::class, 'search']);
 });

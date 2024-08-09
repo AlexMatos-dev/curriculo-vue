@@ -50,7 +50,8 @@ class JobList extends Model
         'job_status',
         'contact_email',
         'contact_name',
-        'contact_phone'
+        'contact_phone',
+        'contact_website'
     ];
 
     public function company()
@@ -481,10 +482,14 @@ class JobList extends Model
                 'languagesProficiencyId' => [],
                 'languagesProficiencyName' => [],
                 'visasIds' => [],
+                'visasNames' => [],
+                'countriesIds' => [],
+                'countriesNames' => [],
                 'visas' => [],
                 'jobCertificationsIds' => [],
                 'jobCertifications' => [],
                 'jobDrivingLicensesIds' => [],
+                'jobDrivingLicensesNames' => [],
                 'jobDrivingLicenses' => [],
                 'skillsProficiency' => [],
                 'skillsProficiencyId' => [],
@@ -592,6 +597,10 @@ class JobList extends Model
                 }
                 $usedAttr[$jobId]['visas'][] = ucfirst($translation) . ' / ' . ucfirst($countryTrans);
                 $usedAttr[$jobId]['visasIds'][] = $jobVisa['typevisas_id'];
+                $usedAttr[$jobId]['visasNames'][] = $translation;
+                $usedAttr[$jobId]['countriesIds'][] = $jobVisa['country_id'];
+                $usedAttr[$jobId]['countriesNames'][] = $countryTrans;
+                
             }
         }
         foreach($jobCertificationArray as $jobId => $certifications){
@@ -605,7 +614,8 @@ class JobList extends Model
             foreach($drivingLicenses as $drivingLicense){
                 $translation = $drivingLicense[$languageIso] ? $drivingLicense[$languageIso] : $drivingLicense[$defaultLanguage];
                 $usedAttr[$jobId]['jobDrivingLicenses'][] = ucfirst($translation) ." / {$drivingLicense['symbol']}";
-                $usedAttr[$jobId]['jobDrivingLicensesIds'][] = $drivingLicense['job_driving_license'];
+                $usedAttr[$jobId]['jobDrivingLicensesNames'][] = $translation;
+                $usedAttr[$jobId]['jobDrivingLicensesIds'][] = $drivingLicense['driving_license'];
             }
         }
         // Set prepared data to objects
@@ -636,7 +646,11 @@ class JobList extends Model
             $thisObj->languagesProficiencyName = $values['languagesProficiencyName'];
             $thisObj->visas              = $values['visas'];
             $thisObj->visasIds           = $values['visasIds'];
-            $thisObj->drivingLicensesIds = $values['jobDrivingLicenses'];
+            $thisObj->visasNames         = $values['visasNames'];
+            $thisObj->countriesIds       = $values['countriesIds'];
+            $thisObj->countriesNames     = $values['countriesNames'];
+            $thisObj->drivingLicensesIds = $values['jobDrivingLicensesIds'];
+            $thisObj->jobDrivingLicensesNames = $values['jobDrivingLicensesNames'];
             $thisObj->drivingLicenses    = $values['jobDrivingLicenses'];
             $thisObj->certificationsIds  = $values['jobCertificationsIds'];
             $thisObj->certifications     = $values['jobCertifications'];
@@ -1171,14 +1185,16 @@ class JobList extends Model
      * @param Array $visas - Array of object Visas
      * @return Bool
      */
-    public function syncVisas($visas = [])
+    public function syncVisas($visas = [], $countries = [])
     {
         JobVisa::where('joblist_id', $this->job_id)->delete();
-        foreach($visas as $visa){
+        if(count($visas) != count($countries))
+            return false;
+        for($index = 0; $index < count($visas); $index++){
             JobVisa::create([
                 'joblist_id' => $this->job_id,
-                'visas_type_id' => $visa->visas_type_id,
-                'country_id' => $visa->country_id
+                'visas_type_id' => $visas[$index],
+                'country_id' => $countries[$index]
             ]);
         }
         return true;
@@ -1203,7 +1219,7 @@ class JobList extends Model
 
     /**
      * Syncs job driving licenses by deleting all visas of $this JobList and them adding the sents driving licenses
-     * @param Array $drivingLicenses - Array of object DrivingLicense
+     * @param Array $drivingLicenses - Array of DrivingLicense id
      * @return Bool
      */
     public function syncDrivingLicenses($drivingLicenses = [])
@@ -1212,7 +1228,7 @@ class JobList extends Model
         foreach($drivingLicenses as $drivingLicense){
             JobDrivingLicense::create([
                 'job_id' => $this->job_id,
-                'driving_license' => $drivingLicense->driving_license,
+                'driving_license' => $drivingLicense,
             ]);
         }
         return true;

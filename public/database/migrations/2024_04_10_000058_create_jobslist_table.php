@@ -37,6 +37,7 @@ class CreateJobsListTable extends Migration
 			$table->string('job_status', '10')->default(JobList::DRAFT_JOB);
 			$table->string('contact_email', 300)->nullable();
 			$table->string('contact_name', 300)->nullable();
+			$table->string('contact_website', 300)->nullable();
 			$table->string('contact_phone', 20)->nullable();
 			$table->timestamps();
 		});

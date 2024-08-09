@@ -198,9 +198,10 @@ class JobListController extends Controller
                 'working_visa'      => 'integer',
                 'job_period'        => 'integer',
                 'wage_currency'     => 'integer|required',
-                'contact_email'     => 'string|max:300|required',
-                'contact_name'      => 'string|max:300|required',
-                'contact_phone'     => 'string|max:300|required',
+                'contact_email'     => 'string|max:300',
+                'contact_name'      => 'string|max:300',
+                'contact_phone'     => 'string|max:300',
+                'contact_website'   => 'string|max:300',
                 'job_language'      => 'integer|required'
             ]);
             $objects = Validator::checkExistanceOnTable([
@@ -297,9 +298,10 @@ class JobListController extends Controller
                 'working_visa'      => 'integer',
                 'job_period'        => 'integer',
                 'wage_currency'     => 'integer|required',
-                'contact_email'     => 'string|max:300|required',
-                'contact_name'      => 'string|max:300|required',
-                'contact_phone'     => 'string|max:300|required',
+                'contact_email'     => 'string|max:300',
+                'contact_name'      => 'string|max:300',
+                'contact_phone'     => 'string|max:300',
+                'contact_website'   => 'string|max:300',
                 'job_language'      => 'integer|required'
             ]);
             $objects = Validator::checkExistanceOnTable([
@@ -365,7 +367,7 @@ class JobListController extends Controller
     /**
      * Manages job languages, this method can ADD a new language, REMOVE, SYNC new languages (delete current and create anew) a current language or LIST all languages of job
      * @param Int joblist_id - required
-     * @param Stirng action - Either ('add', 'remove', 'sync' or 'list)
+     * @param String action - Either ('add', 'remove', 'sync' or 'list)
      * @param Int job_language_id
      * @param Int language_id
      * @param Int proficiency_id
@@ -435,22 +437,60 @@ class JobListController extends Controller
         returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
 
-    /**
-     * Manages job visas, this method can ADD a new visa, REMOVE a current visa or LIST all visas of job
+     /**
+     * Manages job languages, SYNC new languages (delete current and create anew)
      * @param Int joblist_id - required
-     * @param Stirng action - Either ('add', 'remove' or 'list)
-     * @param Int visas_type_id
-     * @param Int country_id
-     * @param Int job_visa_id
+     * @param String action - Either ('sync')
+     * @param Array driving_licenses_ids
+     * @param Array driving_licenses_names
+     * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
+     */
+    public function manageDrivingLicenses()
+    {
+        Validator::validateParameters($this->request, [
+            'action' => 'string|in:add,remove,list,sync',
+            'driving_licenses_ids' => 'array',
+            'driving_licenses_names' => 'array'
+        ]);
+        $result = false;
+        $data = null;
+        switch(request('action')){
+            case 'sync':
+                $result = $this->getJobBySession()->syncDrivingLicenses(request('driving_licenses_ids') );
+                if($result){
+                    $jobObj = $this->getJobBySession();
+                    $data = $jobObj->getJobFullData(null, [
+                        'company_id' => [$jobObj->company_id], 
+                        'status' => [$jobObj::PUBLISHED_JOB, $jobObj::PENDING_JOB, $jobObj::DRAFT_JOB, $jobObj::HIDDEN_JOB]
+                    ]);
+                }
+            break;
+        }
+        if(!$result)
+            Validator::throwResponse(translate('action not performed'), 500);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
+    }
+
+    /**
+     * Manages job visas, this method can ADD a new visa, REMOVE, SYNC (delete current and create anew) a current visa or LIST all visas of job
+     * @param Int joblist_id - required
+     * @param String action - Either ('add', 'remove', 'sync' or 'list')
+     * @param Array job_visa_id
+     * @param Array job_visas_ids
+     * @param Array job_visas_names
+     * @param Array visa_countries_ids
      * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
      */
     public function manageJobVisas()
     {
         Validator::validateParameters($this->request, [
-            'action' => 'string|in:add,remove,list',
+            'action' => 'string|in:add,remove,list,sync',
             'visas_type_id' => 'int',
             'country_id' => 'int',
-            'job_visa_id' => 'int'
+            'job_visa_id' => 'int',
+            'job_visas_ids' => 'array',
+            'job_visas_names' => 'array',
+            'visa_countries_ids' => 'array'
         ]);
         $result = false;
         $data = null;
@@ -488,6 +528,16 @@ class JobListController extends Controller
                     $join->on('type_visas.typevisas_id', '=', 'job_visas.visas_type_id');
                 })->get();
             break;
+            case 'sync':
+                $result = $this->getJobBySession()->syncVisas(request('job_visas_ids'), request('visa_countries_ids'));
+                if($result){
+                    $jobObj = $this->getJobBySession();
+                    $data = $jobObj->getJobFullData(null, [
+                        'company_id' => [$jobObj->company_id], 
+                        'status' => [$jobObj::PUBLISHED_JOB, $jobObj::PENDING_JOB, $jobObj::DRAFT_JOB, $jobObj::HIDDEN_JOB]
+                    ]);
+                }
+            break;
         }
         if(!$result)
             Validator::throwResponse(translate('action not performed'), 500);
@@ -497,7 +547,7 @@ class JobListController extends Controller
     /**
      * Manages job skills, this method can ADD a new skill, REMOVE a current skill or LIST all skills of job
      * @param Int joblist_id - required
-     * @param Stirng action - Either ('add', 'remove', 'sync' or 'list)
+     * @param String action - Either ('add', 'remove', 'sync' or 'list)
      * @param Int tag_id
      * @param Int proficiency_id
      * @param Int job_skill_id
