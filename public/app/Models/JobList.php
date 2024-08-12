@@ -507,12 +507,15 @@ class JobList extends Model
             ['job_language_id','language_id','proficiency_id'],
             'joblist_id'
         );
+        $skillsQuery = JobSkill::whereIn('joblist_id', $ids)->leftJoin('tags', function($join){
+            $join->on('tags.tags_id', '=', 'job_skills.tag_id');
+        })->leftJoin('translations', function($join){
+            $join->on('translations.en', '=', 'tags.tags_name');
+        });
+        if(!$companyData)
+            $skillsQuery->whereNull('tags.suggestion_id');
         $jobSkillsArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
-            JobSkill::whereIn('joblist_id', $ids)->leftJoin('tags', function($join){
-                $join->on('tags.tags_id', '=', 'job_skills.tag_id');
-            })->leftJoin('translations', function($join){
-                $join->on('translations.en', '=', 'tags.tags_name');
-            })->get(), 
+            $skillsQuery->get(), 
             ['job_skill_id','tag_id','proficiency_id'],
             'joblist_id'
         );
@@ -534,12 +537,15 @@ class JobList extends Model
             ['symbol','driving_license','job_driving_license'],
             'job_id'
         );
+        $jobCertificationQuery = JobCertification::whereIn('job_certifications.joblist_id', $ids)->leftJoin('certification_types', function($join){
+            $join->on('certification_types.certification_type', '=', 'job_certifications.certification_type');
+        })->leftJoin('translations', function($join){
+            $join->on('translations.en', '=', 'certification_types.name');
+        });
+        if(!$companyData)
+            $jobCertificationQuery->whereNull('certification_types.suggestion_id');
         $jobCertificationArray = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations(
-            JobCertification::whereIn('job_certifications.joblist_id', $ids)->leftJoin('certification_types', function($join){
-                $join->on('certification_types.certification_type', '=', 'job_certifications.certification_type');
-            })->leftJoin('translations', function($join){
-                $join->on('translations.en', '=', 'certification_types.name');
-            })->get(), 
+            $jobCertificationQuery->get(), 
             ['job_certification','certification_type','job_certification'],
             'joblist_id'
         );
@@ -673,7 +679,8 @@ class JobList extends Model
                 $thisObj->job_country = ucfirst($countryName);
                 $location .= ', ' . $thisObj->job_country;
             }
-            $thisObj->location = $location;
+            $locationPosition = strpos($location, ', ');
+            $thisObj->location = is_numeric($locationPosition) && $locationPosition == 0 ? str_replace(', ', '', $location) : $location;
             $fullLocation = $thisObj->job_city;
             if($thisObj->job_state)
                 $fullLocation .= ", {$thisObj->job_state}";
@@ -1199,19 +1206,69 @@ class JobList extends Model
         }
         return true;
     }
-
+    
     /**
-     * Syncs job certifications by deleting all JobCertifications of $this JobList and them adding the sents CertificationTypes
-     * @param Array $certifications - Array of object CertificationType
+     * Syncs job certification by deleting all job_certifications of $this JobList and them adding the sents certifications
+     * @param Array $certifications_ids - Array of certifications ids
+     * @param Array $certifications_names - Array of certifications names
+     * @param Array $countries_ids - Array of countries ids (optional)
      * @return Bool
      */
-    public function syncCertifications($certifications = [])
+    public function syncCertifications($certifications_ids = [], $certifications_names = [], $countries_ids = [])
     {
+        if(count($certifications_ids) != count($certifications_names))
+            return false;
+        if($countries_ids && count($countries_ids) != count($certifications_names))
+            return false;
         JobCertification::where('joblist_id', $this->job_id)->delete();
-        foreach($certifications as $certification){
+        $errorOcurred = false;
+        $translationsCreatedEns = [];
+        $certificationCreated = [];
+        $suggestionsCreated = [];
+        for($i = 0; $i < count($certifications_ids); $i++){
+            $data = [
+                'id'      => $certifications_ids[$i],
+                'name'    => $certifications_names[$i],
+                'country' => !empty($countries_ids[$i]) ? $$countries_ids[$i] : null
+            ];
+            if((int)$data['id'] == 0){
+                $myCertification = (new CertificationType())->findCertificationByNameAndLang($data['name'], $data['country'], Session()->get('user_lang'));
+                if($myCertification){
+                    $certificationCreated[] = $myCertification->certification_type;
+                    continue;
+                }
+                $certification = (new CertificationType())->createCertification($data['name'], $data['country'], Session()->get('user_lang'));
+                if(!$certification){
+                    $errorOcurred = true;
+                    break;
+                }
+                $certificationCreated[] = $certification->certification_type;
+                $translationsCreatedEns[] = $data['name'];
+                $suggestion = (new Suggestion())->saveSuggestion(Suggestion::CERTIFICATION_TYPE_SUGGESTION, $certification->certification_type, $data['name']);
+                if(!$suggestion){
+                    $errorOcurred = true;
+                    break;
+                }
+                $suggestionsCreated[] = $suggestion->suggestion_id;
+                $certification->suggestion_id = $suggestion->suggestion_id;
+                $certification->save();
+            }else{
+                JobCertification::create([
+                    'joblist_id' => $this->job_id,
+                    'certification_type' => $data['id']
+                ]);
+            }
+        }
+        if($errorOcurred){
+            Suggestion::whereIn('suggestion_id', $suggestionsCreated)->delete();
+            CertificationType::whereIn('certification_type', $certificationCreated)->delete();
+            Translation::whereIn('en', $translationsCreatedEns)->delete();
+            return false;
+        }
+        foreach($certificationCreated as $certificationId){
             JobCertification::create([
                 'joblist_id' => $this->job_id,
-                'certification_type' => $certification->certification_type
+                'certification_type' => $certificationId
             ]);
         }
         return true;

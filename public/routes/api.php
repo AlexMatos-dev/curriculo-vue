@@ -73,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function ()
         Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
         Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
         Route::post('managedrivinglicense/{joblist_id}', [JobListController::class, 'manageDrivingLicenses']);
+        Route::post('managecertification/{joblist_id}', [JobListController::class, 'manageCertification']);
     });
 });
 

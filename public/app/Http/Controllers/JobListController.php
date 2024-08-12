@@ -191,13 +191,13 @@ class JobListController extends Controller
                 'job_seniority'     => 'integer',
                 'minimum_wage'      => 'required|min:1',
                 'max_wage'          => 'required|min:1',
-                'job_description'   => 'required|max:500',
+                'job_description'   => 'max:5000',
                 'experience_in_months' => 'integer',
-                'job_experience_description' => 'max:500',
-                'job_benefits'      => 'max:65535',
-                'job_offer'         => 'max:65535',
-                'job_requirements'  => 'max:65535',
-                'profession_for_job' => 'integer',
+                'job_experience_description' => 'max:5000',
+                'job_benefits'      => 'max:5000',
+                'job_offer'         => 'max:5000',
+                'job_requirements'  => 'max:5000',
+                'profession_for_job'=> 'integer',
                 'payment_type'      => 'integer',
                 'job_contract'      => 'integer',
                 'working_visa'      => 'integer',
@@ -221,11 +221,7 @@ class JobListController extends Controller
                 'wage_currency'     => ['object' => CommonCurrency::class, 'data' => $request->wage_currency],
                 'job_language'      => ['object' => ListLangue::class,     'data' => $request->job_language],
             ]);
-            if ($request->job_state && !$request->job_country)
-                Validator::throwResponse(translate('a country is required'));
-            if ($request->job_city && !$request->job_state)
-                Validator::throwResponse(translate('a state is required'));
-            if ($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
+            if($request->job_seniority && $objects['job_seniority']->category != Proficiency::CATEGORY_SENIORITY)
                 Validator::throwResponse(translate('invalid proficiency, must be seniority type'));
             $data = $request->all();
             $data['job_city'] = array_key_exists('job_city', $data) ? mb_strtolower($data['job_city']) : null;
@@ -293,14 +289,14 @@ class JobListController extends Controller
                 'job_country'       => 'required|integer',
                 'job_seniority'     => 'integer',
                 'minimum_wage'      => 'required|min:1',
-                'max_wage'          => 'required|min:2',
-                'job_description'   => 'required|max:500',
+                'max_wage'          => 'required|min:1',
+                'job_description'   => 'max:3000',
                 'experience_in_months' => 'integer',
-                'job_experience_description' => 'max:500',
-                'job_benefits'      => 'max:65535',
-                'job_offer'         => 'max:65535',
-                'job_requirements'  => 'max:65535',
-                'profession_for_job' => 'integer',
+                'job_experience_description' => 'max:3000',
+                'job_benefits'      => 'max:3000',
+                'job_offer'         => 'max:3000',
+                'job_requirements'  => 'max:3000',
+                'profession_for_job'=> 'integer',
                 'payment_type'      => 'integer',
                 'job_contract'      => 'integer',
                 'working_visa'      => 'integer',
@@ -650,20 +646,54 @@ class JobListController extends Controller
             Validator::throwResponse(translate('action not performed'), 500);
         returnResponse(['message' => translate('action performed'), 'data' => $data]);
     }
+    
+    /**
+     * Manages certification, this method can SYNC certifications
+     * @param Int joblist_id - required
+     * @param String action - Either ('sync')
+     * @param Array certifications_ids
+     * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
+     */
+    public function manageCertification()
+    {
+        Validator::validateParameters($this->request, [
+            'action' => 'string|in:sync',
+            'certifications_ids' => 'array',
+            'certifications_names' => 'array',
+            'countries_ids' => 'array'
+        ]);
+        $result = false;
+        $data = null;
+        switch(request('action')){
+            case 'sync':
+                $result = $this->getJobBySession()->syncCertifications(request('certifications_ids'), request('certifications_names'), request('countries_ids', []));
+                $jobObj = $this->getJobBySession();
+                $data = $jobObj->getJobFullData(null, [
+                    'company_id' => [$jobObj->company_id], 
+                    'status' => [$jobObj::PUBLISHED_JOB, $jobObj::PENDING_JOB, $jobObj::DRAFT_JOB, $jobObj::HIDDEN_JOB]
+                ]);
+            break;
+        }
+        if(!$result)
+            Validator::throwResponse(translate('action not performed'), 500);
+        returnResponse(['message' => translate('action performed'), 'data' => $data]);
+    }
 
+    /**
+     * Get job contact information
+     * @param Int jobId - required
+     */
     public function getContactInformations($jobId)
     {
         try
         {
             $job = JobList::findOrFail($jobId);
-
             $result = [
                 "contactEmail" => $job->contact_email,
                 "contactName" => $job->contact_name,
                 "contactPhone" => $job->contact_phone,
                 "contactWebSite" => $job->contact_website,
             ];
-
             return response()->json($result);
         }
         catch (ModelNotFoundException $e)
