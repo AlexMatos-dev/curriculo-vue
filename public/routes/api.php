@@ -66,11 +66,14 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::post('joblist/store', [JobListController::class, 'store']);
     Route::put('joblist/{joblist}', [JobListController::class, 'update']);
     Route::delete('joblist/{joblist}', [JobListController::class, 'destroy']);
+    Route::get('joblist/{joblist}/getInformations', [JobListController::class, 'getContactInformations']);
     Route::prefix('joblist')->middleware(['job', 'verify_email'])->group(function ()
     {
         Route::post('managelanguage/{joblist_id}', [JobListController::class, 'manageJobLanguages']);
         Route::post('manageskills/{joblist_id}', [JobListController::class, 'manageJobSkills']);
         Route::post('managevisas/{joblist_id}', [JobListController::class, 'manageJobVisas']);
+        Route::post('managedrivinglicense/{joblist_id}', [JobListController::class, 'manageDrivingLicenses']);
+        Route::post('managecertification/{joblist_id}', [JobListController::class, 'manageCertification']);
     });
 });
 
@@ -99,7 +102,8 @@ Route::prefix('professional')->group(function ()
 Route::prefix('company')->group(function ()
 {
     Route::get('index', [CompanyController::class, 'index']);
-    Route::middleware('auth:sanctum')->group(function(){
+    Route::middleware('auth:sanctum')->group(function ()
+    {
         Route::post('update', [CompanyController::class, 'update']);
         Route::middleware(['companyadmin',  'verify_email'])->group(function ()
         {
@@ -107,7 +111,8 @@ Route::prefix('company')->group(function ()
             Route::post('managerecruiter', [CompanyController::class, 'manageCompanyRecruiter']);
         });
 
-        Route::middleware('company_recruiter')->group(function(){
+        Route::middleware('company_recruiter')->group(function ()
+        {
             Route::get('job/search/{job_id}', [CompanyController::class, 'searchCompanyJob']);
             Route::get('jobs', [CompanyController::class, 'getMyCompanyJobs']);
             Route::post('postjob', [CompanyController::class, 'postJob']);
@@ -116,7 +121,7 @@ Route::prefix('company')->group(function ()
         });
     });
 
-    
+
     Route::get('{company_slug}', [CompanyController::class, 'show']);
 });
 
@@ -168,6 +173,7 @@ Route::prefix('job_applied')->middleware(['auth:sanctum', 'verify_email'])->grou
 
     Route::middleware('professional')->group(function ()
     {
+        Route::get('listappliances', [JobAppliedController::class, 'listAppliances']);
         Route::post('applyforvacancy', [JobAppliedController::class, 'applyForVacancy']);
         Route::post('canceljobapplied', [JobAppliedController::class, 'cancelJobApplied']);
     });
@@ -237,4 +243,5 @@ Route::prefix('driving_license')->group(function ()
 Route::prefix('job_certification')->group(function ()
 {
     Route::get('index', [JobCertificationController::class, 'index']);
+    Route::get('search', [JobCertificationController::class, 'search']);
 });

@@ -19,7 +19,7 @@ class SystemTranslationSeeder extends Seeder
         $translationsArray = json_decode(file_get_contents($path), true);
         $translationObj = new Translation();
         foreach($translationsArray as $translation){
-            if($translationObj->where('en', $translation['en'])->first())
+            if($translationObj->where('en', $translation['en'])->where('category', Translation::CATEGORY_SYSTEM_TRANSLATIONS)->first())
                 continue;
             Translation::create([
                 'en' => $translation['en'],

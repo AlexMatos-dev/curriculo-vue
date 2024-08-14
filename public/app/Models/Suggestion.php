@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Auth;
 
 class Suggestion extends Model
 {
-    const TAG_SUGGESTION        = 'tags';
-    const PROFESSION_SUGGESTION = 'listprofessions';
+    const TAG_SUGGESTION                = 'tags';
+    const PROFESSION_SUGGESTION         = 'listprofessions';
+    const CERTIFICATION_TYPE_SUGGESTION = 'certification_type';
 
     protected $primaryKey = 'suggestion_id';
     protected $table = 'suggestions';
@@ -35,7 +36,8 @@ class Suggestion extends Model
     {
         return [
             $this::TAG_SUGGESTION,
-            $this::PROFESSION_SUGGESTION
+            $this::PROFESSION_SUGGESTION,
+            $this::CERTIFICATION_TYPE_SUGGESTION
         ];
     }
 

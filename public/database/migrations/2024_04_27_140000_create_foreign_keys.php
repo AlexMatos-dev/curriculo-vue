@@ -171,6 +171,12 @@ class CreateForeignKeys extends Migration
 				->onDelete('restrict')
 				->onUpdate('restrict');
 		});
+		Schema::table('certification_types', function (Blueprint $table)
+		{
+			$table->foreign('suggestion_id')->references('suggestion_id')->on('suggestions')
+				->onDelete('restrict')
+				->onUpdate('restrict');
+		});
 		Schema::table('job_languages', function (Blueprint $table)
 		{
 			$table->foreign('joblist_id')->references('job_id')->on('jobslist')
@@ -700,6 +706,10 @@ class CreateForeignKeys extends Migration
 		Schema::table('tags', function (Blueprint $table)
 		{
 			$table->dropForeign('tags_suggestion_id_foreign');
+		});
+		Schema::table('certification_types', function (Blueprint $table)
+		{
+			$table->dropForeign('certification_types_suggestion_id_foreign');
 		});
 		Schema::table('listprofessions', function (Blueprint $table)
 		{

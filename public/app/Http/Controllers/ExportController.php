@@ -20,7 +20,7 @@ class ExportController extends Controller
             mkdir(storage_path('app/exports'));
         $path = storage_path('app/exports/translations.json');
         try {
-            $data = getSystemTranslations();
+            $data = getSystemTranslations(true);
             $filtered = [];
             foreach($data as $en => $translations){
                 unset($translations['object']);

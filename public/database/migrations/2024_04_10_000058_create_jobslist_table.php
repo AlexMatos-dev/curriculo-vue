@@ -21,12 +21,12 @@ class CreateJobsListTable extends Migration
 			$table->unsignedInteger('job_seniority')->nullable();
 			$table->decimal('minimum_wage', 10, 2)->default('0.0');
 			$table->decimal('max_wage', 10, 2)->default('0.0');
-			$table->string('job_description', 500);
+			$table->text('job_description', 5000)->nullable();
 			$table->integer('experience_in_months')->nullable();
-			$table->string('job_experience_description', 500)->nullable();
-			$table->text('job_benefits', 3000)->nullable();
-			$table->text('job_offer', 3000)->nullable();
-			$table->text('job_requirements', 3000)->nullable();
+			$table->text('job_experience_description', 5000)->nullable();
+			$table->text('job_benefits', 5000)->nullable();
+			$table->text('job_offer', 5000)->nullable();
+			$table->text('job_requirements', 5000)->nullable();
 			$table->unsignedInteger('payment_type')->nullable();
 			$table->unsignedInteger('job_contract')->nullable();
 			$table->unsignedInteger('job_period')->nullable();
@@ -37,6 +37,7 @@ class CreateJobsListTable extends Migration
 			$table->string('job_status', '10')->default(JobList::DRAFT_JOB);
 			$table->string('contact_email', 300)->nullable();
 			$table->string('contact_name', 300)->nullable();
+			$table->string('contact_website', 300)->nullable();
 			$table->string('contact_phone', 20)->nullable();
 			$table->timestamps();
 		});

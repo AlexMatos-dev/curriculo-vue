@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('certification_type');
             $table->string('name', 300);
             $table->unsignedInteger('lcountry')->nullable();
+            $table->unsignedBigInteger('suggestion_id')->nullable();
             $table->timestamps();
         });
     }

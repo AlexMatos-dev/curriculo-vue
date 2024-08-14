@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Hash;
 
 class ChatMessage extends Model
 {
@@ -66,7 +67,7 @@ class ChatMessage extends Model
         if(!in_array(get_class($receiverObject), $this::REFERENCES))
             return false;
         $senderObject = $senderObject ? $senderObject : $this->getNotifier();
-        if(!in_array(get_class($senderObject), $this::REFERENCES))
+        if(!$senderObject || !in_array(get_class($senderObject), $this::REFERENCES))
             return false;
         $message = $this->getMessageType($messageType);
         if(!$message)
@@ -121,11 +122,21 @@ class ChatMessage extends Model
 
     /**
      * Fetches system default notifier person
-     * @return Person
+     * @return Person|False
      */
     public function getNotifier()
     {
-        return Person::where('person_username', env('NOTIFICATOR_NAME'))->where('person_email', env('NOTIFICATOR_EMAIL'))->first();
+        $notifier = Person::where('person_username', env('NOTIFICATOR_NAME'))->where('person_email', env('NOTIFICATOR_EMAIL'))->first();
+        if($notifier)
+            return $notifier;
+        $notifier = Person::create([
+            'person_username' => env('NOTIFICATOR_NAME'),
+            'person_email' => env('NOTIFICATOR_EMAIL'),
+            'person_password' => Hash::make(env('NOTIFICATOR_PASS'))
+        ]);
+        if(!$notifier)
+            return false;
+        return $notifier;
     }
 
     /**

@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ModelUtils;
+use App\Helpers\Validator;
+use App\Models\CertificationType;
 use App\Models\JobCertification;
 use App\Models\ListLangue;
 
 class JobCertificationController extends Controller
 {
     /**
-     * List all driving licenses
+     * List all certifications
      * @return \Illuminate\Http\JsonResponse 
      */
     public function index()
@@ -22,5 +24,27 @@ class JobCertificationController extends Controller
         returnResponse(ModelUtils::getTranslationsArray(
             new JobCertification(), 'certification_type', null, null, (new ListLangue())->getNotOficialLangsIso(), false, true, $customQuery
         ), 200);
+    }
+
+    /**
+     * Searches for Certifications accordingly to sent word and language
+     * @param String term
+     * @param Int limit - default = 5
+     * @return @return \Illuminate\Http\JsonResponse
+     */
+    public function search()
+    {
+        Validator::validateParameters($this->request, [
+            'limit' => 'integer'
+        ]);
+        $limit = request('limit', 5);
+        if($limit > 50)
+            $limit = 50;
+        if(!request('term'))
+            returnResponse(['data' => []]);
+        $results = (new CertificationType())->getCertificationTypeByNameAndLanguage((string)request('term', ''), $limit);
+        if(count($results) > 0)
+            $results = ModelUtils::parseAsArrayWithAllLanguagesIsosAndTranslations($results, ['certification_type']);
+        returnResponse(['data' => $results]);
     }
 }

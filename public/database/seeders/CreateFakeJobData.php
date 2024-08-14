@@ -197,22 +197,21 @@ class CreateFakeJobData extends Seeder
                         $langData[] = $dataForJobLanguage[array_rand($dataForJobLanguage)]->llangue_id;   
                     }             
                     $job->syncLanguages($langData, $langSeniorities);
-
                     $visaData = [];
                     for($i = 0; $i < 3; $i++){
-                        $visaData[] = $dataForJobVisas[array_rand($dataForJobVisas)];   
+                        $visaData[] = $dataForJobVisas[array_rand($dataForJobVisas)]->visas_type_id;   
                     }                   
-                    $job->syncVisas((Object) $visaData);
+                    $job->syncVisas($visaData);
 
                     $driveLicenses = [];
                     for($i = 0; $i < 2; $i++){
-                        $driveLicenses[] = (Object)$drivingLicences[array_rand($drivingLicences)];   
+                        $driveLicenses[] = $drivingLicences[array_rand($drivingLicences)]['driving_license'];   
                     } 
                     $job->syncDrivingLicenses($driveLicenses);
 
                     $certifications = [];
                     for($i = 0; $i < 2; $i++){
-                        $certifications[] = (Object)$certificationTypes[array_rand($certificationTypes)];   
+                        $certifications[] = $certificationTypes[array_rand($certificationTypes)]['certification_type'];   
                     } 
                     $job->syncCertifications($certifications); 
                 }

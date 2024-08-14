@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\ChatMessage;
 use App\Models\Company;
@@ -115,32 +116,30 @@ class JobAppliedController extends Controller
         ]);
         if(JobApplied::where('professional_id', $this->getProfessionalBySession()->professional_id)->where('job_id', request('job_id'))->first())
             Validator::throwResponse(translate('professional already applied for this job'), 400);
-        try
-        {
-            $jobApplied = JobApplied::create([
-                'job_id' => $request->job_id,
-                'professional_id' => $this->getProfessionalBySession()->professional_id,
-                'status' => JobApplied::STATUS_APPLIED,
-            ]);
-
-            $company = Company::leftJoin('jobslist', function($join){
-                $join->on('jobslist.company_id', 'companies.company_id');
-            })->where('jobslist.job_id', $request->job_id)->first();
-            if($company && $company->checkPrivacy(ChatMessage::CATEGORY_NOTIFICATION))
-                (new ChatMessage())->makeNotification($company, ChatMessage::TYPE_JOB_APPLIED, '', null, $request->job_id);
-
-            returnResponse([
-                'data' => $jobApplied,
-            ]);
-        }
-        catch (\Exception $e)
-        {
+        $result = JobApplied::create([
+            'job_id' => $request->job_id,
+            'professional_id' => $this->getProfessionalBySession()->professional_id,
+            'status' => JobApplied::STATUS_APPLIED,
+        ]);
+        if(!$result){
             returnResponse([
                 'success' => false,
                 'message' => translate('failed to create job application'),
-                'error' => $e->getMessage()
             ], 500);
         }
+        $company = Company::leftJoin('jobslist', function($join){
+            $join->on('jobslist.company_id', 'companies.company_id');
+        })->where('jobslist.job_id', $request->job_id)->first();
+        if($company && $company->checkPrivacy(ChatMessage::CATEGORY_NOTIFICATION))
+            (new ChatMessage())->makeNotification($company, ChatMessage::TYPE_JOB_APPLIED, '', null, $request->job_id);
+
+        $jobAppliedData = (new JobApplied())->listJobApplied([
+            'jobAppliedId' => $result->applied_id
+        ], false);
+        returnResponse([
+            'data'    => $jobAppliedData[0],
+            'message' => ucfirst(translate('applied with success'))
+        ]);
     }
 
     /**
@@ -160,5 +159,31 @@ class JobAppliedController extends Controller
         if(!$jobApplied->delete())
             Validator::throwResponse(translate('an error occured, job applied not removed'), 500);
         Validator::throwResponse(translate('job applied removed'), 200);
+    }
+
+    /**
+     * Lists all applainces of logged user
+     * @param Int company_id
+     * @param String appliance_status
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listAppliances()
+    {
+        Validator::validateParameters($this->request, [
+            'company_id' => 'int',
+            'appliance_status' => 'string'
+        ]);
+        Validator::checkExistanceOnTable([
+            'company' => ['object' => new Company(), 'data' => request('company_id'), 'required' => false]
+        ]);
+        if(request('appliance_status') && !in_array(request('appliance_status'), [JobApplied::STATUS_APPLIED, JobApplied::STATUS_ACCEPTED, JobApplied::STATUS_REFUSED, JobApplied::STATUS_VALIDATION]))
+            Validator::throwResponse(translate('invalid appliance status'), 400);
+        $data['professional_id'] = $this->getProfessionalBySession()->professional_id;
+        if(request('company_id'))
+            $data['company_id'] = request('company_id');
+        if(request('appliance_status'))
+            $data['status'] = request('appliance_status');
+        $jobsApplied = (new JobApplied())->listJobApplied($data, false);
+        returnResponse(['data' => $jobsApplied]);
     }
 }
