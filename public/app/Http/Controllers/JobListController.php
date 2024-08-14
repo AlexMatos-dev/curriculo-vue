@@ -24,6 +24,7 @@ use App\Models\WorkingVisa;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class JobListController extends Controller
 {

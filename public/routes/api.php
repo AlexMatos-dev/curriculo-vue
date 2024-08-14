@@ -173,6 +173,7 @@ Route::prefix('job_applied')->middleware(['auth:sanctum', 'verify_email'])->grou
 
     Route::middleware('professional')->group(function ()
     {
+        Route::get('listappliances', [JobAppliedController::class, 'listAppliances']);
         Route::post('applyforvacancy', [JobAppliedController::class, 'applyForVacancy']);
         Route::post('canceljobapplied', [JobAppliedController::class, 'cancelJobApplied']);
     });

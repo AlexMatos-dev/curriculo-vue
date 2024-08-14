@@ -232,7 +232,7 @@ class JobList extends Model
         if ($request->has("free_term")){
             $attrs = ['jobslist.job_title'];
             foreach($attrs as $attr){
-                $query->where($attr, 'like', '%'.$request->working_visa.'%');
+                $query->where($attr, 'like', '%'.$request->free_term.'%');
             }
         }
         if($limit)

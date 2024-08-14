@@ -20,9 +20,9 @@ class CompanyAdmin
         $person = Auth::user();
         $company = $person->getProfile(Profile::COMPANY);
         if(!$company)
-            return response()->json(['message' => translate('company not found')], 403);
+            returnResponse(['message' => translate('company not found')], 403);
         if(!$company->isAdminWithPrivilegies($person->person_id))
-            return response()->json(['message' => translate('you have no privilegies')], 403);
+            returnResponse(['message' => translate('you have no privilegies')], 403);
         Session()->put('company', $company);
         return $next($request);
     }
