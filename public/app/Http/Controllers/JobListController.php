@@ -67,63 +67,6 @@ class JobListController extends Controller
      */
     public function index()
     {
-        $translations = [
-            'note: If your do not accept our cookies, you will not be able to login' => [
-                'en' => 'note: If your do not accept our cookies, you will not be able to login',
-                'pt' => 'obs: Se você não aceitar nossos cookies, você não poderá realizar o login',
-                'es' => ''
-            ],
-            'know more at our' => [
-                'en' => 'know more at our',
-                'pt' => 'saiba mais em nossa',
-                'es' => ''
-            ],
-            "by clicking 'Accept all cookies', you agree Jobifull can store cookies on your device and use information in accordance with our Cookie Policy" => [
-                'en' => "by clicking 'Accept all cookies', you agree Jobifull can store cookies on your device and use information in accordance with our Cookie Policy",
-                'pt' => "ao clicar em 'Aceitar todos os cookies', você concorda que a Jobifull pode armazenar cookies no seu dispositivo e utilizar informações de acordo com nossa Política de Cookies",
-                'es' => "al hacer clic en 'Aceptar todas las cookies', aceptas que Jobifull pueda almacenar cookies en tu dispositivo y utilizar información de acuerdo con nuestra Política de Cookies"
-            ],
-            'cookies policy' => [
-                'en' => 'cookies policy',
-                'pt' => 'política de cookies',
-                'es' => ''
-            ],
-            'you must accept our cookies to login' => [
-                'en' => 'you must accept our cookies to login',
-                'pt' => 'você deve aceitar os nossos cookies para realizar login',
-                'es' => ''
-            ],
-            'do not accept' => [
-                'en' => 'do not accept',
-                'pt' => 'não aceito',
-                'es' => ''
-            ],
-            'accept all' => [
-                'en' => 'accept all',
-                'pt' => 'aceito todos',
-                'es' => ''
-            ],
-        ];
-
-        $esGoogle = new GoogleTranslate('es', 'en');
-        $path = storage_path('app/dbSourceFiles/systemTranslations.json');
-        $data = json_decode(file_get_contents($path), true);
-        echo count($data) . '<br><br>';
-        $uno = (new ListLangue())->getNotOficialLangsIso();
-        foreach($translations as $translation){
-            $trans = $translation;
-            $trans['es'] = mb_strtolower($esGoogle->translate($trans['en']));
-            $unnoficial = [];
-            foreach($uno as $langIso => $val){
-                $unnoficial[$langIso] = null;
-            }
-            $trans['unoficialTranslations'] = $unnoficial;
-            $data[] = $trans;
-        }
-        file_put_contents($path, json_encode($data));
-        dd($data);
-        
-
         set_time_limit(60);
         Validator::validateParameters($this->request, [
             'page' => 'integer',
