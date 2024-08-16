@@ -109,7 +109,7 @@ class JobApplied extends Model
                 'jobslist.company_id', 'jobslist.job_modality_id', 'jobslist.job_city', 'jobslist.job_country', 'jobslist.job_seniority', 'jobslist.job_title',
                 'jobslist.job_description', 'jobslist.job_experience_description', 'jobslist.experience_in_months', 'jobslist.job_benefits',
                 'companies.company_slug', 'companies.company_register_number', 'companies.company_name', 'companies.company_slug', 'jobslist.contact_name',
-                'jobslist.contact_email', 'jobslist.contact_phone', 'jobslist.contact_website', 'companies.paying AS paying_company'
+                'jobslist.contact_email', 'jobslist.contact_phone', 'jobslist.ddi', 'jobslist.contact_website', 'companies.paying AS paying_company'
             )->leftJoin('jobslist', function($join){
                 $join->on('jobslist.job_id', '=', 'jobs_applieds.job_id');
             })->leftJoin('companies', function($join){

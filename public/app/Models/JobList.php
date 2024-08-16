@@ -51,6 +51,7 @@ class JobList extends Model
         'contact_email',
         'contact_name',
         'contact_phone',
+        'ddi',
         'contact_website'
     ];
 

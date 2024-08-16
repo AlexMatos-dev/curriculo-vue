@@ -39,6 +39,7 @@ class CreateJobsListTable extends Migration
 			$table->string('contact_name', 300)->nullable();
 			$table->string('contact_website', 300)->nullable();
 			$table->string('contact_phone', 20)->nullable();
+			$table->string('ddi', 10)->nullable();
 			$table->timestamps();
 		});
 	}

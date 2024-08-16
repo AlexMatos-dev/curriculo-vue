@@ -17,6 +17,7 @@ class CreatePersonsTable extends Migration {
 			$table->unsignedInteger('person_langue')->nullable();
 			$table->unsignedInteger('currency')->nullable();
 			$table->dateTime('last_login')->nullable();
+			$table->tinyInteger('accepted_cookies')->default(0);
 			$table->timestamps();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();

@@ -36,7 +36,8 @@ class Person extends Authenticatable
         'person_ddi',
         'person_phone',
         'person_langue',
-        'last_login'
+        'last_login',
+        'accepted_cookies'
     ];
 
      /**

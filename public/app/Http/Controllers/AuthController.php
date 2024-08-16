@@ -49,6 +49,7 @@ class AuthController extends Controller
         }
         $token = $person->createToken('auth_token')->plainTextToken;
         $person->last_login = Carbon::now();
+        $person->accepted_cookies = true;
         $person->save();
         Auth::login($person);
         return response()->json([
