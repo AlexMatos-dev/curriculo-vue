@@ -37,7 +37,8 @@ class Person extends Authenticatable
         'person_phone',
         'person_langue',
         'last_login',
-        'accepted_cookies'
+        'accepted_cookies',
+        'person_slug'
     ];
 
      /**
@@ -216,5 +217,19 @@ class Person extends Authenticatable
         if(!$person)
             return false;
         return $person->llangue_acronyn;
+    }
+
+    /**
+     * Generates a new slug and saves it top $this person
+     * @param Bool dontSave - to not save, only set to $this person
+     * @return Bool|String
+     */
+    public function updateSlug($dontSave = false)
+    {
+        $slug = vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4) ) . "-{$this->person_id}";
+        $this->person_slug = $slug;
+        if($dontSave)
+            return $this->person_slug;
+        return $this->save();
     }
 }
