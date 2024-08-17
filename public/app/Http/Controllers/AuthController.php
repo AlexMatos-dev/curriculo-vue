@@ -50,6 +50,8 @@ class AuthController extends Controller
         $token = $person->createToken('auth_token')->plainTextToken;
         $person->last_login = Carbon::now();
         $person->accepted_cookies = true;
+        if(!$person->person_slug)
+            $person->person_slug = $person->updateSlug(true);
         $person->save();
         Auth::login($person);
         return response()->json([
@@ -81,6 +83,7 @@ class AuthController extends Controller
             'person_langue' => 'integer',
             'profile_type' => 'string'
         ]);
+        Validator::validateEmail(request('person_email'));
         if(Person::where('person_email', request('person_email'))->first())
             returnResponse(['message' => translate('email already in use')], 400);
         Validator::validatePassword(request('person_password'));
@@ -107,6 +110,7 @@ class AuthController extends Controller
         ]);
         if(!$person)
             returnResponse(['message' => translate('person not created')], 500);
+        $person->updateSlug();
         $profile = (new Profile())->createProfile($person, request('profile_type'));
         if(!$profile){
             $person->delete();
@@ -123,12 +127,19 @@ class AuthController extends Controller
     public function profile()
     {
         $personObj = Auth::user();
-        $professional = $personObj->getProfile(Profile::PROFESSIONAL);
-        if($professional)
-            $professional = $professional->gatherInformation();
-        $profilesData = (new Profile())->getProfilesByPersonId($personObj->person_id);
-        $profilesData['person'] = $personObj;
-        returnResponse($profilesData);
+        $personType = '';
+        $key = "lastLoginOf--{$personObj->person_id}";
+        if(Cache::has($key)){
+            $personType = Cache::get($key);
+        }else if(request('personType')){
+            $personType = request('personType');
+            Cache::put($key, $personType);
+        }
+        return response()->json([
+            'personType' => $personType,
+            'profiles' => (new Profile())->getProfilesByPersonId($personObj->person_id),
+            'person' => $personObj
+        ]);
     }
 
     /**

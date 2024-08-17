@@ -23,6 +23,18 @@ class Validator
     }
 
     /**
+     * Performes a validation on sent cnpj 
+     * @param String cnpj
+     * @return Bool|\Illuminate\Http\JsonResponse
+     */
+    public static function validateEmail($email = null)
+    {
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+            self::throwResponse(ucfirst(translate('invalid email')));
+        return true;
+    }
+
+    /**
      * Performes a validation on Request parameters accordingly to sent rules, the rules are exclusive to comparing date. In case of trigger on validation fail, 
      * does not throw exception, just returns a JSON response with correspondent code
      * @return Bool|\Illuminate\Http\JsonResponse
