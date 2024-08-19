@@ -18,7 +18,7 @@ class WebAuthentication
         if(!Session()->has('user_id') || !Session()->get('user_id')){
             Session()->put('web_message', translate('not authenticated'));
             Session()->put('web_message_type', 'error');
-            return redirect('/login');
+            exit(view('login'));
         }
         return $next($request);
     }

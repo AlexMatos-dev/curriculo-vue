@@ -25,6 +25,7 @@ use App\Http\Controllers\PersonController;
 use App\Http\Controllers\ProfessionalController;
 use App\Http\Controllers\ProficiencyController;
 use App\Http\Controllers\RecruiterController;
+use App\Http\Controllers\ReleaseNoteController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TagController;
@@ -32,6 +33,8 @@ use App\Http\Controllers\TypeVisasController;
 use App\Http\Controllers\VisaController;
 use App\Http\Controllers\WorkingVisaController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('version', [ReleaseNoteController::class, 'currentVersion']);
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);

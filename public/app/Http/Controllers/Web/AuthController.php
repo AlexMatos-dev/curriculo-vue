@@ -26,7 +26,7 @@ class AuthController extends Controller
             returnResponse(['success' => false, 'message' => translate('user not found')]);
         if(!$user->loginAdminUser())
             returnResponse(['success' => false, 'message' => translate('user not logged')]);
-        returnResponse(['success' => true, 'message' => translate('user logged')]);
+        returnResponse(['success' => true, 'message' => translate('user logged'), 'view' => view('swagger')->render()]);
     }
 
     public function saveAdmin()
