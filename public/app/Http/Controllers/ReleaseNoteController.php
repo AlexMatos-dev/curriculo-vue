@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReleaseNote;
-use Illuminate\Http\Request;
 
 class ReleaseNoteController extends Controller
 {
