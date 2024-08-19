@@ -8,11 +8,11 @@
         <div class="col-md-12 m-auto">
             <div class="form-group mb-5">
                 <label>Email</label>
-                <input type="text" class="form-control" name="email" required>
+                <input type="text" class="form-control" name="email" id='email' required>
             </div>
             <div class="form-group mt-3">
                 <label>Password</label>
-                <input type="password" class="form-control" name="password" required>
+                <input type="password" class="form-control" name="password" id='password' required>
             </div>
 
             <div class="d-flex">
@@ -49,11 +49,23 @@
                     return;
                 }
                 showAlert(true, response.message, 'success');
-                window.location = "{{ url('/swagger') }}"
+                setCookie('email_aut', encryptText($('#email').val()));
+                setCookie('pass_aut', encryptText($('#password').val()));
+                $('.content-container').html(response.view);
             },
             complete: function(){
                 openLoaderModal(true);
             }
         });
     }
+
+    $(document).ready(function(){
+        let email    = decryptText(getCookie('email_aut'));
+        let password = decryptText(getCookie('pass_aut'));
+        if(email != '' && password != ''){
+            $('#login-form').find('#email').val(email);
+            $('#login-form').find('#password').val(password);
+            login();
+        }
+    });
 </script>
