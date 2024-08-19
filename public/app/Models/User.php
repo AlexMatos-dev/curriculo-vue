@@ -11,14 +11,15 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    const ADMIN_ROLE = 'admin';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'lusers_name',
-        'lusers',
+        'name',
         'email',
         'role',
         'password',
@@ -45,5 +46,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Login admin user to session
+     * @return Bool
+     */
+    public function loginAdminUser()
+    {
+        if(!$this->id)
+            return false;
+        Session()->put('user_id', $this->id);
+        Session()->put('user', $this);
+        return true;
     }
 }

@@ -63,6 +63,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('verify_email', [
             \App\Http\Middleware\VerifyEmail::class
         ]);
+        $middleware->group('web_authentication', [
+            \App\Http\Middleware\WebAuthentication::class
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         
