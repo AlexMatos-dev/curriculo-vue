@@ -40,8 +40,8 @@ class PersonController extends Controller
         $result = $person->update([
             'person_username' => request('person_username'),
             'person_email' => request('person_email'),
-            'person_ddi' => request('person_ddi') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
-            'person_phone' => request('person_phone') ? str_replace(['.', '-'], '', request('person_ddi')) : null,
+            'person_ddi' => request('person_ddi'),
+            'person_phone' => request('person_phone'),
             'person_langue' => request('person_langue'),
             'currency' => request('currency')
         ]);

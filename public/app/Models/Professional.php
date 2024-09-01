@@ -31,7 +31,8 @@ class Professional extends Model
         'professional_title',
         'currently_working',
         'avaliable_to_travel',
-        'paying'
+        'paying',
+        'professional_ddi'
     ];
 
     public function person()

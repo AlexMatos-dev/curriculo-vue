@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\Company;
 use App\Models\CompanyType;
+use App\Models\Gender;
+use App\Models\JobApplied;
 use App\Models\JobList;
+use App\Models\ListLangue;
 use App\Models\Person;
+use App\Models\Professional;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -84,6 +90,7 @@ class CompanyController extends Controller
      * @param String company_video
      * @param String company_email
      * @param String company_phone
+     * @param String company_ddi
      * @param String company_website
      * @param String company_description
      * @param String company_number_employees
@@ -99,6 +106,7 @@ class CompanyController extends Controller
             'company_video' => 'max:150',
             'company_email' => 'required|email|max:150',
             'company_phone' => 'max:20',
+            'company_ddi' => 'max:10',
             'company_website' => 'max:100',
             'company_description' => 'max:500',
             'company_number_employees' => 'numeric|not_in:0',
@@ -116,6 +124,7 @@ class CompanyController extends Controller
             'company_video' => request('company_video'),
             'company_email' => request('company_email'),
             'company_phone' => request('company_phone'),
+            'company_ddi' => request('company_ddi'),
             'company_website' => request('company_website'),
             'company_description' => request('company_description'),
             'company_number_employees' => request('company_number_employees'),
@@ -250,6 +259,14 @@ class CompanyController extends Controller
             $perPage = 10;
         $jobListObj = new JobList();
         $company = $this->getCompanyBySession();
+        if(request('total')){
+            $totals = $jobListObj->getTotalOfMyJobs($company->company_id);
+            returnResponse([
+                'data' => $totals
+            ]); 
+        }
+        if(request('all') && (request('all')) == 'true')
+            $perPage = null;
         $results = $jobListObj->getPaginatedJobs($this->request, $page, $perPage, 5, [
             'company_id' => [$company->company_id], 
             'status' => [$jobListObj::PUBLISHED_JOB, $jobListObj::PENDING_JOB, $jobListObj::DRAFT_JOB, $jobListObj::HIDDEN_JOB]
@@ -260,6 +277,20 @@ class CompanyController extends Controller
             'curent_page' => $results['page'],
             'per_page' => $perPage,
             'last_page' => $results['lastPage']
+        ]);
+    }
+
+    /**
+     * Gets all my company jobs applied professionals
+     * @param Integer job_id 
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getMyCompanyJobsAppliedProfessionals()
+    {
+        $data = (new JobApplied())->getMyCompanyJobAppliances($this->getCompanyBySession()->company_id, request('job_id'));
+        returnResponse([
+            'data'  => $data['data'],
+            'total' => $data['total']
         ]);
     }
 

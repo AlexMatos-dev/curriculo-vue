@@ -118,6 +118,7 @@ Route::prefix('company')->group(function ()
         {
             Route::get('job/search/{job_id}', [CompanyController::class, 'searchCompanyJob']);
             Route::get('jobs', [CompanyController::class, 'getMyCompanyJobs']);
+            Route::get('appliedprofessionals', [CompanyController::class, 'getMyCompanyJobsAppliedProfessionals']);
             Route::post('postjob', [CompanyController::class, 'postJob']);
             Route::post('trashjob', [CompanyController::class, 'desactivateJob']);
             Route::post('untrashjob', [CompanyController::class, 'reactivateJob']);

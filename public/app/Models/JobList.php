@@ -6,7 +6,6 @@ use App\Helpers\ModelUtils;
 use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 class JobList extends Model
 {
@@ -342,6 +341,16 @@ class JobList extends Model
     }
 
     /**
+     * Get total number of my company jobs
+     * @param Int companyId
+     * @return Int
+     */
+    public function getTotalOfMyJobs($companyId = null)
+    {
+        return JobList::where('company_id', $companyId)->count();
+    }
+
+    /**
      * Get jobs paginated
      * @param request request
      * @param Int page
@@ -357,6 +366,8 @@ class JobList extends Model
         // $paying = $this->listJobs($request, true, 200, null, true, $byIds, $byCompany);
         $paying = [];
         $totalPaying = count($paying);
+        if(!$perPage)
+            $perPage = $totalPaying + $totalNonPaying;
         $paginationData = $this->calculatePaginationData([
             'nonPaying' => $totalNonPaying,
             'paying'    => $totalPaying
@@ -663,6 +674,7 @@ class JobList extends Model
             $thisObj->certifications     = $values['jobCertifications'];
             $thisObj->wage_currency_id   = $job->wage_currency;
             $thisObj->posted_at          = $this->getTimeSincePosted($job->job_created_at);
+            $thisObj->posted_at_full     = $this->getTimeSincePosted($job->job_created_at, true);
             $thisObj->exp_required       = $this->getRequiredExperience($job->experience_in_months);
             $thisObj->experience_required= $this->getRequiredExperience($job->experience_in_months, true);
             $thisObj->match              = $this->generateCompatilityMatchOfJob($thisObj, $searchParameters);
@@ -756,11 +768,11 @@ class JobList extends Model
         $requiredExperience = '';
         $years = round($experience_in_months / 12);
         if($years < 1){
-            $monthTrans = $experience_in_months > 1 ? translate('months') : translate('month');
-            $requiredExperience = $experience_in_months . ' ' . ucfirst($monthTrans) . ' ' . ($fullText ? ucfirst(translate('experience')) : ucfirst(translate('exp')));
+            $monthTrans = $experience_in_months != 1 ? translate('months') : translate('month');
+            $requiredExperience = $experience_in_months . ' ' . ucfirst($monthTrans) . ($fullText ? ' ' . translate('of') . ' ' : ' ') . ($fullText ? translate('experience') : ucfirst(translate('exp')));
         }else{
-            $yearTrans = $years > 1 ? translate('years') : translate('year');
-            $requiredExperience = $years . ' ' . ucfirst($yearTrans) . ' ' . ($fullText ? ucfirst(translate('experience')) : ucfirst(translate('exp')));
+            $yearTrans = $years != 1 ? translate('years') : translate('year');
+            $requiredExperience = $years . ' ' . ucfirst($yearTrans) . ($fullText ? ' ' . translate('of') . ' ' : ' ') . ($fullText ? translate('experience') : ucfirst(translate('exp')));
         }
         return $requiredExperience;
     }
@@ -768,9 +780,10 @@ class JobList extends Model
     /**
      * Returns the time in days or months since job was created
      * @param String jobCreatedAt
+     * @param Bool full
      * @return String
      */
-    public function getTimeSincePosted($jobCreatedAt = '')
+    public function getTimeSincePosted($jobCreatedAt = '', $full = false)
     {
         if($jobCreatedAt == '')
             return '';
@@ -779,9 +792,15 @@ class JobList extends Model
         $inDays = abs((int)$today->diffInDays($jobCreatedAt));
         if($inDays > 90){
             $months = round($inDays / 30);
-            return $months . 'm';
+            $val = 'm';
+            if($full)
+                $val = $months > 1 ? translate('months') : translate('month');
+            return "$months $val";
         }else{
-            return $inDays . 'd';
+            $val = 'm';
+            if($full)
+                $val = $inDays > 1 ? translate('days') : translate('day');
+            return "$inDays $val";
         }
     }
 

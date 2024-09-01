@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,11 +16,25 @@ class WebAuthentication
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(!Session()->has('user_id') || !Session()->get('user_id')){
+        if(!$request->token || !User::where('users', $request->token)->first()){
             Session()->put('web_message', translate('not authenticated'));
             Session()->put('web_message_type', 'error');
-            exit(view('login'));
+            $view = $this->getViewByPath($request->getRequestUri());
+            if(!$view)
+                exit(view('notFound'));
+            exit(view('login')->with(['view' => $view]));
         }
         return $next($request);
+    }
+
+    public function getViewByPath($uri)
+    {
+        $views = [
+            '/translations' => 'systemTranslation',
+            '/swagger' => 'swagger'
+        ];
+        if(!array_key_exists($uri, $views))
+            return false;
+        return $views[$uri];
     }
 }

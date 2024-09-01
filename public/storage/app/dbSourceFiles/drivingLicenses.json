@@ -141,5 +141,93 @@
             "es": "habilitación para vehículo pesado",
             "en": "heavy vehicle license"
         }
+    },
+    {
+        "pt": "ciclomotores",
+        "es": "ciclomotores",
+        "en": "mopeds",
+        "symbol": "AM",
+        "description": {
+            "pt": "habilitação para ciclomotores",
+            "es": "habilitación para ciclomotores",
+            "en": "moped license"
+        }
+    },
+    {
+        "pt": "triciclos e quadriciclos",
+        "es": "triciclos y cuadriciclos",
+        "en": "tricycles and quadricycles",
+        "symbol": "B1",
+        "description": {
+            "pt": "habilitação para triciclos e quadriciclos",
+            "es": "habilitación para triciclos y cuadriciclos",
+            "en": "tricycles and quadricycles license"
+        }
+    },
+    {
+        "pt": "motocicletas leves",
+        "es": "motocicletas ligeras",
+        "en": "light motorcycles",
+        "symbol": "A1",
+        "description": {
+            "pt": "habilitação para motocicletas leves",
+            "es": "habilitación para motocicletas ligeras",
+            "en": "light motorcycle license"
+        }
+    },
+    {
+        "pt": "motocicletas de média cilindrada",
+        "es": "motocicletas de media cilindrada",
+        "en": "medium motorcycles",
+        "symbol": "A2",
+        "description": {
+            "pt": "habilitação para motocicletas de média cilindrada",
+            "es": "habilitación para motocicletas de media cilindrada",
+            "en": "medium motorcycle license"
+        }
+    },
+    {
+        "pt": "caminhões com reboque",
+        "es": "camiones con remolque",
+        "en": "trucks with trailer",
+        "symbol": "C+E",
+        "description": {
+            "pt": "habilitação para caminhões com reboque",
+            "es": "habilitación para camiones con remolque",
+            "en": "trucks with trailer license"
+        }
+    },
+    {
+        "pt": "ônibus com reboque",
+        "es": "autobuses con remolque",
+        "en": "buses with trailer",
+        "symbol": "D+E",
+        "description": {
+            "pt": "habilitação para ônibus com reboque",
+            "es": "habilitación para autobuses con remolque",
+            "en": "buses with trailer license"
+        }
+    },
+    {
+        "pt": "tratores",
+        "es": "tractores",
+        "en": "tractors",
+        "symbol": "T",
+        "description": {
+            "pt": "habilitação para tratores",
+            "es": "habilitación para tractores",
+            "en": "tractor license"
+        }
+    },
+    {
+        "pt": "veículos de duas rodas de baixa potência",
+        "es": "vehículos de dos ruedas de baja potencia",
+        "en": "low-power two-wheel vehicles",
+        "symbol": "L",
+        "description": {
+            "pt": "habilitação para veículos de duas rodas de baixa potência",
+            "es": "habilitación para vehículos de dos ruedas de baja potencia",
+            "en": "low-power two-wheel vehicles license"
+        }
     }
 ]
