@@ -36,6 +36,12 @@
         "category": "language"
     },
     {
+        "en": "native",
+        "pt": "nativo",
+        "es": "nativo",
+        "category": "language"
+    },
+    {
         "en": "beginner",
         "pt": "iniciante",
         "es": "principiante",

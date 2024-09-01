@@ -33,7 +33,8 @@ class Company extends Model
         'company_description',
         'company_number_employees',
         'company_benefits',
-        'paying'
+        'paying',
+        'company_ddi'
     ];
 
     public function companyType()

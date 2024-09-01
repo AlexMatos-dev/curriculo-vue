@@ -23,8 +23,8 @@ use App\Models\Visa;
 use App\Models\WorkingVisa;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class JobListController extends Controller
 {
@@ -208,6 +208,7 @@ class JobListController extends Controller
                 'contact_name'      => 'string|max:300',
                 'contact_phone'     => 'string|max:300',
                 'contact_website'   => 'string|max:300',
+                'ddi'               => 'string|max:10',
                 'job_language'      => 'integer|required'
             ]);
             $objects = Validator::checkExistanceOnTable([
@@ -267,6 +268,7 @@ class JobListController extends Controller
      * @param Int working_visa
      * @param Int job_period
      * @param Int wage_currency
+     * @param String ddi
      * @return \Illuminate\Http\JsonResponse - Schema ["message" => String, "data" => Array]
      */
     public function update(int $jobListId, Request $request)
@@ -307,6 +309,7 @@ class JobListController extends Controller
                 'contact_name'      => 'string|max:300',
                 'contact_phone'     => 'string|max:300',
                 'contact_website'   => 'string|max:300',
+                'ddi'               => 'string|max:10',
                 'job_language'      => 'integer|required'
             ]);
             $objects = Validator::checkExistanceOnTable([

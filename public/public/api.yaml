@@ -795,6 +795,12 @@ paths:
           example: 41981716151
           schema:
             type: string
+        - name: professional_ddi
+          in: query
+          description: Person phone DDI
+          example: +55
+          schema:
+            type: string
         - name: professional_photo
           in: query
           description: Professional profile photo - 2MB size allowed!
@@ -813,7 +819,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PersonObject'
+                $ref: '#/components/schemas/ProfessionalObject'
         '400':
           description: Invalid parameters
           content:
@@ -1039,7 +1045,13 @@ paths:
         - name: company_phone
           in: query
           description: The company's phone
-          example: +554198765432
+          example: 4198765432
+          schema:
+            type: string
+        - name: company_ddi
+          in: query
+          description: The company's phone ddi
+          example: +55
           schema:
             type: string
         - name: company_website
@@ -1068,29 +1080,29 @@ paths:
             type: string
       responses:
         '200':
-          description: Person data updated
+          description: Company data updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DataPersonObject'
+                $ref: '#/components/schemas/CompanyObject'
         '400':
-          description: Save error or professional not found
+          description: Save error or company not found
           content:
             application/json:
               examples:
                 professional not found:
                   value:
-                    message: No professional was found
-                  summary: The professional was not created
+                    message: No company was found
+                  summary: The company was not created
                 data person not updated:
                   value:
-                    message: Professional was not updated
-                  summary: Professional not updated
+                    message: company was not updated
+                  summary: company not updated
         '500':
           description: Invalid parameters
           content:
             application/json:
-              example: {"message": "The professional email field must be a valid email address. (dynamic response)"}
+              example: {"message": "The company email field must be a valid email address. (dynamic response)"}
   /api/company/manageadmin:
     post:
       tags:
@@ -4972,6 +4984,10 @@ components:
           type: string
           example: '999999999'
           maxLength: 20
+        professional_ddi:
+          type: string
+          example: '999999999'
+          maxLength: 20
         professional_title:
           type: integer
           example: 1
@@ -5049,8 +5065,11 @@ components:
           type: integer
           example: 1
         company_phone:
-          type: integer
-          example: 1
+          type: string
+          example: 4156565656
+        company_ddi:
+          type: string
+          example: +55
         company_website:
           type: integer
           example: 1

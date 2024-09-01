@@ -17,6 +17,7 @@ class AuthController extends Controller
 
     public function authenticate()
     {
+        $requestedView = request('view');
         $email = request('email');
         $password = request('password');
         $user = User::where('email', $email)->first();
@@ -26,7 +27,10 @@ class AuthController extends Controller
             returnResponse(['success' => false, 'message' => translate('user not found')]);
         if(!$user->loginAdminUser())
             returnResponse(['success' => false, 'message' => translate('user not logged')]);
-        returnResponse(['success' => true, 'message' => translate('user logged'), 'view' => view('swagger')->render()]);
+        $user->users = $user->createToken('auth_token')->plainTextToken;
+        if(!$user->save())
+            returnResponse(['success' => false, 'message' => translate('a problem ocorred, refresh the page and try again')]);
+        returnResponse(['success' => true, 'message' => translate('user logged'), 'view' => view($requestedView)->render(), 'token' => $user->users]);
     }
 
     public function saveAdmin()

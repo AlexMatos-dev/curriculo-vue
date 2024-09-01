@@ -147,7 +147,6 @@ class Profile extends Model
                 break;
             }
         } catch (\Throwable $th) {
-            dd($th->getMessage());
             return false;
         }
         $result = Profile::create([

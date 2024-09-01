@@ -6,6 +6,7 @@
     </div>
     <form id="login-form">
         <div class="col-md-12 m-auto">
+            <input type="hidden" name="view" value="{{ $view }}">
             <div class="form-group mb-5">
                 <label>Email</label>
                 <input type="text" class="form-control" name="email" id='email' required>
@@ -14,14 +15,13 @@
                 <label>Password</label>
                 <input type="password" class="form-control" name="password" id='password' required>
             </div>
-
             <div class="d-flex">
                 <a class="btn btn-primary bg-primary-color text-white md-m-auto col-12 col-md-4 mt-5" onclick="login()">Enter</a>
             </div>
         </div>
     </form>
-    @include('footer')
 </section>
+@include('footer')
 <script>
     const sessionMessage = {
         message: "{{ Session()->get('web_message') }}",
@@ -52,6 +52,7 @@
                 setCookie('email_aut', encryptText($('#email').val()));
                 setCookie('pass_aut', encryptText($('#password').val()));
                 $('.content-container').html(response.view);
+                $(document).find('#user_token').val(response.token);
             },
             complete: function(){
                 openLoaderModal(true);

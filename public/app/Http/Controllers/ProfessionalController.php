@@ -24,6 +24,7 @@ class ProfessionalController extends Controller
      * @param String professional_title
      * @param String professional_photo
      * @param String professional_cover
+     * @param String professional_ddi
      * @return \Illuminate\Http\JsonResponse
      */
     public function update()
@@ -33,6 +34,7 @@ class ProfessionalController extends Controller
             'professional_lastname' => 'required|max:250',
             'professional_email' => 'required|max:250|email',
             'professional_phone' => 'max:20',
+            'professional_ddi' => 'max:10',
             'professional_title' => 'max:255',
         ]);
         $person = Auth::user();
@@ -42,6 +44,7 @@ class ProfessionalController extends Controller
             'professional_lastname' => request('professional_lastname'),
             'professional_email' => request('professional_email'),
             'professional_phone' => request('professional_phone'),
+            'professional_ddi' => request('ddi'),
             'professional_title' => request('professional_title'),
             'person_id' => $person->person_id
         ];

@@ -6,6 +6,7 @@ use App\Helpers\LaravelMail;
 use App\Helpers\ModelUtils;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class JobApplied extends Model
 {
@@ -207,5 +208,81 @@ class JobApplied extends Model
             break;
         }
         return '';
+    }
+
+    /**
+     * Gets company jobs applications
+     * @param Int companyId
+     * @param Int jobId
+     * @return Array - schema: ['totals' => Int, 'data' => Array]
+     */
+    public function getMyCompanyJobAppliances($companyId = null, $jobId = null)
+    {
+        $query = Professional::select(
+            'professionals.*', 'dataperson.*', 'jobs_applieds.applied_id', 'jobs_applieds.job_id', 
+            DB::raw("CONCAT(professionals.professional_firstname, ' ', professionals.professional_lastname) AS professional_fullname")
+        )->leftJoin('jobs_applieds', function($join){
+            $join->on('jobs_applieds.professional_id', '=', 'professionals.professional_id');
+        })->leftJoin('jobslist', function($join){
+            $join->on('jobslist.job_id', '=', 'jobs_applieds.job_id');
+        })->leftJoin('dataperson', function($join){
+            $join->on('dataperson.dpprofes_id', '=', 'professionals.professional_id');
+        })->where('jobslist.company_id', $companyId);
+        if($jobId)
+            $query->where('jobslist.job_id', $jobId);
+        $data = $query->get();
+        $languagesIso  = (new ListLangue())->getNotOficialLangsIso();
+        $gendersData   = ModelUtils::getTranslationsArray(new \App\Models\Gender(), 'gender_name', [], 'gender_name', $languagesIso);
+        $countriesData = ModelUtils::getTranslationsArray(new \App\Models\ListCountry(), 'lcountry_name', [], 'lcountry_id', $languagesIso);
+        $professions   = ModelUtils::getTranslationsArray(new \App\Models\ListProfession(), 'profession_name', [], 'lprofession_id', $languagesIso);
+        $userLang = Session()->get('user_lang');
+        if(!in_array($userLang, \App\Models\Translation::OFFICIAL_LANGUAGES))
+            $userLang = 'en';
+        $professionalByAppliance = [];
+        $totals = [];
+        foreach($data as $professional){
+            $information = $professional;
+            // Profession
+            $information['profession'] = '';
+            if($information['dpprofes_id'] && array_key_exists($information['dpprofes_id'], $professions))
+                $information['profession'] = ucfirst($professions[$information['dpprofes_id']][$userLang] ? $professions[$information['dpprofes_id']][$userLang] : $professions[$information['dpprofes_id']]['en']);
+            // Country
+            $countryData = array_key_exists($information['dpcountry_id'], $countriesData) ? $countriesData[$information['dpcountry_id']] : null;
+            $information['country'] = '';
+            if($countryData)
+                $information['country'] = ucfirst($countryData[$userLang] ? $countryData[$userLang] : $countryData['en']);
+            // Gender
+            $genderData = array_key_exists($information['dpgender'], $gendersData) ? $gendersData[$information['dpgender']] : null;
+            $information['gender'] = '';
+            if($genderData)
+                $information['gender'] = ucfirst($genderData[$userLang] ? $genderData[$userLang] : $genderData['en']);
+            // BirthDate
+            $information['birth_date'] = $information['dpdate_of_birth'] ? ModelUtils::parseDateByLanguage($information['dpdate_of_birth'], false, $userLang) : '';
+            // Images
+            $information['professional_photo'] = $information['professional_photo'] ? base64_encode($information['professional_photo']) : null;
+            $information['professional_cover'] = $information['professional_cover'] ? base64_encode($information['professional_cover']) : null;
+            // Location
+            $location = $information['dpcity'];
+            if($information['country'])
+                $location .= ", {$information['country']}";
+            $information['location'] = trim($location, ', ');
+            // Full location
+            $full_location = $information['dpcity'];
+            if($information['dpstate'])
+                $full_location .= ", {$information['dpstate']}";
+            if($information['country'])
+                $full_location .= ", {$information['country']}";
+            $information['full_location'] = trim($full_location, ', ');
+            $professionalByAppliance[$professional->job_id][] = $professional;
+            if(!array_key_exists($professional->job_id, $totals)){
+                $totals[$professional->job_id] = 1;
+            }else{
+                $totals[$professional->job_id]++;
+            }
+        }
+        return [
+            'total' => $totals,
+            'data'  => $professionalByAppliance
+        ];
     }
 }
