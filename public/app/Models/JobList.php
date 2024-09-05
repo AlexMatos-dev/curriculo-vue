@@ -279,7 +279,9 @@ class JobList extends Model
         $totalCompanies = $payingCount + $nonPayingCount;
         if($payingCount == $nonPayingCount)
             $totalCompanies = (int)ceil($totalCompanies / 2);
-        $maxPages     = (int)ceil($totalCompanies / $perPage);
+        $maxPages = 0;
+      	if($totalCompanies > 0)
+        	$maxPages = (int)ceil($totalCompanies / $perPage);
         $logics = [
             'paying'        => 0,
             'nonPaying'     => 0,
