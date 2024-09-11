@@ -624,10 +624,14 @@ class JobList extends Model
             }
         }
         foreach($jobCertificationArray as $jobId => $certifications){
+            $used = [];
             foreach($certifications as $certification){
+                if(in_array($certification['certification_type'], $used))
+                    continue;                    
+                $used[] = $certification['certification_type'];
                 $translation = $certification[$languageIso] ? $certification[$languageIso] : $certification[$defaultLanguage];
                 $usedAttr[$jobId]['jobCertifications'][] = $translation;
-                $usedAttr[$jobId]['jobCertificationsIds'][] = $certification['job_certification'];
+                $usedAttr[$jobId]['jobCertificationsIds'][] = $certification['certification_type'];
             }
         }
         foreach($jobDrivingLicenseArray as $jobId => $drivingLicenses){
