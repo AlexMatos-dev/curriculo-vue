@@ -40,10 +40,10 @@ class PersonController extends Controller
         $result = $person->update([
             'person_username' => request('person_username'),
             'person_email' => request('person_email'),
-            'person_ddi' => request('person_ddi'),
+            'person_ddi' => request('person_ddi') ? request('person_ddi') : null,
             'person_phone' => request('person_phone'),
-            'person_langue' => request('person_langue'),
-            'currency' => request('currency')
+            'person_langue' => request('person_langue') ? request('person_langue') : null,
+            'currency' => request('currency') ? request('currency') : null
         ]);
         if(!$result)
             returnResponse(['message' => translate('person not updated')], 500);

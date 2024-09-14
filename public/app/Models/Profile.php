@@ -68,7 +68,7 @@ class Profile extends Model
                 foreach($object->getFillable() as $attr){
                     $val = $object->{$attr};
                     if(in_array($attr, ['company_cover_photo','company_logo','professional_photo','recruiter_photo']))
-                        $val = $val ? base64_encode($val) : null;
+                        $val = $val ? $val : null;
                     $data[$attr] = $val;
                 }
                 $data[$object->getKeyName()] = $object->{$object->getKeyName()};
