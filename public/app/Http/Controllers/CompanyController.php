@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\Company;
 use App\Models\CompanyType;
-use App\Models\Gender;
 use App\Models\JobApplied;
 use App\Models\JobList;
-use App\Models\ListLangue;
 use App\Models\Person;
-use App\Models\Professional;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -100,9 +95,9 @@ class CompanyController extends Controller
     public function update()
     {
         Validator::validateParameters($this->request, [
-            'company_register_number' => 'required|max:100',
+            'company_register_number' => 'max:100',
             'company_name' => 'required|max:300',
-            'company_type' => 'required|integer',
+            'company_type' => 'integer',
             'company_video' => 'max:150',
             'company_email' => 'required|email|max:150',
             'company_phone' => 'max:20',
@@ -113,18 +108,18 @@ class CompanyController extends Controller
             'company_benefits' => 'max:4294967295'
         ]);
         Validator::checkExistanceOnTable([
-            'company_type' => ['object' => CompanyType::class, 'data' => request('company_type')]
+            'company_type' => ['object' => CompanyType::class, 'data' => request('company_type'), 'required' => false]
         ]);
         $person = Auth::user();
         $dataToSet = [
             'company_register_number' => request('company_register_number'),
             'company_slug' => $person->makeSlug(request('company_name'), null),
             'company_name' => request('company_name'),
-            'company_type' => request('company_type'),
+            'company_type' => request('company_type') ? request('company_type') : null,
             'company_video' => request('company_video'),
             'company_email' => request('company_email'),
             'company_phone' => request('company_phone'),
-            'company_ddi' => request('company_ddi'),
+            'company_ddi' => request('company_ddi') ? request('company_ddi') : null,
             'company_website' => request('company_website'),
             'company_description' => request('company_description'),
             'company_number_employees' => request('company_number_employees'),

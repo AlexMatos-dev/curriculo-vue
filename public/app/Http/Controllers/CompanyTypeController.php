@@ -27,7 +27,7 @@ class CompanyTypeController extends Controller
             't.unofficial_translations',
             'company_types.created_at',
             'company_types.updated_at'
-        );
+        )->where('t.category', Translation::CATEGORY_COMPANY_TYPE);
         if(request('name')){
             $languageISO = request('languageISO', Translation::OFFICIAL_LANGUAGES[0]);
             if(!in_array($languageISO, Translation::OFFICIAL_LANGUAGES))

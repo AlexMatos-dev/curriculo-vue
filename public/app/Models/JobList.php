@@ -756,8 +756,8 @@ class JobList extends Model
             foreach($attrToUnset as $attrName){
                 unset($thisObj->{$attrName});
             }
-            $thisObj->company_logo = base64_encode($thisObj->company_logo);
-            $thisObj->company_cover_photo = base64_encode($thisObj->company_cover_photo);
+            $thisObj->company_logo = $thisObj->company_logo ? $thisObj->company_logo : null;
+            $thisObj->company_cover_photo = $thisObj->company_cover_photo ? $thisObj->company_cover_photo : null;
             $results[] = $thisObj;
         }
         return $results;
