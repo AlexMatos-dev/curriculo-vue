@@ -52,7 +52,7 @@ footer {
     margin-top: 20px!important;
     font-size: 0.9em!important;
     color: #777!important;
-    position: absolute;
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
