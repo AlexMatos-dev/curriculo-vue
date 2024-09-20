@@ -1316,6 +1316,61 @@ paths:
           content:
             application/json:
               example: {"message":"company not found"}
+  /api/company/inviterecruiter:
+    post:
+      tags:
+        - company
+      summary: Sends an invitation to a recruite to join the company's recruiters crew
+      description: Sends an email with a token and link.
+      parameters:
+        - name: recruiter_id
+          in: query
+          schema:
+            type: integer
+          description: recruiter id
+          example: 1
+          required: true
+      responses:
+        '200':
+          description: Sends email and creates a pending invitation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyRecruiter'
+                  message:
+                    type: string
+                    example: invitation sent
+                    description: success message
+        '400':
+          description: already is a recruiter of the company
+          content:
+            application/json:
+              example: {"message":"already one of your company's recruiter"}
+  /api/company/recruiter/index:
+    get:
+      tags:
+        - company
+      summary: Gets a list of all recruiters and their status
+      description: Generates a list of recruiters.
+      responses:
+        '200':
+          description: Sends email and creates a pending invitation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyRecruiter'
+              
+              
 
   /api/recruiter/update:
     post:
@@ -1354,6 +1409,82 @@ paths:
           content:
             application/json:
               example: {"message": "recruiter not updated"}
+  /api/recruiter/acceptinvitation:
+    post:
+      tags:
+        - recruiter
+      summary: Accepts a recruiter invitation from a company
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+            example: Km0DexMH1QOwNukwioKs28rUKgV19F
+            description: Received in the email of the invitation
+      responses:
+        '200':
+          description: 'invitation was accepted'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyRecruiter'
+                  message:
+                    type: string
+                    example: invitation accepted
+                    description: sucess message
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              example: {"message": "invitation not found"}
+        '500':
+          description: token expired, it lasts for 15 minutes
+          content:
+            application/json:
+              example: {"message": "this invitation expired, request a new one"}
+  /api/recruiter/refuseinvitation:
+    post:
+      tags:
+        - recruiter
+      summary: Refuses a recruiter invitation from a company
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+            example: Km0DexMH1QOwNukwioKs28rUKgV19F
+            description: Received in the email of the invitation
+      responses:
+        '200':
+          description: 'invitation was refused'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyRecruiter'
+                  message:
+                    type: string
+                    example: invitation refused
+                    description: success message
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              example: {"message": "invitation not found"}
+        '500':
+          description: token expired, it lasts for 15 minutes
+          content:
+            application/json:
+              example: {"message": "this invitation expired, request a new one"}
 
 
   /api/joblist/index:
@@ -6685,6 +6816,41 @@ components:
         $anyLanguageIso:
           type: string
           example: 'any language iso | NULL'
+    CompanyRecruiter:
+      type: object
+      properties:
+        company_recruiter_id:
+          type: integer
+          example: 1
+        person_username:
+          type: string
+          example: 'John'
+        person_email:
+          type: string
+          example: 'email@email.com'
+        person_ddi:
+          type: integer
+          example: 1
+        person_phone:
+          type: string
+          example: (44)999204545
+        person_langue:
+          type: integer
+          example: 1
+        recruiter_photo:
+          type: string
+          example: 'base 64 image | Null'
+        status:
+          type: string
+          description: Either 'active','invited' or 'refused'
+          example: 'active'
+        created_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'
+        updated_at:
+          type: string
+          example: '2024-04-23T14:16:25.000000Z'   
+    
     
   securitySchemes:
     bearerAuth:
