@@ -36,6 +36,14 @@ class Controller
         return $professionalObj;
     }
 
+    public function getRecruiterBySession()
+    {
+        $recruiterObj = Session()->get('recruiter');
+        if(!$recruiterObj)
+            return false;
+        return $recruiterObj;
+    }
+
     public function getCurriculumBySession()
     {
         $curriculumObj = Session()->get('curriculum');

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
+use App\Models\CompanyRecruiter;
 use App\Models\Profile;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class RecruiterController extends Controller
@@ -29,5 +31,71 @@ class RecruiterController extends Controller
         if(!$recruiter->save())
             returnResponse(['message' => translate('recruiter not updated')], 500);
         returnResponse($recruiter); 
+    }
+
+    /**
+     * Accepts a company invitation to be a recruiter
+     * Note: Token is only valid for 15 minutes
+     * @param String token
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function acceptInvitation()
+    {
+        $recruiter = $this->getRecruiterBySession();
+        Validator::validateParameters($this->request, [
+            'token' => 'required|string'
+        ]);
+        $companyRecruiter = CompanyRecruiter::where('token', request('token'))->where('recruiter_id', $recruiter->recruiter_id)->first();
+        if(!$companyRecruiter)
+            returnResponse(['message' => translate('invitation not found')], 404);
+        $difference = $companyRecruiter->updated_at->diff(Carbon::now());
+        if($difference->d > 0 || ($difference->d == 0 && $difference->i > 15)){
+            $companyRecruiter->token = null;
+            $companyRecruiter->save();
+            Validator::throwResponse(translate("this invitation expired, request a new one"), 500);
+        }
+        if($companyRecruiter->status == CompanyRecruiter::ACTIVE_RECRUITER)
+            returnResponse(['message' => translate('invitation already accepted')], 500);
+        $companyRecruiter->status = CompanyRecruiter::ACTIVE_RECRUITER;
+        $companyRecruiter->token  = null;
+        if(!$companyRecruiter->save())
+            returnResponse(['message' => translate('invitation not accepted, try again')], 500);
+        returnResponse([
+            'message' => translate('invitation accepted'), 
+            'data' => $companyRecruiter->listByCompany($companyRecruiter->company_id, null, $companyRecruiter->company_recruiter_id)
+        ], 200);
+    }
+
+    /**
+     * Refuses a company invitation to be a recruiter
+     * Note: Token is only valid for 15 minutes
+     * @param String token
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refuseInvitation()
+    {
+        $recruiter = $this->getRecruiterBySession();
+        Validator::validateParameters($this->request, [
+            'token' => 'required|string'
+        ]);
+        $companyRecruiter = CompanyRecruiter::where('token', request('token'))->where('recruiter_id', $recruiter->recruiter_id)->first();
+        if(!$companyRecruiter)
+            returnResponse(['message' => translate('invitation not found')], 404);
+        $difference = $companyRecruiter->updated_at->diff(Carbon::now());
+        if($difference->d > 0 || ($difference->d == 0 && $difference->i > 15)){
+            $companyRecruiter->token = null;
+            $companyRecruiter->save();
+            Validator::throwResponse(translate("this invitation expired, request a new one"), 500);
+        }
+        if($companyRecruiter->status == CompanyRecruiter::REFUSED_INVITATION)
+            returnResponse(['message' => translate('invitation already declined')], 500);
+        $companyRecruiter->status = CompanyRecruiter::REFUSED_INVITATION;
+        $companyRecruiter->token  = null;
+        if(!$companyRecruiter->save())
+            returnResponse(['message' => translate('invitation not declined, try again')], 500);
+        returnResponse([
+            'message' => translate('invitation declined'), 
+            'data' => $companyRecruiter->listByCompany($companyRecruiter->company_id, null, $companyRecruiter->company_recruiter_id)
+        ], 200);
     }
 }

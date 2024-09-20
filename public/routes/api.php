@@ -108,6 +108,8 @@ Route::prefix('company')->group(function ()
     Route::middleware('auth:sanctum')->group(function ()
     {
         Route::post('update', [CompanyController::class, 'update']);
+        Route::post('inviterecruiter', [CompanyController::class, 'inviteRecruiter']);
+        Route::get('recruiter/index', [CompanyController::class, 'listRecuiters']);
         Route::middleware(['companyadmin',  'verify_email'])->group(function ()
         {
             Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
@@ -124,14 +126,14 @@ Route::prefix('company')->group(function ()
             Route::post('untrashjob', [CompanyController::class, 'reactivateJob']);
         });
     });
-
-
     Route::get('{company_slug}', [CompanyController::class, 'show']);
 });
 
 Route::prefix('recruiter')->middleware('auth:sanctum', 'recruiter')->group(function ()
 {
     Route::post('update', [RecruiterController::class, 'update']);
+    Route::post('acceptinvitation', [RecruiterController::class, 'acceptInvitation']);
+    Route::post('refuseinvitation', [RecruiterController::class, 'refuseInvitation']);
 });
 
 Route::prefix('social_network')->group(function ()
