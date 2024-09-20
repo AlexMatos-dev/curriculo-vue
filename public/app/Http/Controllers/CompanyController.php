@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\Company;
+use App\Models\CompanyRecruiter;
 use App\Models\CompanyType;
 use App\Models\JobApplied;
 use App\Models\JobList;
 use App\Models\Person;
 use App\Models\Profile;
+use App\Models\Recruiter;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class CompanyController extends Controller
@@ -217,6 +220,8 @@ class CompanyController extends Controller
      */
     public function manageCompanyRecruiter()
     {
+        returnResponse(['message' => translate('this api is no longer in use')], 400);
+
         $actions = ['add', 'remove', 'list'];
         if(!in_array(request('action'), $actions))
             returnResponse(['message' => translate('invalid action')], 400);
@@ -367,5 +372,66 @@ class CompanyController extends Controller
             'company_id' => [$job->company_id], 
             'status' => [$job::PUBLISHED_JOB, $job::PENDING_JOB, $job::DRAFT_JOB, $job::HIDDEN_JOB]
         ])], 200);
+    }
+
+    /**
+     * Sends an invitation to sent recruiter id
+     * @param Int recruiter_id - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function inviteRecruiter()
+    {
+        Validator::validateParameters($this->request, [
+            'recruiter_id' => 'required|integer'
+        ]);
+        Validator::checkExistanceOnTable([
+            'recruiter_id' => ['object' => Recruiter::class, 'data' => request('recruiter_id')]
+        ]);
+        $person  = Auth::user();
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
+        $recruiterObject = $company->isMyRecruiter(request('recruiter_id'), true);
+        if($recruiterObject){
+            if($recruiterObject->status == CompanyRecruiter::ACTIVE_RECRUITER)
+                Validator::throwResponse(translate("already one of your company's recruiter"), 404);
+            $difference = $recruiterObject->updated_at->diff(Carbon::now());
+            if($difference->d == 0 && $difference->i < 1){
+                $remainingSeconds = 60 - $difference->s;
+                Validator::throwResponse(translate("email was already sent, wait for ") . $remainingSeconds . ' ' . translate('seconds before sending the invitation again'), 500);
+            }
+        }
+        $companyRecruiter = CompanyRecruiter::where('recruiter_id', request('recruiter_id'))->where('company_id', $company->company_id)->first();
+        if(!$companyRecruiter){
+            $companyRecruiter = CompanyRecruiter::create([
+                'company_id' => $company->company_id,
+                'recruiter_id' => request('recruiter_id'),
+                'status' => CompanyRecruiter::INVITED_RECRUITER
+            ]);
+        }
+        if(!$companyRecruiter)
+            Validator::throwResponse(translate('invitation not sent, try again later'), 500);
+        $response = $companyRecruiter->sendInvitation($company);
+        if(!$response)
+            Validator::throwResponse(translate('invitation email not sent, please try again'), 500);
+        $objectInstance = $companyRecruiter;
+        unset($objectInstance->token);
+        returnResponse([
+            "message" => translate('invitation sent'), 
+            "data"    => $objectInstance 
+        ]);
+    }
+
+    /**
+     * Get all recruiters of my company
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listRecuiters()
+    {
+        $person  = Auth::user();
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
+        $companyRecruiterObj = new CompanyRecruiter();
+        $recruiters = $companyRecruiterObj->listByCompany($company->company_id);
+        returnResponse([ 
+            "data" => $recruiters 
+        ]); 
     }
 }

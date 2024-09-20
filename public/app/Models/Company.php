@@ -225,25 +225,25 @@ class Company extends Model
      * Verifies if person_id (RECRUITER) belongs to $this company recruiters
      * @param Int person_id
      * @param Bool fetchObject
-     * @return Bool|Recruiter - If fetchObject == true
+     * @return Bool|CompanyRecruiter - If fetchObject == true
      */
-    public function isMyRecruiter($person_id = null, $fetchObject = false)
+    public function isMyRecruiter($recruiter_id = null, $fetchObject = false)
     {
-        $recruiters = $this->getRecruiters();
-        foreach($recruiters as $recruiter){
-            if($recruiter->person_id == $person_id && $recruiter->company_id == $this->company_id)
-                return $fetchObject ? $recruiter : true;
+        $companyRecruiters = $this->getCompanyRecruiters();
+        foreach($companyRecruiters as $companyRecruiter){
+            if($companyRecruiter->recruiter_id == $recruiter_id && $companyRecruiter->company_id == $this->company_id)
+                return $fetchObject ? $companyRecruiter : true;
         }
         return false;
     }
 
     /**
      * Returns an array with all recruiter of $this company
-     * @return ArrayOfRecruiters
+     * @return ArrayOfCompanyRecruiter
      */
-    public function getRecruiters()
+    public function getCompanyRecruiters()
     {
-        return Recruiter::where('company_id', $this->company_id)->get();
+        return CompanyRecruiter::where('company_id', $this->company_id)->get();
     }
 
     /**
