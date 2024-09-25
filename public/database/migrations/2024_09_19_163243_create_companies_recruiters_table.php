@@ -15,7 +15,6 @@ return new class extends Migration
             $table->bigIncrements('company_recruiter_id', true);
             $table->unsignedBigInteger('recruiter_id');
             $table->unsignedBigInteger('company_id');
-            $table->string('token', 64)->nullable();
             $table->string('status', 20)->nullable();
             $table->timestamps();
         });
