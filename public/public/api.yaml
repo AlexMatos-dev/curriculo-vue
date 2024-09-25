@@ -86,6 +86,8 @@ tags:
     description: Job applied routes and methods
   - name: chat_message
     description: Chat message routes and methods
+  - name: notification
+    description: Notification messages routes and methods
   - name: tag
     description: Tag routes and methods
   - name: job_payment_type
@@ -1414,13 +1416,6 @@ paths:
       tags:
         - recruiter
       summary: Accepts a recruiter invitation from a company
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-            example: Km0DexMH1QOwNukwioKs28rUKgV19F
-            description: Received in the email of the invitation
       responses:
         '200':
           description: 'invitation was accepted'
@@ -1452,13 +1447,6 @@ paths:
       tags:
         - recruiter
       summary: Refuses a recruiter invitation from a company
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-            example: Km0DexMH1QOwNukwioKs28rUKgV19F
-            description: Received in the email of the invitation
       responses:
         '200':
           description: 'invitation was refused'
@@ -1480,11 +1468,41 @@ paths:
           content:
             application/json:
               example: {"message": "invitation not found"}
-        '500':
-          description: token expired, it lasts for 15 minutes
+  /api/recruiter/myinvitations:
+    get:
+      tags:
+        - recruiter
+      summary: Returns an array of invitation (active and inactive)
+      responses:
+        '200':
+          description: 'invitation list gathered'
           content:
             application/json:
-              example: {"message": "this invitation expired, request a new one"}
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CompanyRecruiter'
+                  message:
+                    type: string
+                    example: invitations listed
+                    description: success message
+        '404':
+          description: Invitation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: []
+                  message:
+                    type: string
+                    example: invitations listed
+                    description: success message
 
 
   /api/joblist/index:
@@ -4540,7 +4558,7 @@ paths:
   /api/chat_message/professional/list:
     get:
       tags:
-        - chat message
+        - chat_message
       description: List all messages related to my professional profile
       parameters:
         - name: job_id
@@ -4672,7 +4690,7 @@ paths:
   /api/chat_message/recruiter/sendmessage:
     post:
       tags:
-        - chat message
+        - chat_message
       description: Sends a message as my recruiter profile
       parameters:
         - name: job_id
@@ -4790,6 +4808,55 @@ paths:
           content:
             application/json:
               example: {"message": "chat message not removed"}
+              
+  /api/chat_message/{profileName}/notifications:
+    get:
+      tags:
+        - notification
+      description: List all notifications messages related to send profile
+      parameters:
+        - name: profileName
+          in: path
+          required: true
+          description: Either company or recruiter or profissional
+          example: company
+          schema:
+            type: string
+        - name: message_type
+          in: query
+          required: false
+          description: Either one of the constants (1 to job status changed, 2 to job applied and 3 to company invited recruiter)
+          example: 1
+          schema:
+            type: integer
+        - name: message_read
+          in: query
+          required: false
+          description: Either 1 or 0
+          example: 1
+          schema:
+            type: integer
+        - name: fromDate
+          in: query
+          required: false
+          description: Created notification start date
+          example: 2024-01-01
+          schema:
+            type: string
+        - name: toDate
+          in: query
+          required: false
+          description: Created notification end date
+          example: 2024-01-02
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Array of Notification messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationObject'
   
   /api/company_types/getcompanytypes:
     get:
@@ -6850,6 +6917,49 @@ components:
         updated_at:
           type: string
           example: '2024-04-23T14:16:25.000000Z'   
+    NotificationObject:
+      type: object
+      properties:
+        chat_message_id:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: 'Invitation'
+        sender_message_id:
+          type: integer
+          example: '1'
+        sender_message_table_name:
+          type: string
+          example: either companies, recruiters or professionals
+        receiver_message_id:
+          type: integer
+          example: 1
+        receiver_message_table_name:
+          type: string
+          example: either companies, recruiters or professionals
+        message_read:
+          type: integer
+          example: either 1 or 0
+        message_type:
+          type: integer
+          description: Either one of the constants (1 to job status changed, 2 to job applied and 3 to company invited recruiter)
+          example: 1
+        category:
+          type: string
+          example: 'notification'
+        created_at:
+          type: string
+          example: "2024-09-21T22:15:42.000000Z"
+        updated_at:
+          type: string
+          example: "2024-09-21T22:15:42.000000Z"
+        created_at_localized:
+          type: string
+          example: '21/09/2024 01:01:01'
+        updated_at_localized:
+          type: string
+          example: '21/09/2024 01:01:01' 
     
     
   securitySchemes:

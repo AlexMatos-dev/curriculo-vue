@@ -102,14 +102,42 @@ Route::prefix('professional')->group(function ()
     });
 });
 
+Route::prefix('chat_message')->middleware('auth:sanctum')->group(function (){
+    Route::prefix('company')->group(function ()
+    {
+        Route::middleware(['companyadmin','chat'])->group(function(){
+            Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
+            Route::get('list', [ChatMessageController::class, 'listMessages']);
+            Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
+        });
+    });
+    Route::prefix('recruiter')->group(function ()
+    {
+        Route::middleware(['recruiter','chat'])->group(function(){
+            Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
+            Route::get('list', [ChatMessageController::class, 'listMessages']);
+            Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
+        });
+    });
+    Route::prefix('professional')->group(function ()
+    {
+        Route::middleware(['professional','chat'])->group(function(){
+            Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
+            Route::get('list', [ChatMessageController::class, 'listMessages']);
+            Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
+        });
+    });
+    Route::prefix('{profile_type}')->group(function(){
+        Route::get('notifications', [ChatMessageController::class, 'listNotifications']);
+    });
+});
+
 Route::prefix('company')->group(function ()
 {
     Route::get('index', [CompanyController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function ()
     {
         Route::post('update', [CompanyController::class, 'update']);
-        Route::post('inviterecruiter', [CompanyController::class, 'inviteRecruiter']);
-        Route::get('recruiter/index', [CompanyController::class, 'listRecuiters']);
         Route::middleware(['companyadmin',  'verify_email'])->group(function ()
         {
             Route::post('manageadmin', [CompanyController::class, 'manageCompanyAdmin']);
@@ -124,16 +152,19 @@ Route::prefix('company')->group(function ()
             Route::post('postjob', [CompanyController::class, 'postJob']);
             Route::post('trashjob', [CompanyController::class, 'desactivateJob']);
             Route::post('untrashjob', [CompanyController::class, 'reactivateJob']);
+            Route::post('inviterecruiter', [CompanyController::class, 'inviteRecruiter']);
+            Route::get('recruiter/index', [CompanyController::class, 'listRecuiters']);
         });
     });
     Route::get('{company_slug}', [CompanyController::class, 'show']);
 });
 
-Route::prefix('recruiter')->middleware('auth:sanctum', 'recruiter')->group(function ()
+Route::prefix('recruiter')->middleware(['auth:sanctum', 'recruiter'])->group(function ()
 {
     Route::post('update', [RecruiterController::class, 'update']);
     Route::post('acceptinvitation', [RecruiterController::class, 'acceptInvitation']);
     Route::post('refuseinvitation', [RecruiterController::class, 'refuseInvitation']);
+    Route::get('myinvitations', [RecruiterController::class, 'getInvitations']);
 });
 
 Route::prefix('social_network')->group(function ()
@@ -185,15 +216,15 @@ Route::prefix('job_applied')->middleware(['auth:sanctum', 'verify_email'])->grou
     });
 });
 
-Route::prefix('chat_message')->middleware(['auth:sanctum', 'verify_email'])->group(function ()
-{
-    Route::middleware('chat')->prefix('{prefix}')->group(function ()
-    {
-        Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
-        Route::get('list', [ChatMessageController::class, 'listMessages']);
-        Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
-    });
-});
+// Route::prefix('chat_message')->middleware(['auth:sanctum', 'verify_email'])->group(function ()
+// {
+//     Route::middleware('chat')->prefix('{prefix}')->group(function ()
+//     {
+//         Route::post('sendmessage', [ChatMessageController::class, 'sendMessage']);
+//         Route::get('list', [ChatMessageController::class, 'listMessages']);
+//         Route::delete('remove', [ChatMessageController::class, 'removeMessage']);
+//     });
+// });
 
 Route::prefix('company_types')->group(function ()
 {

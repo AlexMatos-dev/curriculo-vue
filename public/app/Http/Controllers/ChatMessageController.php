@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ModelUtils;
 use App\Helpers\Validator;
 use App\Models\ChatMessage;
 use App\Models\JobList;
+use Illuminate\Support\Facades\Auth;
 
 class ChatMessageController extends Controller
 {
@@ -87,5 +89,47 @@ class ChatMessageController extends Controller
             $results = $chatMessage->listChatMessages($chatMessageObjects, request('job_id'));
         }
         returnResponse($results);
+    }
+
+    /**
+     * List all notifications of logged user sent profile type
+     * @param Integer message_type - one of the constants
+     * @param Integer message_read - 1 to true and 0 to false
+     * @param String fromData
+     * @param String toDate
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listNotifications()
+    {
+        Validator::validateParameters($this->request, [
+            'message_type' => 'integer',
+            'message_read' => 'integer',
+            'fromDate' => 'max:10',
+            'toDate' => 'max:10'
+        ]);
+        $chatMessage = new ChatMessage();
+        $profileTypes = $chatMessage->getProfileTypes();
+        if(!array_key_exists(request('profile_type'), $profileTypes))
+            Validator::throwResponse(translate('invalid profile type'), 400);
+        if(request('message_type') && !array_key_exists(request('message_type'), $chatMessage->getMessageType()))
+            Validator::throwResponse(translate('invalid message type'), 400);
+        $person = Auth::user();
+        $profileObj = $person->getProfile($profileTypes[request('profile_type')]);
+        if(!$profileObj)
+            Validator::throwResponse(translate('profile not found'), 400);
+
+        $profileName = $profileTypes[request('profile_type')];
+        $profileId   = $profileObj->{$profileObj->getKeyName()};
+        $data = $chatMessage->listNotifications($profileName, $profileId, $this->request);
+        $filteredData = [];
+        foreach($data as $chatMessage){
+            $object = $chatMessage;
+            $object->created_at_localized  = ModelUtils::parseDateByLanguage($object->created_at, true);
+            $object->updated_at_localized = ModelUtils::parseDateByLanguage($object->updated_at, true);
+            $filteredData[] = $object;
+        }
+        returnResponse([
+            'data' => $filteredData
+        ]);
     }
 }
