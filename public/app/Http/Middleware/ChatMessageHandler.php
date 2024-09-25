@@ -22,13 +22,14 @@ class ChatMessageHandler extends Controller
     public function handle(Request $request, Closure $next): Response
     {
         $person = Auth::user();
-        if(!in_array(request('prefix'), ['professional', 'company', 'recruiter']))
+        $prefix = str_replace('api/chat_message/', '', $request->route()->getPrefix());
+        if(!in_array($prefix, ['professional', 'company', 'recruiter']))
             Validator::throwResponse('invalid prefix', 500);
-        $profile = $person->getProfile($this->getProfileType(request('prefix')));
+        $profile = $person->getProfile($this->getProfileType($prefix));
         if(!$profile)
-            Validator::throwResponse(request('prefix') . ' ' . translate('profile not found'), 500);
+            Validator::throwResponse($prefix . ' ' . translate('profile not found'), 500);
         Session()->put('chatSender', $profile);
-        Session()->put('chatSenderType', request('prefix'));
+        Session()->put('chatSenderType', $prefix);
         if($this->isReceiverException())
             return $next($request);
         $receiverTypeProfile = $this->getProfileType(request('receiverType'));

@@ -22,8 +22,9 @@ class ChatMessage extends Model
         'person'       => Person::class
     ];
 
-    const TYPE_JOB_STATUS_CHANGED = 1;
-    const TYPE_JOB_APPLIED        = 2;
+    const TYPE_JOB_STATUS_CHANGED                 = 1;
+    const TYPE_JOB_APPLIED                        = 2;
+    const TYPE_INVITATION_TO_BE_COMPANY_RECRUITER = 3;
 
     protected $primaryKey = 'chat_message_id';
     protected $table = 'chat_messages';
@@ -43,7 +44,8 @@ class ChatMessage extends Model
         'chat_attachment_id ',
         'message_read',
         'category',
-        'job_id'
+        'job_id',
+        'message_type'
     ];
 
     public function attachment()
@@ -81,7 +83,8 @@ class ChatMessage extends Model
             'receiver_message_id' => $receiverObject->{$receiverObject->getKeyName()},
             'receiver_message_table_name' => $receiverObject->getTable(),
             'category' => $this::CATEGORY_NOTIFICATION,
-            'job_id' => $job_id
+            'job_id' => $job_id,
+            'message_type' => $messageType
         ]);
     }
 
@@ -105,7 +108,8 @@ class ChatMessage extends Model
             'receiver_message_id' => $receiverObject->{$receiverObject->getKeyName()},
             'receiver_message_table_name' => $receiverObject->getTable(),
             'category' => $this::CATEGORY_MESSAGE,
-            'job_id' => $job_id
+            'job_id' => $job_id,
+            'message_type' => $messageType
         ]);
         if($imageSource){
             $chatAttachment = ChatAttachment::create([
@@ -148,7 +152,8 @@ class ChatMessage extends Model
     {
         $result = [
             $this::TYPE_JOB_STATUS_CHANGED => 'you appliance status has changed',
-            $this::TYPE_JOB_APPLIED        => 'professional applied to one of your job(s)'
+            $this::TYPE_JOB_APPLIED        => 'professional applied to one of your job(s)',
+            $this::TYPE_INVITATION_TO_BE_COMPANY_RECRUITER => 'recruiter invitation'
         ];
         if($id && !array_key_exists($id, $result))
             return false;
@@ -195,5 +200,46 @@ class ChatMessage extends Model
             $messagesByJob[$chatMessage->job_id][] = $chatMessage; 
         }
         return $messagesByJob;
+    }
+
+    /**
+     * Gets profile types of notifications
+     * @return Array
+     */
+    public function getProfileTypes()
+    {
+        return [
+            'company'      => 'companies',
+            'recruiter'    => 'recruiters',
+            'professional' => 'professionals',
+            'person'       => 'persons'
+        ];
+    }
+
+    /**
+     * List all notifications by profile
+     * @param String profileName - either one from fuction getProfileTypes() such as 'companies'
+     * @param Int profileId - logged profile id such as a company_id
+     * @return ChatMessageObjArray
+     */
+    public function listNotifications($profileName, $profileId, $request)
+    {
+        $queryObj = ChatMessage::where('category', ChatMessage::CATEGORY_NOTIFICATION);
+        $queryObj->orWhere(function($query) use ($profileName, $profileId) {
+            $query->where('sender_message_table_name', $profileName)->where('sender_message_id', $profileId);
+        });
+        $queryObj->orWhere(function($query) use ($profileName, $profileId) {
+            $query->where('receiver_message_table_name', $profileName)->where('receiver_message_id', $profileId);
+        });
+        if($request->get('message_type'))
+            $queryObj->where('message_type', $request->get('message_type'));
+        if($request->get('fromData'))
+            $queryObj->where('created_at', '>', $request->get('fromData'));
+        if($request->get('toDate'))
+            $queryObj->where('created_at', '<', $request->get('toDate'));
+        if($request->get('message_read'))
+            $queryObj->where('message_read', (int)$request->get('message_read'));
+        $queryObj->orderBy('updated_at', 'DESC');
+        return $queryObj->get();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
+use App\Models\ChatMessage;
 use App\Models\Company;
 use App\Models\CompanyRecruiter;
 use App\Models\CompanyType;
@@ -391,29 +392,29 @@ class CompanyController extends Controller
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $recruiterObject = $company->isMyRecruiter(request('recruiter_id'), true);
         if($recruiterObject){
-            if($recruiterObject->status == CompanyRecruiter::ACTIVE_RECRUITER)
-                Validator::throwResponse(translate("already one of your company's recruiter"), 404);
-            $difference = $recruiterObject->updated_at->diff(Carbon::now());
-            if($difference->d == 0 && $difference->i < 1){
-                $remainingSeconds = 60 - $difference->s;
-                Validator::throwResponse(translate("email was already sent, wait for ") . $remainingSeconds . ' ' . translate('seconds before sending the invitation again'), 500);
-            }
+            $rules = [
+                CompanyRecruiter::ACTIVE_RECRUITER => translate("already one of your company's recruiter"),
+                CompanyRecruiter::REFUSED_INVITATION => translate("invitation was refused"),
+                CompanyRecruiter::INVITED_RECRUITER => translate("invitation was already sent")
+            ];
+            if(array_key_exists($recruiterObject->status, $rules))
+                Validator::throwResponse($rules[$recruiterObject->status], 500);
+            Validator::throwResponse(translate('a problem occurred, please contact the support'), 500);
         }
-        $companyRecruiter = CompanyRecruiter::where('recruiter_id', request('recruiter_id'))->where('company_id', $company->company_id)->first();
-        if(!$companyRecruiter){
-            $companyRecruiter = CompanyRecruiter::create([
-                'company_id' => $company->company_id,
-                'recruiter_id' => request('recruiter_id'),
-                'status' => CompanyRecruiter::INVITED_RECRUITER
-            ]);
-        }
+        $companyRecruiter = CompanyRecruiter::create([
+            'company_id' => $company->company_id,
+            'recruiter_id' => request('recruiter_id'),
+            'status' => CompanyRecruiter::INVITED_RECRUITER
+        ]);
         if(!$companyRecruiter)
             Validator::throwResponse(translate('invitation not sent, try again later'), 500);
-        $response = $companyRecruiter->sendInvitation($company);
-        if(!$response)
-            Validator::throwResponse(translate('invitation email not sent, please try again'), 500);
+        (new ChatMessage())->makeNotification(
+            Recruiter::find(request('recruiter_id')), 
+            ChatMessage::TYPE_INVITATION_TO_BE_COMPANY_RECRUITER, 
+            '', 
+            $company
+        );
         $objectInstance = $companyRecruiter;
-        unset($objectInstance->token);
         returnResponse([
             "message" => translate('invitation sent'), 
             "data"    => $objectInstance 
@@ -422,14 +423,15 @@ class CompanyController extends Controller
 
     /**
      * Get all recruiters of my company
+     * @param String status - either ('active', 'invited' or 'refused')
      * @return \Illuminate\Http\JsonResponse
      */
-    public function listRecuiters()
+    public function listInvitations()
     {
         $person  = Auth::user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
         $companyRecruiterObj = new CompanyRecruiter();
-        $recruiters = $companyRecruiterObj->listByCompany($company->company_id);
+        $recruiters = $companyRecruiterObj->listByCompany($company->company_id, request('status'));
         returnResponse([ 
             "data" => $recruiters 
         ]); 

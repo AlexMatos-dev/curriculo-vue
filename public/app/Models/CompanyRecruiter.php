@@ -23,7 +23,6 @@ class CompanyRecruiter extends Model
     protected $fillable = [
         'recruiter_id',
         'company_id',
-        'token',
         'status'
     ];
 
@@ -86,15 +85,17 @@ class CompanyRecruiter extends Model
             'persons.person_username', 'persons.person_email', 'persons.person_ddi', 'persons.person_phone', 'persons.person_langue', 'persons.currency',
             'recruiters.recruiter_photo', 'companies_recruiters.company_recruiter_id', 'companies_recruiters.status', 
             'companies_recruiters.created_at', 'companies_recruiters.updated_at'
-        )->where('companies_recruiters.company_id', $companyId)->leftJoin('recruiters', function($join){
-            $join->on('recruiters.recruiter_id', '=', 'companies_recruiters.company_id');
+        )->leftJoin('recruiters', function($join){
+            $join->on('recruiters.recruiter_id', '=', 'companies_recruiters.recruiter_id');
         })->leftJoin('persons', function($join){
             $join->on('persons.person_id', '=', 'recruiters.person_id');
         })->orderBy('companies_recruiters.updated_at', 'DESC');
+        if($companyId)
+            $query->where('companies_recruiters.company_id', $companyId);
         if($perStatus)
             $query->where('companies_recruiters.status', $perStatus);
         if($byCompanyRecruiterId)
-            $query->where('companies_recruiters.company_recruiter_id', $byCompanyRecruiterId);
+            $query->where('companies_recruiters.recruiter_id', $byCompanyRecruiterId);
         $data = $query->get();
         if($byCompanyRecruiterId && count($data) < 1)
             return null;
