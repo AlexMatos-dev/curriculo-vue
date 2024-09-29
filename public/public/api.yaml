@@ -1535,7 +1535,14 @@ paths:
     get:
       tags:
         - recruiter
-      summary: Returns an array of invitation (active and inactive)
+      summary: Returns an array of invitation. The status are 'active','refused' and 'invited'
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            example: invited
+            description: Related to the status
       responses:
         '200':
           description: 'invitation list gathered'
