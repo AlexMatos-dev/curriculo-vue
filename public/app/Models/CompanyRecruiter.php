@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\ModelUtils;
 use App\Helpers\Utils;
 use Illuminate\Database\Eloquent\Model;
 
@@ -102,7 +103,9 @@ class CompanyRecruiter extends Model
         $response = [];
         foreach($data as $recruiter){
             $obj = $recruiter;
-            $obj['recruiter_photo'] = $obj->recruiter_photo ? base64_encode($obj->recruiter_photo) : null;
+            $obj['recruiter_photo'] = $obj->recruiter_photo ? $obj->recruiter_photo : null;
+            $obj['createdAt'] = ModelUtils::parseDateByLanguage($obj->created_at);
+            $obj['updatedAt'] = ModelUtils::parseDateByLanguage($obj->updated_at);
             if($byCompanyRecruiterId)
                 return $obj;
             $response[] = $obj;

@@ -426,7 +426,7 @@ class CompanyController extends Controller
      * @param String status - either ('active', 'invited' or 'refused')
      * @return \Illuminate\Http\JsonResponse
      */
-    public function listInvitations()
+    public function listRecuiters()
     {
         $person  = Auth::user();
         $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
@@ -435,5 +435,50 @@ class CompanyController extends Controller
         returnResponse([ 
             "data" => $recruiters 
         ]); 
+    }
+
+    /**
+     * Performs a free term search
+     * @param String search_type - either ('name','email','all')
+     * @param String term - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function findRecruiter()
+    {
+        Validator::validateParameters($this->request, [
+            'search_type' => 'in:name,email,all',
+            'term'        => 'required'
+        ]);
+        $person  = Auth::user();
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
+        $myRecruiters = $company->getCompanyRecruiters();
+        $recruitersIds = [];
+        foreach($myRecruiters as $recruiter){
+            $recruitersIds[] = $recruiter->recruiter_id;
+        }
+        $recruiters = (new Recruiter())->search(request('search_type', 'all'), request('term'), $recruitersIds);
+        returnResponse([ 
+            "data" => $recruiters 
+        ]); 
+    }
+
+    /**
+     * Removes a company recruiter, either with any status
+     * @param Integer company_recruiter_id - required
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function removeRecruiter()
+    {
+        Validator::validateParameters($this->request, [
+            'company_recruiter_id' => 'integer|required',
+        ]);
+        $person  = Auth::user();
+        $company = Session()->get('company') ? $this->getCompanyBySession() : $person->getProfile(Profile::COMPANY);
+        $companyRecruiter = $company->isMyRecruiter(request('company_recruiter_id'), true);
+        if(!$companyRecruiter)
+            Validator::throwResponse(translate('not a recruiter of your company'), 500);
+        if(!$companyRecruiter->delete())
+            Validator::throwResponse(translate('recruiter not removed'), 500);
+        returnResponse(['message' => translate('recruiter removed')]);
     }
 }
