@@ -1353,6 +1353,36 @@ paths:
           content:
             application/json:
               example: {"message":"already one of your company's recruiter"}
+  /api/company/removerecruiter:
+    delete:
+      tags:
+        - company
+      summary: Removes a recruiter invitation or the relation of the recruiter with the company
+      parameters:
+        - name: company_recruiter_id
+          in: query
+          schema:
+            type: integer
+          description: company recruiter id
+          example: 1
+          required: true
+      responses:
+        '200':
+          description: Removes invitation or relation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: recruiter removed
+                    description: success message
+        '500':
+          description: recruiter or invitation not removed
+          content:
+            application/json:
+              example: {"message":"recruiter not removed"}
   /api/company/recruiter/index:
     get:
       tags:
@@ -1371,6 +1401,39 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/CompanyRecruiter'
+  /api/company/findrecruiter:
+    get:
+      tags:
+        - company
+      summary: Performs a free term search for looking for Recruiters
+      description: Returns a Recruiter list not included of the ones that already are recruiters of your company.
+      parameters:
+        - name: search_type
+          in: query
+          schema:
+            type: string
+          description: either 'name' or 'email' or 'all'
+          example: all
+          required: false
+        - name: term
+          in: query
+          schema:
+            type: string
+          description: the term to look for
+          example: nname of the recruiter
+          required: true
+      responses:
+        '200':
+          description: Returns an array of Recuiter object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RecruiterObject'
               
               
 
@@ -1472,7 +1535,14 @@ paths:
     get:
       tags:
         - recruiter
-      summary: Returns an array of invitation (active and inactive)
+      summary: Returns an array of invitation. The status are 'active','refused' and 'invited'
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            example: invited
+            description: Related to the status
       responses:
         '200':
           description: 'invitation list gathered'

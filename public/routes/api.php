@@ -153,7 +153,9 @@ Route::prefix('company')->group(function ()
             Route::post('trashjob', [CompanyController::class, 'desactivateJob']);
             Route::post('untrashjob', [CompanyController::class, 'reactivateJob']);
             Route::post('inviterecruiter', [CompanyController::class, 'inviteRecruiter']);
+            Route::delete('removerecruiter', [CompanyController::class, 'removeRecruiter']);
             Route::get('recruiter/index', [CompanyController::class, 'listRecuiters']);
+            Route::get('findrecruiter', [CompanyController::class, 'findRecruiter']);
         });
     });
     Route::get('{company_slug}', [CompanyController::class, 'show']);

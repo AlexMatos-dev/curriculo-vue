@@ -77,6 +77,7 @@ class RecruiterController extends Controller
 
     /**
      * Gets a list of this recruiter invitations
+     * @param String status
      * @return \Illuminate\Http\JsonResponse
      */
     public function getInvitations()
