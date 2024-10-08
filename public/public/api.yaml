@@ -502,6 +502,30 @@ paths:
           content:
             application/json:
               example: {"message": "person not updated"}
+  /api/person/createprofile:
+    post:
+      tags:
+        - person
+      summary: Creates a new profile if profile doesn't already exist
+      parameters:
+        - in: query
+          name: profile
+          schema:
+            type: string
+            example: professional
+            description: either 'professional','recruiter' or 'company'
+      responses:
+        '200':
+          description: Updated account profiles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profiles'
+        '500':
+          description: Save error
+          content:
+            application/json:
+              example: {"message": "profile not create | profile alread created"}
 
   /api/professional/find/{professional_slug}:
     get:

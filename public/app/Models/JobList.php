@@ -6,6 +6,7 @@ use App\Helpers\ModelUtils;
 use App\Models\Company;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class JobList extends Model
 {
@@ -51,7 +52,8 @@ class JobList extends Model
         'contact_name',
         'contact_phone',
         'ddi',
-        'contact_website'
+        'contact_website',
+        'job_slug'
     ];
 
     public function company()
@@ -127,7 +129,7 @@ class JobList extends Model
             $query = JobList::select(
                 'jobslist.job_id', 'jobslist.created_at', 'jobslist.job_status', 'jobslist.*', 'company.company_logo', 'company.company_cover_photo', 'company.company_description', 
                 'company.paying', 'jobslist.created_at AS job_created_at', 'jobslist.updated_at AS job_updated_at', 'company.company_type',
-                'company.company_name'
+                'company.company_name', 'company.company_slug'
             )->distinct();
         }else{
             $query = JobList::select(
@@ -1377,5 +1379,42 @@ class JobList extends Model
             return false;
         $jobData = $this->setApplicationsToJobs($data['results']);
         return $jobData[0];
+    }
+
+    /**
+     * Sets uuid to all jobs without it
+     * @return Array
+     */
+    public function syncAndSetJobUuid()
+    {
+        $saved = [];
+        foreach($this->where('job_slug', '')->get() as $job){
+            $job->job_slug = $job->makeSlug();
+            if($job->save())
+                $saved[] = $job->job_id;
+        }
+        return $saved;
+    }
+
+    /**
+     * Returns a slug with sent parameters
+     * @param Integer id - if null gather from $this->job_id
+     * @return String
+     */
+    public function makeSlug($id = null)
+    {
+        $idToUse = $id ? $id : $this->job_id;
+        $uuid = str_replace(['.', '/', ','], '', microtime(true));
+        $slug = Str::slug($uuid);
+        $size = strlen($slug);
+        $randomNumber = rand(0, $size);
+        $uniqueSlug = '';
+        for($i = 0; $i < $size; $i++){
+            if($randomNumber == $i){
+                $uniqueSlug .= $idToUse;
+            }
+            $uniqueSlug .= $slug[$i];
+        }
+        return $uniqueSlug;
     }
 }

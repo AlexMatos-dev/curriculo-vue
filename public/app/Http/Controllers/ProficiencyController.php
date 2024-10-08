@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Validator;
 use App\Models\Proficiency;
+use App\Models\Translation;
 use Illuminate\Http\Request;
 
 class ProficiencyController extends Controller
@@ -21,7 +22,7 @@ class ProficiencyController extends Controller
         $categoryName = $request->query('category', '');
         $proficiencies = Proficiency::leftJoin('translations', function($join){
             $join->on('proficiency.proficiency_level', '=', 'translations.en');
-        });
+        })->where('translations.category', Translation::CATEGORY_PROFICIENCY);
         if($category = Proficiency::getCategory($categoryName)){
             $proficiencies->where('proficiency.category', $category);
         }

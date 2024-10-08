@@ -83,6 +83,7 @@ Route::middleware('auth:sanctum')->group(function ()
 Route::prefix('person')->middleware('auth:sanctum')->group(function ()
 {
     Route::post('update', [PersonController::class, 'update']);
+    Route::post('createprofile', [PersonController::class, 'createProfile']);
 });
 
 Route::prefix('professional')->group(function ()
