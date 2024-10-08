@@ -1,0 +1,158 @@
+[
+    {
+      "en": "Administration, Finance, and Accounting",
+      "pt": "Administração, Finanças e Contabilidade",
+      "es": "Administración, Finanzas y Contabilidad",
+      "category": "finance"
+    },
+    {
+      "en": "Agribusiness and Natural Resources",
+      "pt": "Agronegócio e Recursos Naturais",
+      "es": "Agroindustria y Recursos Naturales",
+      "category": "food and drinks"
+    },
+    {
+      "en": "Food and Gastronomy",
+      "pt": "Alimentação e Gastronomia",
+      "es": "Alimentación y Gastronomía",
+      "category": "food and drinks"
+    },
+    {
+      "en": "Architecture, Urbanism, and Civil Construction",
+      "pt": "Arquitetura, Urbanismo e Construção Civil",
+      "es": "Arquitectura, Urbanismo y Construcción Civil",
+      "category": "construction and civil engineering"
+    },
+    {
+      "en": "Art, Design, and Audiovisual Production",
+      "pt": "Arte, Design e Produção Audiovisual",
+      "es": "Arte, Diseño y Producción Audiovisual",
+      "category": "fashion and design"
+    },
+    {
+      "en": "Science, Research, and Development",
+      "pt": "Ciências, Pesquisa e Desenvolvimento",
+      "es": "Ciencias, Investigación y Desarrollo",
+      "category": "science and research"
+    },
+    {
+      "en": "International Trade and Relations",
+      "pt": "Comércio Exterior e Relações Internacionais",
+      "es": "Comercio Exterior y Relaciones Internacionales",
+      "category": "commerce"
+    },
+    {
+      "en": "Law and Legal Consulting",
+      "pt": "Direito e Consultoria Jurídica",
+      "es": "Derecho y Consultoría Jurídica",
+      "category": "juridic services"
+    },
+    {
+      "en": "Education and Training",
+      "pt": "Educação e Formação",
+      "es": "Educación y Formación",
+      "category": "education"
+    },
+    {
+      "en": "Physical Education, Sports, and Well-being",
+      "pt": "Educação Física, Esporte e Bem-estar",
+      "es": "Educación Física, Deportes y Bienestar",
+      "category": "health"
+    },
+    {
+      "en": "Engineering and Industry",
+      "pt": "Engenharia e Indústria",
+      "es": "Ingeniería e Industria",
+      "category": "industry"
+    },
+    {
+      "en": "Entertainment, Media, and Communication",
+      "pt": "Entretenimento, Mídia e Comunicação",
+      "es": "Entretenimiento, Medios y Comunicación",
+      "category": "entertainment and media"
+    },
+    {
+      "en": "Management and Leadership",
+      "pt": "Gestão e Liderança",
+      "es": "Gestión y Liderazgo",
+      "category": "project management"
+    },
+    {
+      "en": "Hospitality and Tourism",
+      "pt": "Hotelaria e Turismo",
+      "es": "Hotelería y Turismo",
+      "category": "tourism and hospitality"
+    },
+    {
+      "en": "Internet and Technology",
+      "pt": "Internet e Tecnologia",
+      "es": "Internet y Tecnología",
+      "category": "information technology (it)"
+    },
+    {
+      "en": "Logistics, Transportation, and Mobility",
+      "pt": "Logística, Transporte e Mobilidade",
+      "es": "Logística, Transporte y Movilidad",
+      "category": "transportation and logistics"
+    },
+    {
+      "en": "Maintenance and Repairs",
+      "pt": "Manutenção e Reparos",
+      "es": "Mantenimiento y Reparaciones",
+      "category": "maintenance"
+    },
+    {
+      "en": "Marketing, Advertising, and Public Relations",
+      "pt": "Marketing, Publicidade e Relações Públicas",
+      "es": "Marketing, Publicidad y Relaciones Públicas",
+      "category": "marketing and advertising"
+    },
+    {
+      "en": "Environment and Sustainability",
+      "pt": "Meio Ambiente e Sustentabilidade",
+      "es": "Medio Ambiente y Sustentabilidad",
+      "category": "energy and sustainability"
+    },
+    {
+      "en": "Fashion and Beauty",
+      "pt": "Moda e Beleza",
+      "es": "Moda y Belleza",
+      "category": "fashion and design"
+    },
+    {
+      "en": "Human Resources",
+      "pt": "Recursos Humanos",
+      "es": "Recursos Humanos",
+      "category": "human resources (hr)"
+    },
+    {
+      "en": "Health and Medicine",
+      "pt": "Saúde e Medicina",
+      "es": "Salud y Medicina",
+      "category": "health"
+    },
+    {
+      "en": "Information Security and Surveillance",
+      "pt": "Segurança da Informação e Vigilância",
+      "es": "Seguridad de la Información y Vigilancia",
+      "category": "information security"
+    },
+    {
+      "en": "Client Services and Customer Support",
+      "pt": "Serviços e Atendimento ao Cliente",
+      "es": "Servicios y Atención al Cliente",
+      "category": "client services"
+    },
+    {
+      "en": "Telecommunications",
+      "pt": "Telecomunicações",
+      "es": "Telecomunicaciones",
+      "category": "telecommunications"
+    },
+    {
+      "en": "Others",
+      "pt": "Outros",
+      "es": "Otros",
+      "category": "others"
+    }
+  ]

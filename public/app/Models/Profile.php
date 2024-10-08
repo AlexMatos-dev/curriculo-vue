@@ -18,6 +18,11 @@ class Profile extends Model
         'recruiters'    => Recruiter::class,
         'companies'     => Company::class
     ];
+    const PROFILE_TYPE_REFERENCES_SINGULAR = [
+        'professional' => Professional::class,
+        'recruiter'    => Recruiter::class,
+        'company'      => Company::class
+    ];
 
     protected $primaryKey = 'profile_id';
     protected $table = 'profiles';

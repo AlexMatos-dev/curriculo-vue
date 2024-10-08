@@ -116,7 +116,8 @@ class JobListController extends Controller
                 'data' => $results['results'],
                 'curent_page' => $results['page'],
                 'per_page' => $perPage,
-                'last_page' => $results['lastPage']
+                'last_page' => $results['lastPage'],
+                'total' => JobList::where('job_id', '>', 0)->count()
             ]);
         }
         else
@@ -126,7 +127,8 @@ class JobListController extends Controller
                 'data' => $results['results'],
                 'curent_page' => $results['page'],
                 'per_page' => $perPage,
-                'last_page' => $results['lastPage']
+                'last_page' => $results['lastPage'],
+                'total' => JobList::where('job_id', '>', 0)->count()
             ]);
         }
     }
@@ -236,6 +238,8 @@ class JobListController extends Controller
             }
             $data['experience_in_months'] = (int)$data['experience_in_months'];
             $jobList = JobList::create($data);
+            $jobList->job_slug = $jobList->makeSlug();
+            $jobList->save();
             returnResponse(["message" => ucfirst(translate('job created successfully')), 'data' => $jobList->getJobFullData($jobList->job_id, [
                 'company_id' => [$company->company_id],
                 'status' => [$jobList::PUBLISHED_JOB, $jobList::PENDING_JOB, $jobList::DRAFT_JOB, $jobList::HIDDEN_JOB]
