@@ -178,7 +178,8 @@ class CreateFakeJobData extends Seeder
                     'contact_email' => $faker->email(),
                     'contact_name' => $faker->name($gender),
                     'contact_phone' => $faker->phoneNumber(),
-                    'job_status' => JobList::PUBLISHED_JOB
+                    'job_status' => JobList::PUBLISHED_JOB,
+                    'job_slug' => (new JobList())->makeSlug(random_int(1, 1000))
                 ]);
                 if($job){
                     for($in = 0; $in < random_int(2, 10); $in++){
