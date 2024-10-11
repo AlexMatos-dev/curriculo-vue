@@ -805,7 +805,7 @@ class JobList extends Model
                 $val = $months > 1 ? translate('months') : translate('month');
             return "$months $val";
         }else{
-            $val = 'm';
+            $val = 'd';
             if($full)
                 $val = $inDays > 1 ? translate('days') : translate('day');
             return "$inDays $val";
